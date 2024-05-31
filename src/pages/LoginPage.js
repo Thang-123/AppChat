@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
-import { registerUser, loginUser } from './chatSlice';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { loginUser, registerUser } from "./chatSlice";
 
-const RegisterPage = () => {
+const LoginPage = () => {
     const dispatch = useDispatch();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -12,11 +11,11 @@ const RegisterPage = () => {
     const websocket = useRef(null);
     const navigate = useNavigate();
 
-    const handleRegister = () => {
+    const handleLogin = () => {
         websocket.current.send(JSON.stringify({
             action: 'onchat',
             data: {
-                event: 'REGISTER',
+                event: 'LOGIN',
                 data: {
                     user: username,
                     pass: password
@@ -24,8 +23,6 @@ const RegisterPage = () => {
             }
         }));
     };
-
-
 
     useEffect(() => {
         websocket.current = new WebSocket('ws://140.238.54.136:8080/chat/chat');
@@ -56,16 +53,18 @@ const RegisterPage = () => {
                     dispatch(registerUser({ user: username }));
                     navigate('login');
                 } else {
-                    // alert(data.mes);
                     setFeedbackMessage(data.mes);
                 }
                 break;
             case 'LOGIN':
                 if (data.status === 'success') {
+                    // Lưu thông tin đăng nhập vào localStorage
+                    localStorage.setItem('userInfo', JSON.stringify({ username: username, reLoginCode: data.data.RE_LOGIN_CODE }));
+                    // Dispatch action để lưu thông tin đăng nhập vào Redux store
                     dispatch(loginUser({ user: username, reLoginCode: data.data.RE_LOGIN_CODE }));
                     navigate('/');
                 } else {
-                    setFeedbackMessage(data.mes); // Lấy thông báo từ phản hồi và hiển thị
+                    setFeedbackMessage(data.mes);
                 }
                 break;
             default:
@@ -109,7 +108,7 @@ const RegisterPage = () => {
                                     />
                                 </div>
 
-                                <button type="button" onClick={handleRegister} className="btn btn-primary w-100">Register</button>
+                                <button type="button" onClick={handleLogin} className="btn btn-primary w-100">Login</button>
                             </form>
 
                             {feedbackMessage && (
@@ -120,11 +119,11 @@ const RegisterPage = () => {
 
                         </div>
                     </div>
-                    <p className="mt-3 text-center">Already have an account? <Link to="/login" className="text-primary">Sign In</Link></p>
+                    <p className="mt-3 text-center">Don't have an account? <Link to="/register" className="text-primary">Sign Up</Link></p>
                 </div>
             </div>
         </div>
     );
 };
 
-export default RegisterPage;
+export default LoginPage;
