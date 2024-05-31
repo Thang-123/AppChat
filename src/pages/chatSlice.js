@@ -1,4 +1,3 @@
-// src/chatSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const chatSlice = createSlice({
@@ -15,29 +14,19 @@ const chatSlice = createSlice({
         },
         loginUser: (state, action) => {
             state.user = action.payload.user;
-            state.loggedIn = true;
             state.reLoginCode = action.payload.reLoginCode;
+            state.loggedIn = true;
         },
         logoutUser: (state) => {
             state.user = null;
             state.loggedIn = false;
-            state.reLoginCode = null;
         },
         addMessage: (state, action) => {
-            state.messages.push(action.payload.message);
+            state.messages.push(action.payload);
         },
-        setMessages: (state, action) => {
-            state.messages = action.payload.messages;
-        },
+
     },
 });
 
-export const {
-    registerUser,
-    loginUser,
-    logoutUser,
-    addMessage,
-    setMessages,
-} = chatSlice.actions;
-
+export const { registerUser, loginUser, logoutUser, addMessage } = chatSlice.actions;
 export default chatSlice.reducer;

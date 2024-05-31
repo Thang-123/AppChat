@@ -1,17 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
 import { Outlet } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
+import { useSelector } from 'react-redux';
 
-function App() {
+const App = () => {
+    const { loggedIn } = useSelector((state) => state.chat);
+
     return (
-        <>
-            <Toaster/>
-            <main >
-                <Outlet/>
-            </main>
-        </>
+        <div className="app">
+            <Outlet />
+        </div>
     );
-}
+};
 
 export default App;
