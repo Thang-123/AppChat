@@ -17,7 +17,7 @@ const Sidebar = ({ messages }) => (
     </div>
 );
 
-const MessagePage = ({ handleSendMessage, handleUploadImage, logout }) => {
+const MessagePage = ({handleJoinRoom, handleSendMessage, handleUploadImage, logout }) => {
     const [message, setMessage] = useState('');
     const [image, setImage] = useState(null);
 
@@ -69,17 +69,11 @@ const ChatPage = () => {
     const {messages, loggedIn, reLoginCode } = useSelector((state) => state.chat);
 
     useEffect(() => {
-        // Kiểm tra xem có thông tin đăng nhập được lưu không
-        const storedUserInfo = localStorage.getItem('userInfo');
-        if (storedUserInfo) {
-            const { username, reLoginCode } = JSON.parse(storedUserInfo);
-            handleRelogin(username, reLoginCode);
-        }
-
         websocket.current = new WebSocket('ws://140.238.54.136:8080/chat/chat');
 
         websocket.current.onopen = () => {
-            console.log('WebSocket connected');
+            console.log('WebSocket disconnected');
+            handleGetReloginFromStorage()
         };
 
         websocket.current.onmessage = (event) => {
@@ -92,7 +86,7 @@ const ChatPage = () => {
         };
 
         websocket.current.onclose = () => {
-            handleWebSocketClose();
+            console.log('WebSocket disconnected');
         };
 
         return () => {
@@ -100,50 +94,85 @@ const ChatPage = () => {
         };
     }, [dispatch]);
 
-    const handleWebSocketClose = () => {
-        console.log('WebSocket disconnected');
+    const handleGetReloginFromStorage = () => {
+        console.log('WebSocket connected');
         // Kiểm tra xem có thông tin đăng nhập đã được lưu không
-        const storedUserInfo = localStorage.getItem('userInfo');
-        if (storedUserInfo) {
-            const { username, reLoginCode } = JSON.parse(storedUserInfo);
+        const storedUserName = localStorage.getItem('user');
+        const storedLoginCode = localStorage.getItem('code');
+        if (storedUserName && storedLoginCode) {
+            const username = JSON.parse(storedUserName).username;
+            const reLoginCode = JSON.parse(storedLoginCode).reLoginCode;
             handleRelogin(username, reLoginCode);
+        }
+        else{
+            console.log("KO co data trong local storage")
         }
     };
 
-    const handleRelogin = (username, reloginCode) => {
-        // Thực hiện tái đăng nhập
-        if (websocket.current === WebSocket.OPEN) {
+    const handleRelogin = (user, code) => {
+        if (websocket.current.readyState === WebSocket.OPEN) {
             websocket.current.send(JSON.stringify({
                 action: 'onchat',
                 data: {
                     event: 'RE_LOGIN',
                     data: {
-                        user: username,
-                        code: reloginCode
+                        user: user,
+                        code: code,
                     }
                 }
             }));
         } else {
-            console.log('WebSocket is still connecting or closed.');
+            console.log('WebSocket is not open yet.');
         }
-    };
+    }
+    // const handleJoinRoom =(data) => {
+    //     if (websocket.current.readyState === WebSocket.OPEN) {
+    //         if(loggedIn){
+    //             websocket.current.send(JSON.stringify({
+    //                 action: 'onchat',
+    //                 data: {
+    //                     event: 'JOIN_ROOM',
+    //                     data: {
+    //                         name: 'ABC'
+    //                     }
+    //                 }
+    //
+    //         }))
+    //         }
+    //     }
+    // }
+    const getRoomChatMess =(data) => {
+        if (websocket.current.readyState === WebSocket.OPEN) {
+            if(loggedIn){
+                websocket.current.send(JSON.stringify({
+                    action: 'onchat',
+                    data: {
+                        event: 'GET_ROOM_CHAT_MES',
+                        data: {
+                            name: 'ABC',
+                            page: 1
+                        }
+                    }
+
+                }))
+            }
+        }
+    }
     const handleServerResponse = (data) => {
         switch (data.event) {
-            case 'LOGIN':
+            case 'RE_LOGIN':
                 if (data.status === 'success') {
-                    if (loggedIn && reLoginCode) {
-                        handleRelogin(reLoginCode)
-                            .then((user) => {
-                                dispatch(loginUser({ user, reLoginCode: null })); // Clear reLoginCode after successful re-login
-                                // Reconnect WebSocket or handle reconnection logic
-                            })
-                            .catch((error) => {
-                                console.error('Error during re-login:', error);
-                                // Handle re-login error
-                            });
+                    console.log("relogin success");
                     }
-                } else {
-                    // alert(data.mes);
+                break;
+            case 'SEND_CHAT':
+                if (data.status === 'success') {
+                   console.log(data.mes);
+                }
+                break;
+                case 'JOIN_ROOM':
+                if (data.status === 'success') {
+                   console.log(data.mes);
                 }
                 break;
             default:
@@ -151,19 +180,18 @@ const ChatPage = () => {
         }
     };
         const handleSendMessage = () => {
-        if (websocket.current === WebSocket.OPEN) {
+        if (websocket.current.readyState === WebSocket.OPEN) {
             websocket.current.send(JSON.stringify({
                 action: 'onchat',
                 data: {
                     event: 'SEND_CHAT',
                     data: {
                         type: 'room',
-                        to: 'abc',
+                        to: 'ABC',
                         mes: message
                     }
                 }
             }));
-            setMessage('');
         } else {
             console.log('WebSocket is still connecting or closed.');
         }

@@ -12,6 +12,9 @@ const LoginPage = () => {
     const navigate = useNavigate();
 
     const handleLogin = () => {
+        localStorage.clear()
+        console.log('Attempting to login with username:', JSON.stringify({ username }));
+        localStorage.setItem('user', JSON.stringify({ username }));
         websocket.current.send(JSON.stringify({
             action: 'onchat',
             data: {
@@ -58,11 +61,16 @@ const LoginPage = () => {
                 break;
             case 'LOGIN':
                 if (data.status === 'success') {
-                    // Lưu thông tin đăng nhập vào localStorage
-                    localStorage.setItem('userInfo', JSON.stringify({ username: username, reLoginCode: data.data.RE_LOGIN_CODE }));
-                    // Dispatch action để lưu thông tin đăng nhập vào Redux store
-                    dispatch(loginUser({ user: username, reLoginCode: data.data.RE_LOGIN_CODE }));
-                    navigate('/');
+                    const reLoginCode = data.data.RE_LOGIN_CODE;
+                    if (reLoginCode) {
+                        dispatch(loginUser({ user: username, reLoginCode }));
+                        localStorage.setItem('code', JSON.stringify({reLoginCode }));
+                        console.log(localStorage.getItem('user'));
+                        console.log(localStorage.getItem('code'));
+                        navigate('/chat'); // Điều hướng đến trang chat sau khi đăng nhập thành công
+                    } else {
+                        console.error('RE_LOGIN_CODE is missing in the response data.');
+                    }
                 } else {
                     setFeedbackMessage(data.mes);
                 }
@@ -125,5 +133,4 @@ const LoginPage = () => {
         </div>
     );
 };
-
 export default LoginPage;
