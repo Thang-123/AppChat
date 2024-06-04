@@ -5,7 +5,6 @@ import MessagePage from './MessagePage';
 import './Chat.css';
 import {addMessage} from "../pages/chatSlice";
 import {useDispatch, useSelector} from "react-redux";
-import Header from "./Header";
 
 const Chat = () => {
     const dispatch = useDispatch();
@@ -158,7 +157,6 @@ const Chat = () => {
     let handleCreateRoom;
     return (
         <div>
-            <Header onJoinRoom={handleJoinRoom} onCreateRoom={handleCreateRoom} />
             <div className="chat-page d-flex">
                 <div className="sidebar bg-white border-right d-flex flex-column">
                     <Sidebar groups={groups}/>
