@@ -3,64 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {addMessage, loginUser, logoutUser, registerUser} from './chatSlice';
 import axios from 'axios';
 
-const Sidebar = ({ messages }) => (
-    <div className="overflow-auto" style={{ maxHeight: '400px' }}>
-        {messages && messages.map((msg, index) => (
-            <div key={index} className="mb-2">
-                {msg.startsWith('http') ? (
-                    <img src={msg} alt="Uploaded" className="max-w-full" />
-                ) : (
-                    <div className="bg-blue-500 text-white px-4 py-2 rounded">{msg}</div>
-                )}
-            </div>
-        ))}
-    </div>
-);
-
-const MessagePage = ({handleJoinRoom, handleSendMessage, handleUploadImage, logout }) => {
-    const [message, setMessage] = useState('');
-    const [image, setImage] = useState(null);
-
-    return (
-        <div>
-            <div className="input-group mt-3">
-                <input
-                    type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="form-control"
-                    placeholder="Type a message"
-                />
-                <button
-                    onClick={handleSendMessage}
-                    className="btn btn-primary"
-                >
-                    Send
-                </button>
-            </div>
-            <div className="mt-3">
-                <div className="input-group">
-                    <input type="file" onChange={(e) => setImage(e.target.files[0])} className="form-control" />
-                    <button
-                        onClick={handleUploadImage}
-                        className="btn btn-success"
-                    >
-                        Upload Image
-                    </button>
-                </div>
-            </div>
-            <div className="card-footer text-center">
-                <button
-                    onClick={logout}
-                    className="btn btn-danger"
-                >
-                    Logout
-                </button>
-            </div>
-        </div>
-    );
-};
-
 const ChatPage = () => {
     const dispatch = useDispatch();
     const [message, setMessage] = useState('');
@@ -234,7 +176,7 @@ const ChatPage = () => {
             <h2 className="text-center">Chat Room</h2>
             <div className="row mt-4">
                 <div className="col-md-3">
-                    <Sidebar messages={messages} />
+                    {/*<Sidebar messages={messages} />*/}
                 </div>
                 <div className="col-md-9">
                     <MessagePage

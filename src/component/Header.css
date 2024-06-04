@@ -1,0 +1,26 @@
+.app-header .logo img {
+    width: 50px;
+    height: auto;
+}
+
+.app-header .search-bar {
+    flex-grow: 1;
+    margin-right: 15px; /* Adjust the value as needed */
+}
+
+.app-header .search-bar input {
+    width: 20%;
+}
+
+.app-header .btn {
+    margin-right: 15px; /* Adjust the value as needed */
+}
+
+.app-header .user-profile {
+    margin-left: auto;
+}
+
+.app-header .user-profile img {
+    width: 40px;
+    height: 40px;
+}
