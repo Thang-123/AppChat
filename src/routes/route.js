@@ -3,7 +3,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "../App";
 import RegisterPage from "../pages/RegisterPage";
 import LoginPage from "../pages/LoginPage";
-import ChatPage from "../pages/Chat";
+import ChatPage from "../pages/ChatPage";
+import Chat from "../component/Chat";
 import * as PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 
@@ -31,11 +32,13 @@ const Router = () => {
                     element: <AuthLayouts><LoginPage /></AuthLayouts>
                 },{
                     path: "chat",
-                    element: loggedIn ? <AuthLayouts><ChatPage /></AuthLayouts> : <AuthLayouts><LoginPage /></AuthLayouts>
+                    // element: loggedIn ? <AuthLayouts><ChatPage /></AuthLayouts> : <AuthLayouts><LoginPage /></AuthLayouts>
+                    element: loggedIn ? <AuthLayouts><Chat /></AuthLayouts> : <AuthLayouts><LoginPage /></AuthLayouts>
                 },
                 {
                     path: "",
-                    element: loggedIn ? <ChatPage /> : <LoginPage />,
+                    // element: loggedIn ? <ChatPage /> : <LoginPage />,
+                    element: loggedIn ? <Chat /> : <LoginPage />,
                 }
             ]
         }
