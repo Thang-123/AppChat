@@ -1,91 +1,88 @@
-import React, { useEffect, useState } from 'react'
-import { IoSearchOutline } from "react-icons/io5";
+import React, { useEffect, useState } from 'react';
+import { IoSearchOutline, IoClose } from 'react-icons/io5';
 import Loading from './Loading';
 import UserSearchCard from './UserSearchCard';
-import toast from 'react-hot-toast'
-import axios from 'axios';
-import { IoClose } from "react-icons/io5";
+import WebSocketService from '../webSocketService';
 
-const SearchUser = ({onClose}) => {
-    const [searchUser,setSearchUser] = useState([])
-    const [loading,setLoading] = useState(false)
-    const [search,setSearch] = useState("")
+const SearchUser = ({ onClose }) => {
+    const [searchUser, setSearchUser] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState('');
+
+    useEffect(() => {
+        WebSocketService.registerCallback('', (data) =>{
+
+        });
+
+        return () => {
+            WebSocketService.close();
+        };
+    }, []);
 
 
-    const handleSearchUser = async()=>{
-        const URL = `${process.env.REACT_APP_BACKEND_URL}/api/search-user`
-        try {
-            setLoading(true)
-            const response = await axios.post(URL,{
-                search : search
-            })
-            setLoading(false)
 
-            setSearchUser(response.data.data)
+    const handleSearchUser = () => {
 
-        } catch (error) {
-            toast.error(error?.response?.data?.message)
+    };
+
+    useEffect(() => {
+        if (search.trim() !== '') {
+            handleSearchUser();
+        } else {
+            setSearchUser([]);
         }
-    }
+    }, [search]);
 
-    useEffect(()=>{
-        handleSearchUser()
-    },[search])
+    const handleInputChange = (e) => {
+        setSearch(e.target.value);
+    };
 
-    console.log("searchUser",searchUser)
     return (
-        <div className='fixed top-0 bottom-0 left-0 right-0 bg-slate-700 bg-opacity-40 p-2 z-10'>
-            <div className='w-full max-w-lg mx-auto mt-10'>
-                {/**input search user */}
-                <div className='bg-white rounded h-14 overflow-hidden flex '>
-                    <input
-                        type='text'
-                        placeholder='Search user by name, email....'
-                        className='w-full outline-none py-1 h-full px-4'
-                        onChange={(e)=>setSearch(e.target.value)}
-                        value={search}
-                    />
-                    <div className='h-14 w-14 flex justify-center items-center'>
-                        <IoSearchOutline size={25}/>
+        <div className="modal show d-block" tabIndex="-1" role="dialog">
+            <div className="modal-dialog modal-dialog-centered" role="document">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title">Search User</h5>
+                        <button type="button" className="close" onClick={onClose}>
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        {/* Input search user */}
+                        <div className="input-group mb-3">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Search user by name, email..."
+                                onChange={handleInputChange}
+                                value={search}
+                            />
+                            <div className="input-group-append">
+                                <span className="input-group-text">
+                                    <IoSearchOutline size={25} />
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Display search user */}
+                        <div>
+                            {searchUser.length === 0 && !loading && (
+                                <p className="text-center text-muted">No user found!</p>
+                            )}
+
+                            {loading && <Loading />}
+
+                            {searchUser.length !== 0 && !loading && (
+                                searchUser.map((user, index) => (
+                                    <UserSearchCard key={index} user={user} onClose={onClose} />
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
-
-                {/**display search user */}
-                <div className='bg-white mt-2 w-full p-4 rounded'>
-                    {/**no user found */}
-                    {
-                        searchUser.length === 0 && !loading && (
-                            <p className='text-center text-slate-500'>no user found!</p>
-                        )
-                    }
-
-                    {
-                        loading && (
-                            <p><Loading/></p>
-                        )
-                    }
-
-                    {
-                        searchUser.length !==0 && !loading && (
-                            searchUser.map((user,index)=>{
-                                return(
-                                    <UserSearchCard key={user._id} user={user} onClose={onClose}/>
-                                )
-                            })
-                        )
-                    }
-
-
-                </div>
-            </div>
-
-            <div className='absolute top-0 right-0 text-2xl p-2 lg:text-4xl hover:text-white' onClick={onClose}>
-                <button>
-                    <IoClose/>
-                </button>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default SearchUser
+export default SearchUser;

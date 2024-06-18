@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "../App";
 import RegisterPage from "../pages/RegisterPage";
 import LoginPage from "../pages/LoginPage";
-import ChatPage from "../pages/ChatPage";
 import Chat from "../component/Chat";
 import * as PropTypes from "prop-types";
 import { useSelector } from "react-redux";

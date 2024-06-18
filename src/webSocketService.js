@@ -1,58 +1,62 @@
-const WebSocketService = (() => {
-    let socket;
-    let callbacks = {};
+class WebSocketService {
+    constructor() {
+        this.websocket = null;
+        this.callbacks = {};
+    }
 
-    const connect = (url) => {
-        socket = new WebSocket(url);
+    connect(url) {
+        this.websocket = new WebSocket(url);
 
-        socket.onopen = () => {
+        this.websocket.onopen = () => {
             console.log('WebSocket connected');
         };
 
-        socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (callbacks[data.event] && data.status == 'success') {
-                callbacks[data.event](data.data);
-            }else if (callbacks[data.event] && data.status == 'error'){
-                callbacks[data.event](data.mes);
-            }
-        };
+        this.websocket.onmessage = this.handleMessage;
+        this.websocket.onclose = this.handleClose;
+        this.websocket.onerror = this.handleError;
+    }
 
-        socket.onclose = () => {
-            console.log('WebSocket closed');
-        };
+    sendMessage(message) {
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+            this.websocket.send(JSON.stringify(message));
+        } else {
+            console.error('WebSocket not connected or ready');
+        }
+    }
 
-        socket.onerror = (error) => {
-            console.log('WebSocket error', error);
-        };
-    };
+    registerCallback(eventType, callback) {
+        this.callbacks[eventType] = callback;
+    }
 
-    const registerCallback = (event, callback) => {
-        callbacks[event] = callback;
-    };
+    handleMessage = (event) => {
+        const data = JSON.parse(event.data);
+        const eventType = data.event;
 
-    const sendMessage = (message) => {
-        try {
-            socket.send(JSON.stringify(message));
-            // console.log(message)
-        } catch (error) {
-            console.error('Error sending message:', error);
+        if (this.callbacks[eventType]) {
+            this.callbacks[eventType](data);
+        } else {
+            console.warn(`No callback registered for event: ${eventType}`);
         }
     };
 
-    const close = () => {
-        socket.onclose();
-    }
+    handleClose = () => {
+        console.log('WebSocket connection closed');
 
-
-    return {
-        connect,
-        registerCallback,
-        sendMessage,
-        close
+        // Handle reconnection or cleanup logic if needed
+        // Example: Attempt to reconnect in case of unexpected close
+        // this.connect(this.websocket.url);
     };
-})();
 
-export default WebSocketService;
+    handleError = (error) => {
+        console.error('WebSocket error:', error);
+        // Implement custom error handling logic as needed
+    };
 
+    close() {
+        if (this.websocket) {
+            this.websocket.close();
+        }
+    }
+}
 
+export default new WebSocketService();

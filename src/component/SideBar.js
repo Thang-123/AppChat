@@ -5,6 +5,8 @@ import { FaUserPlus, FaImage, FaVideo } from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
 import { FiArrowUpLeft } from 'react-icons/fi';
 import Avatar from './Avatar';
+import SearchUser from "./SearchUser";
+import WebSocketService from "../webSocketService";
 
 const Sidebar = () => {
 
@@ -12,10 +14,32 @@ const Sidebar = () => {
     const [allUser,setAllUser] = useState([])
     const [openSearchUser,setOpenSearchUser] = useState(false)
 
+    useEffect(() => {
+
+        WebSocketService.registerCallback('GET_USER_LIST', (data) =>{
+            console.log('Get user list response:' + data)
+        });
+
+        return () => {
+            WebSocketService.close();
+        };
+    }, []);
+
     function handleLogout() {
 
     }
-
+    const handleGetUserList = () => {
+        WebSocketService.sendMessage({
+            action: 'onchat',
+            data: {
+                event: 'GET_USER_LIST',
+            }
+        });
+    };
+    const handleToggleShowSearchUser= () => {
+        setOpenSearchUser(prev => !prev);
+        console.log("button clicked");
+    };
     return (
         <div className='container-fluid'>
             <div className='row'>
@@ -24,7 +48,10 @@ const Sidebar = () => {
                         <NavLink to="/" className='nav-link w-100 h-12 flex justify-center items-center cursor-pointer hover-bg-slate-200 rounded' title='Chat'>
                             <IoChatbubbleEllipses size={20}/>
                         </NavLink>
-                        <div className='w-100 h-12 flex justify-center items-center cursor-pointer hover-bg-slate-200 rounded' title='Add Friend' onClick={() => setOpenSearchUser(true)}>
+                        <div className='w-100 h-12 flex justify-center items-center cursor-pointer hover-bg-slate-200 rounded' title='Add Friend'  onClick={() => {
+                            handleToggleShowSearchUser();
+                            handleGetUserList();
+                        }}>
                             <FaUserPlus size={20}/>
                         </div>
                     </div>
@@ -96,7 +123,8 @@ const Sidebar = () => {
             {/*{editUserOpen && <EditUserDetails onClose={() => setEditUserOpen(false)} user={user}/>}*/}
 
             {/* Search user */}
-            {/*{openSearchUser && <SearchUser onClose={() => setOpenSearchUser(false)}/>}*/}
+            {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser}/>}
+
         </div>
     );
 };

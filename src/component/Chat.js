@@ -5,6 +5,7 @@ import MessagePage from './MessagePage';
 import './Chat.css';
 import {addMessage} from "../pages/chatSlice";
 import {useDispatch, useSelector} from "react-redux";
+import WebSocketService from "../webSocketService";
 
 const Chat = () => {
     const dispatch = useDispatch();
@@ -24,134 +25,21 @@ const Chat = () => {
         { name: 'Puerto Rico', message: 'I want to ask about the group chat ...', unread: 0, icon: 'icon8.png' },
     ]);
     useEffect(() => {
-        websocket.current = new WebSocket('ws://140.238.54.136:8080/chat/chat');
-
-        websocket.current.onopen = () => {
-            console.log('WebSocket disconnected');
-            handleGetReloginFromStorage()
-        };
-
-        websocket.current.onmessage = (event) => {
-            const parsedData = JSON.parse(event.data);
-            console.log('Received:', parsedData);
-            handleServerResponse(parsedData); // Xử lý phản hồi từ server
-            if (parsedData.event === 'MESSAGE') {
-                dispatch(addMessage({ message: parsedData.message }));
-            }
-        };
-
-        websocket.current.onclose = () => {
-            console.log('WebSocket disconnected');
-        };
-
+        WebSocketService.connect('ws://140.238.54.136:8080/chat/chat')
         return () => {
-            websocket.current.close();
+            WebSocketService.close();
         };
     }, [dispatch]);
 
-    const handleGetReloginFromStorage = () => {
-        console.log('WebSocket connected');
-        // Kiểm tra xem có thông tin đăng nhập đã được lưu không
-        const storedUserName = localStorage.getItem('user');
-        const storedLoginCode = localStorage.getItem('code');
-        if (storedUserName && storedLoginCode) {
-            const username = JSON.parse(storedUserName).username;
-            const reLoginCode = JSON.parse(storedLoginCode).reLoginCode;
-            handleRelogin(username, reLoginCode);
-        }
-        else{
-            console.log("KO co data trong local storage")
-        }
-    };
 
-    const handleRelogin = (user, code) => {
-        if (websocket.current.readyState === WebSocket.OPEN) {
-            websocket.current.send(JSON.stringify({
-                action: 'onchat',
-                data: {
-                    event: 'RE_LOGIN',
-                    data: {
-                        user: user,
-                        code: code,
-                    }
-                }
-            }));
-        } else {
-            console.log('WebSocket is not open yet.');
-        }
-    }
     const handleJoinRoom =(data) => {
-        if (websocket.current.readyState === WebSocket.OPEN) {
-            if(loggedIn){
-                websocket.current.send(JSON.stringify({
-                    action: 'onchat',
-                    data: {
-                        event: 'JOIN_ROOM',
-                        data: {
-                            name: 'ABC'
-                        }
-                    }
 
-            }))
-            }
-        }
     }
     const getRoomChatMess =(data) => {
-        if (websocket.current.readyState === WebSocket.OPEN) {
-            if(loggedIn){
-                websocket.current.send(JSON.stringify({
-                    action: 'onchat',
-                    data: {
-                        event: 'GET_ROOM_CHAT_MES',
-                        data: {
-                            name: 'ABC',
-                            page: 1
-                        }
-                    }
 
-                }))
-            }
-        }
     }
-    const handleServerResponse = (data) => {
-        switch (data.event) {
-            case 'RE_LOGIN':
-                if (data.status === 'success') {
-                    console.log("relogin success");
-                }
-                break;
-            case 'SEND_CHAT':
-                if (data.status === 'success') {
-                    console.log(data.mes);
-                }else{
-                    console.log(data.mes);
-                }
-                break;
-            case 'JOIN_ROOM':
-                if (data.status === 'success') {
-                    console.log(data.mes);
-                }
-                break;
-            default:
-                console.log('Unknown event:', data.event);
-        }
-    };
     const handleSendMessage = () => {
-        if (websocket.current.readyState === WebSocket.OPEN) {
-            websocket.current.send(JSON.stringify({
-                action: 'onchat',
-                data: {
-                    event: 'SEND_CHAT',
-                    data: {
-                        type: 'room',
-                        to: 'ABC',
-                        mes: message
-                    }
-                }
-            }));
-        } else {
-            console.log('WebSocket is still connecting or closed.');
-        }
+
     };
 
     let handleCreateRoom;
