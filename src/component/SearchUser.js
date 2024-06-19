@@ -15,7 +15,7 @@ const SearchUser = ({ onClose }) => {
         });
 
         return () => {
-            WebSocketService.close();
+            // WebSocketService.close();
         };
     }, []);
 

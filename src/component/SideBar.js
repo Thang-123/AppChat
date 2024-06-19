@@ -7,26 +7,48 @@ import { FiArrowUpLeft } from 'react-icons/fi';
 import Avatar from './Avatar';
 import SearchUser from "./SearchUser";
 import WebSocketService from "../webSocketService";
-
+import {loginUser, logoutUser} from "../pages/chatSlice";
+import {useDispatch} from "react-redux";
 const Sidebar = () => {
-
+    const dispatch = useDispatch();
     const [editUserOpen,setEditUserOpen] = useState(false)
     const [allUser,setAllUser] = useState([])
     const [openSearchUser,setOpenSearchUser] = useState(false)
 
-    useEffect(() => {
+    function handleServerResponse(data) {
+        if (!data) {
+            console.log('Invalid response data received');
+            return;
+        }
+        if (data.status === 'success' ) {
+                dispatch(logoutUser());
+        } else {
+            const errorMessage = data.message || ' Logout failed';
+           console.log(errorMessage)
+        }
+    }
 
+    useEffect(() => {
+        WebSocketService.registerCallback('LOGOUT',(data) =>{
+            console.log('Logout response:' + data)
+            handleServerResponse(data)
+        })
         WebSocketService.registerCallback('GET_USER_LIST', (data) =>{
             console.log('Get user list response:' + data)
         });
 
         return () => {
-            WebSocketService.close();
+            // WebSocketService.close();
         };
     }, []);
 
     function handleLogout() {
-
+    WebSocketService.sendMessage({
+    "action": "onchat",
+    "data": {
+        "event": "LOGOUT"
+    }
+})
     }
     const handleGetUserList = () => {
         WebSocketService.sendMessage({

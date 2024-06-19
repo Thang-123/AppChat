@@ -25,9 +25,9 @@ const Chat = () => {
         { name: 'Puerto Rico', message: 'I want to ask about the group chat ...', unread: 0, icon: 'icon8.png' },
     ]);
     useEffect(() => {
-        WebSocketService.connect('ws://140.238.54.136:8080/chat/chat')
+        // WebSocketService.connect('ws://140.238.54.136:8080/chat/chat')
         return () => {
-            WebSocketService.close();
+            // WebSocketService.close();
         };
     }, [dispatch]);
 

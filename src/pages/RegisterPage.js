@@ -18,7 +18,7 @@ const RegisterPage = () => {
         });
 
         return () => {
-            WebSocketService.close();
+            // WebSocketService.close();
         };
     }, []);
 
