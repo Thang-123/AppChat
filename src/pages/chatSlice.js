@@ -3,22 +3,26 @@ import { createSlice } from '@reduxjs/toolkit';
 const chatSlice = createSlice({
     name: 'chat',
     initialState: {
-        user: null,
+        users: [],
         messages: [],
         loggedIn: false,
         reLoginCode: null,
+        currentUser:null,
     },
     reducers: {
+        setUsers: (state, action) => {
+            state.users = action.payload;
+        },
         registerUser: (state, action) => {
-            state.user = action.payload.user;
+            state.users.push(action.payload.user);
         },
         loginUser: (state, action) => {
-            state.user = action.payload.user;
+            state.currentUser = action.payload.user;
             state.reLoginCode = action.payload.reLoginCode;
             state.loggedIn = true;
         },
         logoutUser: (state) => {
-            state.user = null;
+            state.currentUser = null;
             state.loggedIn = false;
         },
         addMessage: (state, action) => {
@@ -28,5 +32,5 @@ const chatSlice = createSlice({
     },
 });
 
-export const { registerUser, loginUser, logoutUser, addMessage } = chatSlice.actions;
+export const {setUsers, registerUser, loginUser, logoutUser, addMessage } = chatSlice.actions;
 export default chatSlice.reducer;

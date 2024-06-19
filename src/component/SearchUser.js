@@ -1,41 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { IoSearchOutline, IoClose } from 'react-icons/io5';
+import React, { useState } from 'react';
+import { IoSearchOutline } from 'react-icons/io5';
 import Loading from './Loading';
 import UserSearchCard from './UserSearchCard';
-import WebSocketService from '../webSocketService';
+import { useSelector } from "react-redux";
 
 const SearchUser = ({ onClose }) => {
-    const [searchUser, setSearchUser] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
-
-    useEffect(() => {
-        WebSocketService.registerCallback('', (data) =>{
-
-        });
-
-        return () => {
-            // WebSocketService.close();
-        };
-    }, []);
-
-
-
-    const handleSearchUser = () => {
-
-    };
-
-    useEffect(() => {
-        if (search.trim() !== '') {
-            handleSearchUser();
-        } else {
-            setSearchUser([]);
-        }
-    }, [search]);
+    const users = useSelector((state) => state.chat.users);
+    const [loading, setLoading] = useState(false);
 
     const handleInputChange = (e) => {
         setSearch(e.target.value);
     };
+
+    const filteredUsers = users.filter(user =>
+        user.name.toLowerCase().includes(search.toLowerCase())
+    );
 
     return (
         <div className="modal show d-block" tabIndex="-1" role="dialog">
@@ -66,14 +46,14 @@ const SearchUser = ({ onClose }) => {
 
                         {/* Display search user */}
                         <div>
-                            {searchUser.length === 0 && !loading && (
+                            {filteredUsers.length === 0 && !loading && (
                                 <p className="text-center text-muted">No user found!</p>
                             )}
 
                             {loading && <Loading />}
 
-                            {searchUser.length !== 0 && !loading && (
-                                searchUser.map((user, index) => (
+                            {filteredUsers.length !== 0 && !loading && (
+                                filteredUsers.map((user, index) => (
                                     <UserSearchCard key={index} user={user} onClose={onClose} />
                                 ))
                             )}
