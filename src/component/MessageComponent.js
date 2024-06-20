@@ -55,7 +55,7 @@ const MessageComponent = ({ messages, onSendMessage, fetchLatestMessages }) => {
             try {
                 const newMessage = {
                     id: Date.now(),
-                    name: 'You',
+                    sentByCurrentUser: true,
                     mes: currentMessage,
                     imageUrl: imageUrl,
                     videoUrl: videoUrl,
@@ -107,7 +107,7 @@ const MessageComponent = ({ messages, onSendMessage, fetchLatestMessages }) => {
                         <div
                             key={index}
                             className={`p-2 rounded max-w-75 ${
-                                msg.name === 'You' ? 'sent-message' : 'received-message'
+                                msg.sentByCurrentUser ? 'sent-message' : 'received-message'
                             }`}
                         >
                             <p className="mb-1">{msg.mes}</p>

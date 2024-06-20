@@ -10,7 +10,7 @@ const Chat = () => {
     const dispatch = useDispatch();
     const [selectedUser, setSelectedUser] = React.useState(null);
     const { messages, loggedIn, reLoginCode, users } = useSelector((state) => state.chat);
-
+    const {loggedInUser} = useSelector((state) => state.chat);
     useEffect(() => {
         WebSocketService.registerCallback('GET_PEOPLE_CHAT_MES', handleGetUserMessagesResponse);
         WebSocketService.registerCallback('GET_USER_LIST', handleGetUserListResponse);
@@ -54,12 +54,13 @@ const Chat = () => {
             console.log('Failed to fetch user messages');
             return;
         }
-        const messages = data.data || [];
-        dispatch(setMessages(messages));
+        const fetchedMessages = data.data || [];
+        dispatch(setMessages(fetchedMessages));
     };
 
     const handleUserClick = (user) => {
         setSelectedUser(user);
+        // console.log(selectedUser.name)
         fetchUserMessages(user);
     };
 

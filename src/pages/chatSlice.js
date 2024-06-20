@@ -10,14 +10,20 @@ const chatSlice = createSlice({
         currentUser: null,
         currentMessage: { text: '', imageUrl: '', videoUrl: '' },
         loading: false,
+        loggedInUser: null,
     },
     reducers: {
         setUsers: (state, action) => {
             state.users = action.payload;
         },
-        setMessages: (state, action) => {
-            state.messages = action.payload;
+        setMessages(state, action) {
+            state.messages = action.payload.map(msg => ({
+                ...msg,
+                sentByCurrentUser: msg.to !== state.loggedInUser.name
+            }));
         },
+        // nếu tin nhắn có thong tin tên ng nhận != tên ng dùng đã đăng nhập nghĩa la
+        // do la tin nhan gui di con lai la tin nhan do ng dung gui di
         registerUser: (state, action) => {
             state.users.push(action.payload.user);
         },
@@ -25,6 +31,7 @@ const chatSlice = createSlice({
             state.currentUser = action.payload.user;
             state.reLoginCode = action.payload.reLoginCode;
             state.loggedIn = true;
+            state.loggedInUser= action.payload.user;
         },
         logoutUser: (state) => {
             state.currentUser = null;
