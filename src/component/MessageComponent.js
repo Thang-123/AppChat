@@ -1,24 +1,26 @@
-import React, { useState, useRef, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './MessagePage.css';
-import { FaAngleLeft, FaImage, FaPlus, FaVideo } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { HiDotsVertical } from "react-icons/hi";
-import { IoClose } from "react-icons/io5";
-import { IoMdSend } from "react-icons/io";
-
-const MessageComponent = ({ messages, onSendMessage }) => {
-    const [loading, setLoading] = useState(false);
-    const [allMessages, setAllMessages] = useState(messages || []);
+import React, { useEffect, useState, useRef } from 'react';
+import { FaAngleLeft, FaImage, FaPlus, FaVideo } from 'react-icons/fa';
+import { HiDotsVertical } from 'react-icons/hi';
+import { IoClose } from 'react-icons/io5';
+import { IoMdSend } from 'react-icons/io';
+import { Link } from 'react-router-dom';
+import './Chat.css';
+const MessageComponent = ({ messages, onSendMessage, fetchLatestMessages }) => {
+    const [currentMessage, setCurrentMessage] = useState('');
+    const [imageUrl, setImageUrl] = useState('');
+    const [videoUrl, setVideoUrl] = useState('');
     const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
-    const [message, setMessage] = useState({ text: '', imageUrl: '', videoUrl: '' });
-    const currentMessage = useRef(null);
+    const messageContainerRef = useRef(null);
 
     useEffect(() => {
-        if (currentMessage.current) {
-            currentMessage.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        scrollToBottom();
+    }, [messages]);
+
+    const scrollToBottom = () => {
+        if (messageContainerRef.current) {
+            messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
         }
-    }, [allMessages]);
+    };
 
     const handleUploadImageVideoOpen = () => {
         setOpenImageVideoUpload(prev => !prev);
@@ -26,44 +28,51 @@ const MessageComponent = ({ messages, onSendMessage }) => {
 
     const handleUploadImage = async (e) => {
         const file = e.target.files[0];
-        // Xử lý upload ảnh
+        // Handle image upload logic
     };
 
     const handleClearUploadImage = () => {
-        setMessage(prev => ({
-            ...prev,
-            imageUrl: ''
-        }));
+        setImageUrl('');
     };
 
     const handleUploadVideo = async (e) => {
         const file = e.target.files[0];
-        // Xử lý upload video
+        // Handle video upload logic
     };
 
     const handleClearUploadVideo = () => {
-        setMessage(prev => ({
-            ...prev,
-            videoUrl: ''
-        }));
+        setVideoUrl('');
     };
 
     const handleOnChange = (e) => {
-        const { value } = e.target;
-        setMessage(prev => ({
-            ...prev,
-            text: value
-        }));
+        setCurrentMessage(e.target.value);
     };
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (message.text || message.imageUrl || message.videoUrl) {
-            // Gọi hàm onSendMessage từ props để gửi tin nhắn
-            onSendMessage(message);
 
-            // Reset message state
-            setMessage({ text: '', imageUrl: '', videoUrl: '' });
+        if (currentMessage.trim() !== '') {
+            try {
+                const newMessage = {
+                    id: Date.now(),
+                    name: 'You',
+                    mes: currentMessage,
+                    imageUrl: imageUrl,
+                    videoUrl: videoUrl,
+                    createAt: new Date().toISOString()
+                };
+
+                await onSendMessage(newMessage);
+
+                setCurrentMessage('');
+                setImageUrl('');
+                setVideoUrl('');
+
+                // Fetch latest messages after sending a message
+                fetchLatestMessages();
+            } catch (error) {
+                console.error('Failed to send message', error);
+            }
         }
     };
 
@@ -87,95 +96,103 @@ const MessageComponent = ({ messages, onSendMessage }) => {
             </header>
 
             {/* Message display */}
-            <section className="overflow-auto bg-light" style={{ height: 'calc(100vh - 128px)' }}>
-                {/* Render messages */}
-                <div className="d-flex flex-column gap-2 py-2 mx-2" ref={currentMessage}>
-                    {allMessages.map((msg, index) => (
-                        <div key={index} className={`p-2 rounded max-w-75`}>
-                            {/* Display message content */}
-                            <p className="mb-1">{msg.text}</p>
-                            <p className="text-right small text-muted">{/* Format timestamp */}</p>
+            <section
+                id="message-container"
+                ref={messageContainerRef}
+                className="overflow-auto bg-light"
+                style={{ height: 'calc(100vh - 128px)' }}
+            >
+                <div className="d-flex flex-column gap-2 py-2 mx-2">
+                    {messages.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`p-2 rounded max-w-75 ${
+                                msg.name === 'You' ? 'sent-message' : 'received-message'
+                            }`}
+                        >
+                            <p className="mb-1">{msg.mes}</p>
+                            {msg.imageUrl && <img src={msg.imageUrl} alt="Sent" className="img-fluid" />}
+                            {msg.videoUrl && <video src={msg.videoUrl} className="img-fluid" controls />}
+                            <p className="text-right small text-muted">
+                                {new Date(msg.createAt).toLocaleString()}
+                            </p>
                         </div>
                     ))}
                 </div>
-
-                {/* Display uploaded image */}
-                {message.imageUrl && (
-                    <div className="position-fixed bottom-0 w-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50">
-                        <div className="position-absolute top-0 right-0 p-2 cursor-pointer text-danger" onClick={handleClearUploadImage}>
-                            <IoClose size={30} />
-                        </div>
-                        <div className="bg-white p-3 rounded">
-                            <img src={message.imageUrl} alt="Uploaded Image" className="img-fluid" />
-                        </div>
-                    </div>
-                )}
-
-                {/* Display uploaded video */}
-                {message.videoUrl && (
-                    <div className="position-fixed bottom-0 w-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50">
-                        <div className="position-absolute top-0 right-0 p-2 cursor-pointer text-danger" onClick={handleClearUploadVideo}>
-                            <IoClose size={30} />
-                        </div>
-                        <div className="bg-white p-3 rounded">
-                            <video src={message.videoUrl} className="img-fluid" controls />
-                        </div>
-                    </div>
-                )}
-
-                {/* Loading indicator */}
-                {loading && (
-                    <div className="position-fixed bottom-0 w-100 d-flex justify-content-center align-items-center">
-                        {/* Loading component */}
-                    </div>
-                )}
             </section>
+
+            {/* Display uploaded image */}
+            {imageUrl && (
+                <div className="position-fixed bottom-0 w-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50">
+                    <div
+                        className="position-absolute top-0 right-0 p-2 cursor-pointer text-danger"
+                        onClick={handleClearUploadImage}
+                    >
+                        <IoClose size={30} />
+                    </div>
+                    <div className="bg-white p-3 rounded">
+                        <img src={imageUrl} alt="Uploaded" className="img-fluid" />
+                    </div>
+                </div>
+            )}
+
+            {/* Display uploaded video */}
+            {videoUrl && (
+                <div className="position-fixed bottom-0 w-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50">
+                    <div
+                        className="position-absolute top-0 right-0 p-2 cursor-pointer text-danger"
+                        onClick={handleClearUploadVideo}
+                    >
+                        <IoClose size={30} />
+                    </div>
+                    <div className="bg-white p-3 rounded">
+                        <video src={videoUrl} className="img-fluid" controls />
+                    </div>
+                </div>
+            )}
 
             {/* Message input */}
-            <section className="bg-white d-flex align-items-center p-3 border-top">
-                <div className="position-relative">
-                    <button onClick={handleUploadImageVideoOpen} className="btn btn-light rounded-circle">
-                        <FaPlus size={20} />
-                    </button>
-
-                    {/* Image and video upload */}
-                    {openImageVideoUpload && (
-                        <div className="position-absolute bottom-100 bg-white shadow rounded p-2">
-                            <form>
-                                <label htmlFor="uploadImage" className="d-flex align-items-center p-2 cursor-pointer">
-                                    <div className="text-primary mr-2">
-                                        <FaImage size={18} />
-                                    </div>
-                                    <p className="mb-0">Image</p>
-                                </label>
-                                <label htmlFor="uploadVideo" className="d-flex align-items-center p-2 cursor-pointer">
-                                    <div className="text-purple mr-2">
-                                        <FaVideo size={18} />
-                                    </div>
-                                    <p className="mb-0">Video</p>
-                                </label>
-
-                                <input type="file" id="uploadImage" onChange={handleUploadImage} className="d-none" />
-                                <input type="file" id="uploadVideo" onChange={handleUploadVideo} className="d-none" />
-                            </form>
-                        </div>
-                    )}
+            <footer className="bg-white d-flex justify-content-between align-items-center p-3 border-top">
+                {/* Attach media */}
+                <div className="d-flex gap-3">
+                    <label htmlFor="upload-image" className="btn btn-link text-primary m-0">
+                        <FaImage size={20} />
+                    </label>
+                    <input
+                        type="file"
+                        id="upload-image"
+                        accept="image/*"
+                        className="d-none"
+                        onChange={handleUploadImage}
+                    />
+                    <label htmlFor="upload-video" className="btn btn-link text-primary m-0">
+                        <FaVideo size={20} />
+                    </label>
+                    <input
+                        type="file"
+                        id="upload-video"
+                        accept="video/*"
+                        className="d-none"
+                        onChange={handleUploadVideo}
+                    />
                 </div>
 
-                {/* Message input box */}
-                <form className="flex-grow-1 d-flex align-items-center gap-2 ml-2" onSubmit={handleSendMessage}>
-                    <input
-                        type="text"
-                        placeholder="Type here message..."
-                        className="form-control flex-grow-1"
-                        value={message.text}
-                        onChange={handleOnChange}
-                    />
-                    <button type="submit" className="btn btn-link text-primary p-0">
-                        <IoMdSend size={28} />
-                    </button>
+                {/* Send message */}
+                <form onSubmit={handleSendMessage} className="flex-grow-1 ms-3">
+                    <div className="input-group">
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Type a message..."
+                            value={currentMessage}
+                            onChange={handleOnChange}
+                        />
+                        <button type="submit" className="btn btn-primary">
+                            <IoMdSend size={25} />
+                        </button>
+                    </div>
                 </form>
-            </section>
+            </footer>
         </div>
     );
 };

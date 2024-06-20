@@ -7,13 +7,15 @@ const chatSlice = createSlice({
         messages: [],
         loggedIn: false,
         reLoginCode: null,
-        currentUser:null,
+        currentUser: null,
+        currentMessage: { text: '', imageUrl: '', videoUrl: '' },
+        loading: false,
     },
     reducers: {
         setUsers: (state, action) => {
             state.users = action.payload;
         },
-        setMessages:(state,action) =>{
+        setMessages: (state, action) => {
             state.messages = action.payload;
         },
         registerUser: (state, action) => {
@@ -31,9 +33,24 @@ const chatSlice = createSlice({
         addMessage: (state, action) => {
             state.messages.push(action.payload);
         },
-
+        setMessage: (state, action) => {
+            state.currentMessage = action.payload;
+        },
+        setLoading: (state, action) => {
+            state.loading = action.payload;
+        },
     },
 });
 
-export const {setUsers, setMessages, registerUser, loginUser, logoutUser, addMessage } = chatSlice.actions;
+export const {
+    setMessage,
+    setLoading,
+    setUsers,
+    setMessages,
+    registerUser,
+    loginUser,
+    logoutUser,
+    addMessage,
+} = chatSlice.actions;
+
 export default chatSlice.reducer;

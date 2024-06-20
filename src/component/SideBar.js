@@ -64,7 +64,7 @@ const Sidebar = ({ onUserClick,onLogout,onGetUserList,onJoinRoom,users }) => {
                                 <div
                                     key={index}
                                     className='nav-link flex align-items-center gap-2 py-3 px-2 border hover-border-primary rounded hover-bg-slate-100 cursor-pointer'
-                                    onClick={() => onUserClick(user)}  // Handle user click
+                                    onClick={() => onUserClick(user)}
                                 >
                                     <div>
                                         {/*<Avatar width={40} height={40} name={user.name} />*/}

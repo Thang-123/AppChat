@@ -74,4 +74,15 @@
     outline: none;
 }
 
+.sent-message {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end;
+}
+
+.received-message {
+    background-color: #6c757d;
+    color: white;
+    align-self: flex-start;
+}
 
