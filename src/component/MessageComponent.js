@@ -7,9 +7,9 @@ import { HiDotsVertical } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { IoMdSend } from "react-icons/io";
 
-const MessagePage = ({ messages, onSendMessage,upLoadFile }) => {
+const MessageComponent = ({ messages, onSendMessage }) => {
     const [loading, setLoading] = useState(false);
-    const [allMessage, setAllMessage] = useState(messages || []);
+    const [allMessages, setAllMessages] = useState(messages || []);
     const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
     const [message, setMessage] = useState({ text: '', imageUrl: '', videoUrl: '' });
     const currentMessage = useRef(null);
@@ -18,24 +18,15 @@ const MessagePage = ({ messages, onSendMessage,upLoadFile }) => {
         if (currentMessage.current) {
             currentMessage.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
-    }, [allMessage]);
+    }, [allMessages]);
 
     const handleUploadImageVideoOpen = () => {
         setOpenImageVideoUpload(prev => !prev);
     };
 
     const handleUploadImage = async (e) => {
-        // const file = e.target.files[0];
-        //
-        // setLoading(true);
-        // const uploadPhoto = await uploadFile(file); // Add your uploadFile function
-        // setLoading(false);
-        // setOpenImageVideoUpload(false);
-        //
-        // setMessage(prev => ({
-        //     ...prev,
-        //     imageUrl: uploadPhoto.url
-        // }));
+        const file = e.target.files[0];
+        // Xử lý upload ảnh
     };
 
     const handleClearUploadImage = () => {
@@ -46,17 +37,8 @@ const MessagePage = ({ messages, onSendMessage,upLoadFile }) => {
     };
 
     const handleUploadVideo = async (e) => {
-        // const file = e.target.files[0];
-        //
-        // setLoading(true);
-        // const uploadPhoto = await uploadFile(file); // Add your uploadFile function
-        // setLoading(false);
-        // setOpenImageVideoUpload(false);
-        //
-        // setMessage(prev => ({
-        //     ...prev,
-        //     videoUrl: uploadPhoto.url
-        // }));
+        const file = e.target.files[0];
+        // Xử lý upload video
     };
 
     const handleClearUploadVideo = () => {
@@ -77,33 +59,25 @@ const MessagePage = ({ messages, onSendMessage,upLoadFile }) => {
     const handleSendMessage = (e) => {
         e.preventDefault();
         if (message.text || message.imageUrl || message.videoUrl) {
+            // Gọi hàm onSendMessage từ props để gửi tin nhắn
             onSendMessage(message);
+
+            // Reset message state
             setMessage({ text: '', imageUrl: '', videoUrl: '' });
         }
     };
 
     return (
         <div className="bg-no-repeat bg-cover">
+            {/* Header */}
             <header className="sticky-top bg-white d-flex justify-content-between align-items-center p-3 border-bottom">
                 <div className="d-flex align-items-center gap-4">
                     <Link to="/" className="d-lg-none">
                         <FaAngleLeft size={25} />
                     </Link>
                     <div>
-                        {/* <Avatar
-                            width={50}
-                            height={50}
-                            imageUrl={dataUser?.profile_pic}
-                            name={dataUser?.name}
-                            userId={dataUser?._id}
-                        /> */}
+                        {/* Avatar and user details */}
                     </div>
-                    {/* <div>
-                        <h3 className="font-weight-semibold h5 my-0 text-truncate">{dataUser?.name}</h3>
-                        <p className="my-0 small">
-                            {dataUser?.online ? <span className="text-primary">online</span> : <span className="text-muted">offline</span>}
-                        </p>
-                    </div> */}
                 </div>
                 <div>
                     <button className="btn btn-link text-dark p-0">
@@ -112,60 +86,59 @@ const MessagePage = ({ messages, onSendMessage,upLoadFile }) => {
                 </div>
             </header>
 
-            {/* Show all messages */}
+            {/* Message display */}
             <section className="overflow-auto bg-light" style={{ height: 'calc(100vh - 128px)' }}>
-                {/*<div className="d-flex flex-column gap-2 py-2 mx-2" ref={currentMessage}>*/}
-                {/*    {allMessage.map((msg, index) => (*/}
-                {/*        <div key={index} className={`p-2 rounded max-w-75 ${user._id === msg?.msgByUserId ? 'ml-auto bg-info' : 'bg-white'}`}>*/}
-                {/*            <div className="w-100 position-relative">*/}
-                {/*                {msg?.imageUrl && <img src={msg.imageUrl} className="w-100 h-auto object-fit-contain" alt="Message" />}*/}
-                {/*                {msg?.videoUrl && <video src={msg.videoUrl} className="w-100 h-auto object-fit-contain" controls />}*/}
-                {/*            </div>*/}
-                {/*            <p className="mb-1">{msg.text}</p>*/}
-                {/*            <p className="text-right small text-muted">{moment(msg.createdAt).format('hh:mm')}</p>*/}
-                {/*        </div>*/}
-                {/*    ))}*/}
-                {/*</div>*/}
+                {/* Render messages */}
+                <div className="d-flex flex-column gap-2 py-2 mx-2" ref={currentMessage}>
+                    {allMessages.map((msg, index) => (
+                        <div key={index} className={`p-2 rounded max-w-75`}>
+                            {/* Display message content */}
+                            <p className="mb-1">{msg.text}</p>
+                            <p className="text-right small text-muted">{/* Format timestamp */}</p>
+                        </div>
+                    ))}
+                </div>
 
-                {/* Upload Image display */}
+                {/* Display uploaded image */}
                 {message.imageUrl && (
                     <div className="position-fixed bottom-0 w-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50">
                         <div className="position-absolute top-0 right-0 p-2 cursor-pointer text-danger" onClick={handleClearUploadImage}>
                             <IoClose size={30} />
                         </div>
                         <div className="bg-white p-3 rounded">
-                            <img src={message.imageUrl} alt="uploadImage" className="img-fluid" />
+                            <img src={message.imageUrl} alt="Uploaded Image" className="img-fluid" />
                         </div>
                     </div>
                 )}
 
-                {/* Upload Video display */}
+                {/* Display uploaded video */}
                 {message.videoUrl && (
                     <div className="position-fixed bottom-0 w-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50">
                         <div className="position-absolute top-0 right-0 p-2 cursor-pointer text-danger" onClick={handleClearUploadVideo}>
                             <IoClose size={30} />
                         </div>
                         <div className="bg-white p-3 rounded">
-                            <video src={message.videoUrl} className="img-fluid" controls muted autoPlay />
+                            <video src={message.videoUrl} className="img-fluid" controls />
                         </div>
                     </div>
                 )}
 
+                {/* Loading indicator */}
                 {loading && (
                     <div className="position-fixed bottom-0 w-100 d-flex justify-content-center align-items-center">
-                        {/*<Loading />*/}
+                        {/* Loading component */}
                     </div>
                 )}
             </section>
 
-            {/* Send message */}
+            {/* Message input */}
             <section className="bg-white d-flex align-items-center p-3 border-top">
                 <div className="position-relative">
                     <button onClick={handleUploadImageVideoOpen} className="btn btn-light rounded-circle">
                         <FaPlus size={20} />
                     </button>
 
-                    {/* Video and image upload */}
+                    {/* Image and video upload */}
                     {openImageVideoUpload && (
                         <div className="position-absolute bottom-100 bg-white shadow rounded p-2">
                             <form>
@@ -189,7 +162,7 @@ const MessagePage = ({ messages, onSendMessage,upLoadFile }) => {
                     )}
                 </div>
 
-                {/* Input box */}
+                {/* Message input box */}
                 <form className="flex-grow-1 d-flex align-items-center gap-2 ml-2" onSubmit={handleSendMessage}>
                     <input
                         type="text"
@@ -198,7 +171,7 @@ const MessagePage = ({ messages, onSendMessage,upLoadFile }) => {
                         value={message.text}
                         onChange={handleOnChange}
                     />
-                    <button className="btn btn-link text-primary p-0">
+                    <button type="submit" className="btn btn-link text-primary p-0">
                         <IoMdSend size={28} />
                     </button>
                 </form>
@@ -207,4 +180,4 @@ const MessagePage = ({ messages, onSendMessage,upLoadFile }) => {
     );
 };
 
-export default MessagePage;
+export default MessageComponent;

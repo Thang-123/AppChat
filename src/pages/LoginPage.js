@@ -28,13 +28,12 @@ const LoginPage = () => {
     };
 
     useEffect(() => {
-        WebSocketService.connect('ws://140.238.54.136:8080/chat/chat');
+        // WebSocketService.connect('ws://140.238.54.136:8080/chat/chat');
         WebSocketService.registerCallback('LOGIN',(data) => {
             console.log('Login response:', data);
             handleServerResponse(data);
         });
         return () => {
-            // WebSocketService.close();
         };
     }, [dispatch]);
     const handleServerResponse = (data) => {

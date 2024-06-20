@@ -13,6 +13,9 @@ const chatSlice = createSlice({
         setUsers: (state, action) => {
             state.users = action.payload;
         },
+        setMessages:(state,action) =>{
+            state.messages = action.payload;
+        },
         registerUser: (state, action) => {
             state.users.push(action.payload.user);
         },
@@ -32,5 +35,5 @@ const chatSlice = createSlice({
     },
 });
 
-export const {setUsers, registerUser, loginUser, logoutUser, addMessage } = chatSlice.actions;
+export const {setUsers, setMessages, registerUser, loginUser, logoutUser, addMessage } = chatSlice.actions;
 export default chatSlice.reducer;

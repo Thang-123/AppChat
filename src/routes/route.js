@@ -36,7 +36,6 @@ const Router = () => {
                 },
                 {
                     path: "",
-                    // element: loggedIn ? <ChatPage /> : <LoginPage />,
                     element: loggedIn ? <Chat /> : <LoginPage />,
                 }
             ]

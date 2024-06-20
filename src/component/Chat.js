@@ -1,61 +1,151 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import Sidebar from './SideBar';
-import MessagePage from './MessagePage';
+import MessageComponent from './MessageComponent';
 import './Chat.css';
-import {addMessage} from "../pages/chatSlice";
-import {useDispatch, useSelector} from "react-redux";
+import {addMessage, logoutUser, setMessages, setUsers} from "../pages/chatSlice";
+import { useDispatch, useSelector } from "react-redux";
 import WebSocketService from "../webSocketService";
+import webSocketService from "../webSocketService";
 
 const Chat = () => {
     const dispatch = useDispatch();
     const [message, setMessage] = useState('');
-    const [image, setImage] = useState(null);
-    const websocket = useRef(null);
-    const {messages, loggedIn, reLoginCode } = useSelector((state) => state.chat);
-
-    const [groups, setGroups] = useState([
-        { name: 'Picnic', message: 'I want to ask about the group chat ...', unread: 1, icon: 'icon1.png' },
-        { name: 'Health', message: 'I want to ask about the group chat ...', unread: 3, icon: 'icon2.png' },
-        { name: 'Treat Yourself', message: 'I want to ask about the group chat ...', unread: 2, icon: 'icon3.png' },
-        { name: 'Atabey Tours', message: 'I want to ask about the group chat ...', unread: 0, icon: 'icon4.png' },
-        { name: 'Book Club', message: 'I want to ask about the group chat ...', unread: 0, icon: 'icon5.png' },
-        { name: 'Farm ', message: 'I want to ask about the group chat ...', unread: 0, icon: 'icon6.png' },
-        { name: 'San Juan', message: 'I want to ask about the group chat ...', unread: 0, icon: 'icon7.png' },
-        { name: 'Puerto Rico', message: 'I want to ask about the group chat ...', unread: 0, icon: 'icon8.png' },
-    ]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const { messages, loggedIn, reLoginCode } = useSelector((state) => state.chat);
+    const users = useSelector((state) => state.chat.users);
     useEffect(() => {
-        // WebSocketService.connect('ws://140.238.54.136:8080/chat/chat')
+        // WebSocketService.connect('ws://140.238.54.136:8080/chat/chat');
+        WebSocketService.registerCallback('GET_PEOPLE_CHAT_MES', (data) => {
+            handleGetUserMessagesResponse(data);
+        });
+        WebSocketService.registerCallback('MESSAGE', (data) => {
+            if (data.status === 'success') {
+                dispatch(addMessage(data.mes));
+            }
+            console.log(data.mes)
+        });
+        WebSocketService.registerCallback('GET_USER_LIST', (data) => {
+            handleGetUserListResponse(data);
+        });
+        WebSocketService.registerCallback('LOGOUT', (data) => {
+            handleLogoutResponse(data);
+        });
+
+        handleGetUserList();
         return () => {
-            // WebSocketService.close();
         };
     }, [dispatch]);
-
-
-    const handleJoinRoom =(data) => {
-
+    function handleLogoutResponse(data) {
+        if (!data) {
+            console.log('Invalid response data received');
+            return;
+        }
+        if (data.status === 'success') {
+            dispatch(logoutUser());
+        } else {
+            const errorMessage = data.message || 'Logout failed';
+            console.log(errorMessage);
+        }
     }
-    const getRoomChatMess =(data) => {
-
+    function handleGetUserListResponse(data){
+        if (!data || data.status !== 'success') {
+            console.log('Failed to fetch user list');
+            return;
+        }
+        const users = data.data || [];
+        dispatch(setUsers(users));
+        console.log(users)
     }
-    const handleSendMessage = () => {
-
+    function handleGetUserMessagesResponse(data){
+        if (!data || data.status !== 'success') {
+            console.log('Failed to fetch user list');
+            return;
+        }
+        const messages = data.data || [];
+        dispatch(setMessages(messages));
+        console.log(data.data)
+    }
+    const handleUserClick = (user) => {
+        setSelectedUser(user);
+        WebSocketService.sendMessage({
+            "action": "onchat",
+            "data": {
+                "event": "GET_PEOPLE_CHAT_MES",
+                "data": {
+                    "name": user.name,
+                    "page":1
+                }
+            }
+        });
     };
 
-    let handleCreateRoom;
+    const handleSendMessage = () => {
+        if (message.trim() !== '' && selectedUser) {
+            const newMessage = {
+                id: Date.now(),
+                name: 'You',
+                type: 0,
+                to: selectedUser.name,
+                mes: message,
+                createAt: new Date().toISOString()
+            };
+            WebSocketService.sendMessage({
+                action: 'onchat',
+                data: {
+                    event: 'SEND_CHAT',
+                    data: {
+                        type: newMessage.type,
+                        to: newMessage.to,
+                        mes: newMessage.mes
+                    }
+                }
+            });
+        }
+    }
+    const handleLogOut = () => {
+        webSocketService.sendMessage({
+            "action": "onchat",
+            "data": {
+            "event": "LOGOUT"
+        }
+        })
+    };
+    const handleJoinRoom =() =>{
+
+    };
+    const handleGetUserList =() =>{
+       WebSocketService.sendMessage({
+           "action": "onchat",
+           "data": {
+               "event": "GET_USER_LIST"
+           }
+       });
+       }
     return (
         <div>
             <div className="chat-page d-flex">
                 <div className="sidebar bg-white border-right d-flex flex-column">
-                    <Sidebar groups={groups}/>
+                    <Sidebar onUserClick={handleUserClick}
+                             onLogout = {handleLogOut}
+                             onJoinRoom={handleJoinRoom}
+                             onGetUserList={handleGetUserList}
+                             users={users}
+                    />
                 </div>
                 <div className="chat-content flex-grow-1 d-flex flex-column">
-                    <MessagePage messages={messages} onSendMessage={handleSendMessage}/>
+                    {selectedUser && (
+                        <MessageComponent
+                            selectedUser={selectedUser}
+                            messages={messages}
+                            onSendMessage={handleSendMessage}
+                            message={message}
+                            setMessage={setMessage}
+                        />
+                    )}
                 </div>
             </div>
-
         </div>
-
     );
 };
-export default Chat
+
+export default Chat;
