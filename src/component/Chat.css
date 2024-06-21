@@ -117,3 +117,191 @@
     max-width: 100%;
     max-height: 300px;
 }
+/* SearchUser.css */
+.modal-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    overflow: hidden; /* Ẩn thanh cuộn của modal container */
+}
+
+.modal-dialog {
+    width: 400px;
+    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    width: 80%;
+    position: relative;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+    font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-icon {
+    background: none;
+    border: none;
+    position: absolute;
+    right: 0;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-icon:hover {
+    color: #000;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #555;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+}
+
+.close-button:hover {
+    color: #000;
+}
+
+.modal-body {
+    /*padding: 1rem;*/
+    padding-top: 3rem;
+    margin: 1rem;
+    flex: 1;
+    overflow: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.modal-body::-webkit-scrollbar {
+    display: none;
+}
+
+.user-list {
+    max-height: calc(100% - 4rem);
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.user-list::-webkit-scrollbar {
+    display: none;
+}
+
+.no-user-found {
+    text-align: center;
+    color: #999;
+    font-size: 1rem;
+    margin: 1rem 0;
+}
+/* UserCard.css */
+
+.card-link {
+    text-decoration: none; /* Loại bỏ underline của link */
+    color: inherit; /* Giữ nguyên màu chữ khi là link */
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.user-avatar {
+    margin-right: 1rem;
+}
+
+.user-avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-email {
+    margin: 0;
+    color: #777;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 576px) {
+    .user-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .user-avatar {
+        margin-bottom: 1rem;
+    }
+}

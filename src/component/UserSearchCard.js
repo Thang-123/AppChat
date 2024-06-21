@@ -1,16 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const UserSearchCard = ({ user, onClose }) => {
+const UserSearchCard = ({ user, onUserClick }) => {
+    const handleClick = () => {
+        onUserClick(user._id);
+    };
     return (
-        <Link to={`/${user._id}`} onClick={onClose} className="card-link">
-            <div className="card border border-2 border-transparent hover-border-primary rounded-lg p-3">
-                <div className="card-body">
-                    <h5 className="card-title fw-bold text-truncate mb-1">{user.name}</h5>
-                    <p className="card-text text-muted text-truncate mb-1">{user.email}</p>
+        <div onClick={handleClick} className={`user-search-card`}>
+            <div className="user-card">
+                <div className="user-avatar">
+                    {/*<img src={user.avatar} alt={`${user.name}'s avatar`} />*/}
+                </div>
+                <div className="user-info">
+                    <h5 className="user-name">{user.name}</h5>
+                    <p className="user-email">{user.email}</p>
                 </div>
             </div>
-        </Link>
+        </div>
     );
 };
 

@@ -5,7 +5,7 @@ import './Chat.css';
 import {logoutUser, setMessages, setUsers} from "../pages/chatSlice";
 import { useDispatch, useSelector } from "react-redux";
 import WebSocketService from "../webSocketService";
-
+import Message from '../img/message.png';
 const Chat = () => {
     const dispatch = useDispatch();
     const [selectedUser, setSelectedUser] = React.useState(null);
@@ -143,7 +143,7 @@ const Chat = () => {
             </div>
             <div className="chat-content flex-grow-1 d-flex flex-column">
                 {!selectedUser ? (
-                    <img src={`../img/message.png`} alt="Start chatting"
+                    <img src={Message} alt="Start chatting"
                          className="center-image"/>
 
                 ) : (

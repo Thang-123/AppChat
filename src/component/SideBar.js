@@ -7,6 +7,7 @@ import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
 import SearchUser from "./SearchUser";
 import { ListGroup } from "react-bootstrap";
+import UserSearchCard from "./UserSearchCard";
 
 const StyledIconContainer = styled.div`
     display: flex;
@@ -68,7 +69,15 @@ const UserListContainer = styled.div`
     padding: 1rem;
     background-color: #f8f9fa;
 `;
-
+const SearchInputContainer = styled.div`
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+`;
 const Sidebar = ({ onUserClick, onLogout, users }) => {
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [displayedUsers, setDisplayedUsers] = useState(users.slice(0, 10));
@@ -118,7 +127,7 @@ const Sidebar = ({ onUserClick, onLogout, users }) => {
                     <StyledIcon
                         onClick={() => {
                             handleIconClick('addFriend');
-                            handleToggleShowSearchUser();
+                            // handleToggleShowSearchUser();
                         }}
                         active={activeIcon === 'addFriend' ? "true" : "false"}
                         title="Add Friend"
@@ -144,12 +153,16 @@ const Sidebar = ({ onUserClick, onLogout, users }) => {
                 <div className="bg-slate-100 p-4">
                     <h2 className="text-xl font-bold">CHATS</h2>
                     <hr />
-                    <SearchInput
-                        type="text"
-                        placeholder="Search users..."
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                    />
+                    <SearchInputContainer onClick={handleToggleShowSearchUser}>
+                        <input
+                            type="text"
+                            placeholder="Search users..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            style={{ border: 'none', width: '100%' }}
+                            readOnly // Ensure input is not editable directly
+                        />
+                    </SearchInputContainer>
                 </div>
                 <div className='col-12 custom-scrollbar' style={{ height: 'calc(85vh - 55px)'}}>
                     <UserListContainer>
@@ -165,29 +178,21 @@ const Sidebar = ({ onUserClick, onLogout, users }) => {
                             // hasMore={hasMore}
                             // loader={<h4>Loading...</h4>}
                         >
-                            <ListGroup>
+                            <div>
                                 {users.map((user, index) => (
-                                    <div
+                                    <UserSearchCard
                                         key={index}
-                                        className="list-group-item list-group-item-action d-flex align-items-center gap-3 user-list-item"
-                                        onClick={() => onUserClick(user)}
-                                    >
-                                        <div>
-                                            {/* <img src={user.avatarUrl} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> */}
-                                        </div>
-                                        <div className="flex-grow-1">
-                                            <h5 className="mb-1 text-truncate" style={{ fontSize: '16px', fontWeight: '500', color: '#333' }}>{user.name}</h5>
-                                            <small className="text-muted">{user.actionTime}</small>
-                                        </div>
-                                    </div>
+                                        user={user}
+                                        onUserClick={() => onUserClick(user)}
+                                    />
                                 ))}
-                            </ListGroup>
+                            </div>
                         </InfiniteScroll>
                     </UserListContainer>
                 </div>
 
 
-                {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} />}
+                {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser}/>}
             </div>
         </div>
     );
