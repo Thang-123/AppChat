@@ -5,7 +5,7 @@ import { IoClose } from 'react-icons/io5';
 import { IoMdSend } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import './Chat.css';
-const MessageComponent = ({ messages, onSendMessage, fetchUserMessages }) => {
+const MessageComponent = ({ messages, onSendMessage, fetchLatestMessages }) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
@@ -69,7 +69,9 @@ const MessageComponent = ({ messages, onSendMessage, fetchUserMessages }) => {
                 setVideoUrl('');
 
                 // Fetch latest messages after sending a message
-                fetchUserMessages();
+                if (typeof fetchLatestMessages === 'function') {
+                    fetchLatestMessages();
+                }
             } catch (error) {
                 console.error('Failed to send message', error);
             }

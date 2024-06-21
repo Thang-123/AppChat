@@ -28,6 +28,13 @@ class WebSocketService {
     registerCallback(eventType, callback) {
         this.callbacks[eventType] = callback;
     }
+    unRegisterCallback(eventType) {
+        if (this.callbacks[eventType]) {
+            delete this.callbacks[eventType];
+        } else {
+            console.warn(`No callback registered for event: ${eventType}`);
+        }
+    }
 
     handleMessage = (event) => {
         const data = JSON.parse(event.data);

@@ -58,14 +58,24 @@ const Chat = () => {
             console.log('Failed to fetch user messages');
             return;
         }
-        // const fetchedMessages = data.data || [];
+
         const MessageResponse = data.data || [];
-        const MessageSend = MessageResponse.map(msg =>({
-            ...msg,
-            sentByCurrentUser: msg.name !== loggedInUser
-        }))
-        dispatch(setMessages(MessageSend));
+        // Filter out messages that are already in the messages state
+        const newMessages = MessageResponse.filter(msg => !messages.some(m => m.id === msg.id));
+
+        if (newMessages.length > 0) {
+
+            const updatedMessages = [
+                ...messages,
+                ...newMessages.map(msg => ({
+                    ...msg,
+                    sentByCurrentUser: msg.name !== loggedInUser
+                }))
+            ];
+            dispatch(setMessages(updatedMessages));
+        }
     };
+
 
     const handleUserClick = (user) => {
         setSelectedUser(user);
