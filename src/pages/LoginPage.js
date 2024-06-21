@@ -2,20 +2,19 @@ import { Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginUser, registerUser } from "./chatSlice";
+import WebSocketService from "../webSocketService";
 
 const LoginPage = () => {
     const dispatch = useDispatch();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [feedbackMessage, setFeedbackMessage] = useState('');
-    const websocket = useRef(null);
-    const navigate = useNavigate();
 
     const handleLogin = () => {
         localStorage.clear()
         console.log('Attempting to login with username:', JSON.stringify({ username }));
         localStorage.setItem('user', JSON.stringify({ username }));
-        websocket.current.send(JSON.stringify({
+        WebSocketService.sendMessage({
             action: 'onchat',
             data: {
                 event: 'LOGIN',
@@ -24,60 +23,40 @@ const LoginPage = () => {
                     pass: password
                 }
             }
-        }));
+        });
+
     };
 
     useEffect(() => {
-        websocket.current = new WebSocket('ws://140.238.54.136:8080/chat/chat');
-
-        websocket.current.onopen = () => {
-            console.log('WebSocket connected');
-        };
-
-        websocket.current.onmessage = (event) => {
-            const parsedData = JSON.parse(event.data);
-            console.log('Received:', parsedData);
-            handleServerResponse(parsedData);
-        };
-
-        websocket.current.onclose = () => {
-            console.log('WebSocket disconnected');
-        };
-
+        // WebSocketService.connect('ws://140.238.54.136:8080/chat/chat');
+        WebSocketService.registerCallback('LOGIN',(data) => {
+            console.log('Login response:', data);
+            handleServerResponse(data);
+        });
         return () => {
-            websocket.current.close();
         };
     }, [dispatch]);
-
     const handleServerResponse = (data) => {
-        switch (data.event) {
-            case 'REGISTER':
-                if (data.status === 'success') {
-                    dispatch(registerUser({ user: username }));
-                    navigate('login');
+            if (!data) {
+                console.error('Invalid response data received');
+                setFeedbackMessage('Unexpected response from server');
+                return;
+            }
+
+            if (data.status === 'success' ) {
+                const reLoginCode = data.data.RE_LOGIN_CODE;
+                if (reLoginCode) {
+                    dispatch(loginUser({ user: username, reLoginCode }));
+                    localStorage.setItem('code', JSON.stringify({reLoginCode }));
+                    console.log(localStorage.getItem('user'));
+                    console.log(localStorage.getItem('code'));
                 } else {
-                    setFeedbackMessage(data.mes);
+                    console.error('RE_LOGIN_CODE is missing in the response data.');
                 }
-                break;
-            case 'LOGIN':
-                if (data.status === 'success') {
-                    const reLoginCode = data.data.RE_LOGIN_CODE;
-                    if (reLoginCode) {
-                        dispatch(loginUser({ user: username, reLoginCode }));
-                        localStorage.setItem('code', JSON.stringify({reLoginCode }));
-                        console.log(localStorage.getItem('user'));
-                        console.log(localStorage.getItem('code'));
-                        navigate('/chat'); // Điều hướng đến trang chat sau khi đăng nhập thành công
-                    } else {
-                        console.error('RE_LOGIN_CODE is missing in the response data.');
-                    }
-                } else {
-                    setFeedbackMessage(data.mes);
-                }
-                break;
-            default:
-                console.log('Unknown event:', data.event);
-        }
+            } else {
+                const errorMessage = data.message || ' Login failed';
+                setFeedbackMessage(errorMessage);
+            }
     };
 
     return (

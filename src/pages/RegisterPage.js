@@ -1,19 +1,46 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { registerUser, loginUser } from './chatSlice';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { registerUser } from './chatSlice';
+import { useNavigate, Link } from 'react-router-dom';
+import WebSocketService from '../webSocketService';
 
 const RegisterPage = () => {
     const dispatch = useDispatch();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [feedbackMessage, setFeedbackMessage] = useState('');
-    const websocket = useRef(null);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        WebSocketService.registerCallback('REGISTER', (data) =>{
+            console.log('Register Response:' +data)
+            handleServerResponse(data)
+        });
+
+        return () => {
+            // WebSocketService.close();
+        };
+    }, []);
+
+    const handleServerResponse = (data) => {
+        if (!data) {
+            console.error('Invalid response data received');
+            setFeedbackMessage('Unexpected response from server');
+            return;
+        }
+
+        if (data.status === 'success') {
+            dispatch(registerUser({ user: username }));
+            navigate('/login');
+        } else {
+            const errorMessage = data.message || 'Registration failed';
+            setFeedbackMessage(errorMessage);
+        }
+    };
+
+
     const handleRegister = () => {
-        websocket.current.send(JSON.stringify({
+        WebSocketService.sendMessage({
             action: 'onchat',
             data: {
                 event: 'REGISTER',
@@ -22,55 +49,7 @@ const RegisterPage = () => {
                     pass: password
                 }
             }
-        }));
-    };
-
-
-
-    useEffect(() => {
-        websocket.current = new WebSocket('ws://140.238.54.136:8080/chat/chat');
-
-        websocket.current.onopen = () => {
-            console.log('WebSocket connected');
-        };
-
-        websocket.current.onmessage = (event) => {
-            const parsedData = JSON.parse(event.data);
-            console.log('Received:', parsedData);
-            handleServerResponse(parsedData);
-        };
-
-        websocket.current.onclose = () => {
-            console.log('WebSocket disconnected');
-        };
-
-        return () => {
-            websocket.current.close();
-        };
-    }, [dispatch]);
-
-    const handleServerResponse = (data) => {
-        switch (data.event) {
-            case 'REGISTER':
-                if (data.status === 'success') {
-                    dispatch(registerUser({ user: username }));
-                    navigate('login');
-                } else {
-                    // alert(data.mes);
-                    setFeedbackMessage(data.mes);
-                }
-                break;
-            case 'LOGIN':
-                if (data.status === 'success') {
-                    dispatch(loginUser({ user: username, reLoginCode: data.data.RE_LOGIN_CODE }));
-                    navigate('/');
-                } else {
-                    setFeedbackMessage(data.mes); // Lấy thông báo từ phản hồi và hiển thị
-                }
-                break;
-            default:
-                console.log('Unknown event:', data.event);
-        }
+        });
     };
 
     return (
@@ -80,7 +59,7 @@ const RegisterPage = () => {
                     <div className="card">
                         <div className="card-body">
                             <h2 className="card-title text-center">Chat Application</h2>
-                            <p className="card-text text-center">Sign in to your account</p>
+                            <p className="card-text text-center">Create your account</p>
 
                             <form onSubmit={(e) => e.preventDefault()} className="mt-4">
                                 <div className="mb-3">

@@ -3,6 +3,7 @@
     height: 100vh;
     background-color: #f4f5fb;
     font-family: 'Arial', sans-serif;
+    overflow: hidden;
 }
 
 .sidebar {
@@ -74,4 +75,45 @@
     outline: none;
 }
 
+.sent-message {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end;
+}
 
+.received-message {
+    background-color: #6c757d;
+    color: white;
+    align-self: flex-start;
+}
+.custom-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overflow-x: hidden;
+}
+
+.custom-scrollbar::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
+}
+
+.user-list-item {
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.user-list-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.center-image {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+    max-height: 300px;
+}

@@ -1,102 +1,194 @@
-import React, { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 import { IoChatbubbleEllipses } from 'react-icons/io5';
-import { FaUserPlus, FaImage, FaVideo } from 'react-icons/fa';
+import { FaUserPlus } from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
-import { FiArrowUpLeft } from 'react-icons/fi';
-import Avatar from './Avatar';
+import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
+import InfiniteScroll from "react-infinite-scroll-component";
+import SearchUser from "./SearchUser";
+import { ListGroup } from "react-bootstrap";
 
-const Sidebar = () => {
+const StyledIconContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 4rem;
+`;
 
-    const [editUserOpen,setEditUserOpen] = useState(false)
-    const [allUser,setAllUser] = useState([])
-    const [openSearchUser,setOpenSearchUser] = useState(false)
+const StyledIcon = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3rem;
+    height: 3rem;
+    cursor: pointer;
+    border-radius: 0.375rem;
+    transition: background-color 0.3s ease;
 
-    function handleLogout() {
-
+    &:hover {
+        background-color: #cbd5e0;
     }
 
+    ${(props) =>
+            props.active === "true" &&
+            `
+        background-color: #a3bffa;
+    `}
+`;
+
+const Divider = styled.hr`
+    width: 100%;
+    border: none;
+    border-top: 2px solid #279d90;
+    margin: 3rem 0;
+`;
+
+const SidebarContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 6rem;
+    background-color: #e2e8f0;
+    height: 100vh;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+`;
+
+const SearchInput = styled.input`
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+`;
+
+const UserListContainer = styled.div`
+    height: calc(100vh - 65px);
+    padding: 1rem;
+    background-color: #f8f9fa;
+`;
+
+const Sidebar = ({ onUserClick, onLogout, users }) => {
+    const [openSearchUser, setOpenSearchUser] = useState(false);
+    const [displayedUsers, setDisplayedUsers] = useState(users.slice(0, 10));
+    const [hasMore, setHasMore] = useState(users.length > 10);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [activeIcon, setActiveIcon] = useState(null); // State to keep track of active icon
+
+    const handleToggleShowSearchUser = () => {
+        setOpenSearchUser(prev => !prev);
+    };
+
+    const handleIconClick = (icon) => {
+        setActiveIcon(prev => (prev === icon ? null : icon)); // Toggle icon active state
+    };
+
+    const fetchMoreData = () => {
+        if (displayedUsers.length >= users.length) {
+            setHasMore(false);
+            return;
+        }
+
+        const nextUsers = users.slice(displayedUsers.length, displayedUsers.length + 10);
+        setDisplayedUsers([...displayedUsers, ...nextUsers]);
+    };
+
+    const handleSearchChange = (event) => {
+        const { value } = event.target;
+        setSearchTerm(value);
+        const filteredUsers = users.filter(user =>
+            user.name.toLowerCase().includes(value.toLowerCase())
+        );
+        setDisplayedUsers(filteredUsers.slice(0, 10));
+        setHasMore(filteredUsers.length > 10);
+    };
+
     return (
-        <div className='container-fluid'>
-            <div className='row'>
-                <div className='col-3 bg-slate-100 rounded-start rounded-bottom py-5 text-slate-600 d-flex flex-column justify-content-between'>
-                    <div>
-                        <NavLink to="/" className='nav-link w-100 h-12 flex justify-center items-center cursor-pointer hover-bg-slate-200 rounded' title='Chat'>
-                            <IoChatbubbleEllipses size={20}/>
-                        </NavLink>
-                        <div className='w-100 h-12 flex justify-center items-center cursor-pointer hover-bg-slate-200 rounded' title='Add Friend' onClick={() => setOpenSearchUser(true)}>
-                            <FaUserPlus size={20}/>
-                        </div>
-                    </div>
-                    <div className='d-flex flex-column align-items-center'>
-                        {/*<button className='mx-auto' title={user?.name} onClick={() => setEditUserOpen(true)}>*/}
-                            {/*<Avatar width={40} height={40} name={user?.name} imageUrl={user?.profile_pic} userId={user?._id}/>*/}
-                        {/*</button>*/}
-                        <button title='Logout' className='w-100 h-12 flex justify-center items-center cursor-pointer hover-bg-slate-200 rounded' onClick={handleLogout}>
-                            <BiLogOut size={20}/>
-                        </button>
-                    </div>
+        <div className="d-flex">
+            <SidebarContainer>
+                <StyledIconContainer>
+                    <StyledIcon
+                        onClick={() => handleIconClick('chat')}
+                        active={activeIcon === 'chat' ? "true" : "false"}
+                        title="Chat"
+                    >
+                        <IoChatbubbleEllipses size={24} />
+                    </StyledIcon>
+                    <StyledIcon
+                        onClick={() => {
+                            handleIconClick('addFriend');
+                            handleToggleShowSearchUser();
+                        }}
+                        active={activeIcon === 'addFriend' ? "true" : "false"}
+                        title="Add Friend"
+                    >
+                        <FaUserPlus size={24} />
+                    </StyledIcon>
+                    <Divider />
+                    <StyledIcon
+                        onClick={() => handleIconClick('settings')}
+                        active={activeIcon === 'settings' ? "true" : "false"}
+                        title="Settings"
+                    >
+                        <FiSettings size={24} />
+                    </StyledIcon>
+                </StyledIconContainer>
+                <StyledIconContainer style={{ marginTop: 'auto' }}>
+                    <StyledIcon onClick={onLogout} title="Logout">
+                        <BiLogOut size={24} />
+                    </StyledIcon>
+                </StyledIconContainer>
+            </SidebarContainer>
+            <div className="flex-grow-1">
+                <div className="bg-slate-100 p-4">
+                    <h2 className="text-xl font-bold">CHATS</h2>
+                    <hr />
+                    <SearchInput
+                        type="text"
+                        placeholder="Search users..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
                 </div>
-
-                <div className='col-9'>
-                    <div className='row'>
-                        <div className='col-12'>
-                            <div className='h-16 d-flex align-items-center'>
-                                <h2 className='text-xl font-bold p-4 text-slate-800'>Message</h2>
+                <div className='col-12 custom-scrollbar' style={{ height: 'calc(85vh - 55px)'}}>
+                    <UserListContainer>
+                        {users.length === 0 && (
+                            <div className="text-center mt-4">
+                                <FiArrowUpLeft size={24} className="text-gray-500" />
+                                <p className="text-gray-500 mt-2">Explore users to start a conversation with.</p>
                             </div>
-                            <div className='bg-slate-200 p-[0.5px]'></div>
-                        </div>
-
-                        <div className='col-12 h-[calc(100vh-65px)] overflow-x-hidden overflow-y-auto scrollbar'>
-                            {allUser.length === 0 && (
-                                <div className='mt-12 text-center'>
-                                    <div className='flex justify-center items-center my-4 text-slate-500'>
-                                        <FiArrowUpLeft size={50}/>
+                        )}
+                        <InfiniteScroll
+                            dataLength={users.length}
+                            // next={fetchMoreData}
+                            // hasMore={hasMore}
+                            // loader={<h4>Loading...</h4>}
+                        >
+                            <ListGroup>
+                                {users.map((user, index) => (
+                                    <div
+                                        key={index}
+                                        className="list-group-item list-group-item-action d-flex align-items-center gap-3 user-list-item"
+                                        onClick={() => onUserClick(user)}
+                                    >
+                                        <div>
+                                            {/* <img src={user.avatarUrl} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> */}
+                                        </div>
+                                        <div className="flex-grow-1">
+                                            <h5 className="mb-1 text-truncate" style={{ fontSize: '16px', fontWeight: '500', color: '#333' }}>{user.name}</h5>
+                                            <small className="text-muted">{user.actionTime}</small>
+                                        </div>
                                     </div>
-                                    <p className='text-lg text-slate-400'>Explore users to start a conversation with.</p>
-                                </div>
-                            )}
-
-                            {/*{allUser.map((conv, index) => (*/}
-                            {/*    <NavLink to={"/" + conv?.userDetails?._id} key={conv?._id} className='nav-link flex align-items-center gap-2 py-3 px-2 border hover-border-primary rounded hover-bg-slate-100 cursor-pointer'>*/}
-                            {/*        <div>*/}
-                            {/*            <Avatar imageUrl={conv?.userDetails?.profile_pic} name={conv?.userDetails?.name} width={40} height={40}/>*/}
-                            {/*        </div>*/}
-                            {/*        <div>*/}
-                            {/*            <h3 className='text-truncate font-semibold text-base'>{conv?.userDetails?.name}</h3>*/}
-                            {/*            <div className='text-slate-500 text-xs d-flex align-items-center gap-1'>*/}
-                            {/*                <div className='d-flex align-items-center gap-1'>*/}
-                            {/*                    {conv?.lastMsg?.imageUrl && (*/}
-                            {/*                        <div className='d-flex align-items-center gap-1'>*/}
-                            {/*                            <span><FaImage/></span>*/}
-                            {/*                            {!conv?.lastMsg?.text && <span>Image</span>}*/}
-                            {/*                        </div>*/}
-                            {/*                    )}*/}
-                            {/*                    {conv?.lastMsg?.videoUrl && (*/}
-                            {/*                        <div className='d-flex align-items-center gap-1'>*/}
-                            {/*                            <span><FaVideo/></span>*/}
-                            {/*                            {!conv?.lastMsg?.text && <span>Video</span>}*/}
-                            {/*                        </div>*/}
-                            {/*                    )}*/}
-                            {/*                </div>*/}
-                            {/*                <p className='text-truncate'>{conv?.lastMsg?.text}</p>*/}
-                            {/*            </div>*/}
-                            {/*        </div>*/}
-                            {/*        {Boolean(conv?.unseenMsg) && (*/}
-                            {/*            <p className='text-xs w-6 h-6 d-flex justify-content-center align-items-center ml-auto p-1 bg-primary text-white font-semibold rounded-full'>{conv?.unseenMsg}</p>*/}
-                            {/*        )}*/}
-                            {/*    </NavLink>*/}
-                            {/*))}*/}
-                        </div>
-                    </div>
+                                ))}
+                            </ListGroup>
+                        </InfiniteScroll>
+                    </UserListContainer>
                 </div>
+
+
+                {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} />}
             </div>
-
-            {/* Edit user details */}
-            {/*{editUserOpen && <EditUserDetails onClose={() => setEditUserOpen(false)} user={user}/>}*/}
-
-            {/* Search user */}
-            {/*{openSearchUser && <SearchUser onClose={() => setOpenSearchUser(false)}/>}*/}
         </div>
     );
 };
