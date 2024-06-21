@@ -142,7 +142,11 @@ const Chat = () => {
                 />
             </div>
             <div className="chat-content flex-grow-1 d-flex flex-column">
-                {selectedUser && (
+                {!selectedUser ? (
+                    <img src={`../img/message.png`} alt="Start chatting"
+                         className="center-image"/>
+
+                ) : (
                     <MessageComponent
                         selectedUser={selectedUser}
                         messages={messages}

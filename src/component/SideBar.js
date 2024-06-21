@@ -151,7 +151,7 @@ const Sidebar = ({ onUserClick, onLogout, users }) => {
                         onChange={handleSearchChange}
                     />
                 </div>
-                <div className='col-12 custom-scrollbar' style={{ height: 'calc(100vh - 65px)', overflowY: 'auto' }}>
+                <div className='col-12 custom-scrollbar' style={{ height: 'calc(85vh - 55px)'}}>
                     <UserListContainer>
                         {users.length === 0 && (
                             <div className="text-center mt-4">
@@ -160,13 +160,13 @@ const Sidebar = ({ onUserClick, onLogout, users }) => {
                             </div>
                         )}
                         <InfiniteScroll
-                            dataLength={displayedUsers.length}
-                            next={fetchMoreData}
-                            hasMore={hasMore}
-                            loader={<h4>Loading...</h4>}
+                            dataLength={users.length}
+                            // next={fetchMoreData}
+                            // hasMore={hasMore}
+                            // loader={<h4>Loading...</h4>}
                         >
                             <ListGroup>
-                                {displayedUsers.map((user, index) => (
+                                {users.map((user, index) => (
                                     <div
                                         key={index}
                                         className="list-group-item list-group-item-action d-flex align-items-center gap-3 user-list-item"
