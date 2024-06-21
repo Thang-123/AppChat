@@ -3,14 +3,12 @@ import { Link } from 'react-router-dom';
 
 const UserSearchCard = ({ user, onClose }) => {
     return (
-        <Link to={"/" + user._id} onClick={onClose} className='d-flex align-items-center gap-3 p-2 lg:p-4 border border-transparent border-b-slate-200 hover-border hover-border-primary rounded cursor-pointer text-decoration-none'>
-            <div>
-                <div className='fw-bold text-ellipsis overflow-hidden text-truncate' style={{ maxWidth: '200px' }}>
-                    {user.name}
+        <Link to={`/${user._id}`} onClick={onClose} className="card-link">
+            <div className="card border border-2 border-transparent hover-border-primary rounded-lg p-3">
+                <div className="card-body">
+                    <h5 className="card-title fw-bold text-truncate mb-1">{user.name}</h5>
+                    <p className="card-text text-muted text-truncate mb-1">{user.email}</p>
                 </div>
-                <p className='text-sm text-ellipsis overflow-hidden text-truncate' style={{ maxWidth: '200px' }}>
-                    {user.email}
-                </p>
             </div>
         </Link>
     );

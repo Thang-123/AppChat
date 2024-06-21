@@ -85,4 +85,15 @@
     color: white;
     align-self: flex-start;
 }
+/* Custom scrollbar styles */
+.custom-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overflow-x: hidden;
+}
+
+.custom-scrollbar::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
+}
 

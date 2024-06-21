@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import Sidebar from './SideBar';
 import MessageComponent from './MessageComponent';
 import './Chat.css';
-import { setMessages, setUsers } from "../pages/chatSlice";
+import {logoutUser, setMessages, setUsers} from "../pages/chatSlice";
 import { useDispatch, useSelector } from "react-redux";
 import WebSocketService from "../webSocketService";
 
@@ -16,15 +16,19 @@ const Chat = () => {
         WebSocketService.registerCallback('GET_USER_LIST', handleGetUserListResponse);
         WebSocketService.registerCallback('LOGOUT', handleLogoutResponse);
         WebSocketService.registerCallback('SEND_CHAT', handleSendChatResponse);
+        // handleGetUserList();
+    }, [dispatch]);
+    useEffect(() => {
         handleGetUserList();
     }, [dispatch]);
-
     const handleLogoutResponse = (data) => {
         if (!data) {
             console.log('Invalid response data received');
             return;
         }
         if (data.status === 'success') {
+           dispatch(logoutUser());
+           WebSocketService.connect('ws://140.238.54.136:8080/chat/chat')
         } else {
             const errorMessage = data.message || 'Logout failed';
             console.log(errorMessage);
@@ -128,7 +132,7 @@ const Chat = () => {
 
     return (
         <div className="chat-page d-flex">
-            <div className="sidebar bg-white border-right d-flex flex-column">
+            <div className="sidebar bg-white border-right d-flex flex-column" style={{flexBasis: '20%'}}>
                 <Sidebar
                     onUserClick={handleUserClick}
                     onLogout={handleLogOut}
