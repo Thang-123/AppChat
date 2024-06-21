@@ -3,6 +3,7 @@
     height: 100vh;
     background-color: #f4f5fb;
     font-family: 'Arial', sans-serif;
+    overflow: hidden;
 }
 
 .sidebar {
@@ -85,7 +86,6 @@
     color: white;
     align-self: flex-start;
 }
-/* Custom scrollbar styles */
 .custom-scrollbar {
     scrollbar-width: none;
     -ms-overflow-style: none;

@@ -64,8 +64,7 @@ const SearchInput = styled.input`
 `;
 
 const UserListContainer = styled.div`
-    height: calc(100vh - 65px); // Adjusted height to account for the fixed navbar
-    overflow-y: hidden; // Hide scrollbar
+    height: calc(100vh - 65px);
     padding: 1rem;
     background-color: #f8f9fa;
 `;
@@ -152,38 +151,42 @@ const Sidebar = ({ onUserClick, onLogout, users }) => {
                         onChange={handleSearchChange}
                     />
                 </div>
-                <UserListContainer>
-                    {users.length === 0 && (
-                        <div className="text-center mt-4">
-                            <FiArrowUpLeft size={24} className="text-gray-500" />
-                            <p className="text-gray-500 mt-2">Explore users to start a conversation with.</p>
-                        </div>
-                    )}
-                    <InfiniteScroll
-                        dataLength={displayedUsers.length}
-                        next={fetchMoreData}
-                        hasMore={hasMore}
-                        loader={<h4>Loading...</h4>}
-                    >
-                        <ListGroup>
-                            {displayedUsers.map((user, index) => (
-                                <div
-                                    key={index}
-                                    className="list-group-item list-group-item-action d-flex align-items-center gap-3 user-list-item"
-                                    onClick={() => onUserClick(user)}
-                                >
-                                    <div>
-                                        {/* <img src={user.avatarUrl} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> */}
+                <div className='col-12 custom-scrollbar' style={{ height: 'calc(100vh - 65px)', overflowY: 'auto' }}>
+                    <UserListContainer>
+                        {users.length === 0 && (
+                            <div className="text-center mt-4">
+                                <FiArrowUpLeft size={24} className="text-gray-500" />
+                                <p className="text-gray-500 mt-2">Explore users to start a conversation with.</p>
+                            </div>
+                        )}
+                        <InfiniteScroll
+                            dataLength={displayedUsers.length}
+                            next={fetchMoreData}
+                            hasMore={hasMore}
+                            loader={<h4>Loading...</h4>}
+                        >
+                            <ListGroup>
+                                {displayedUsers.map((user, index) => (
+                                    <div
+                                        key={index}
+                                        className="list-group-item list-group-item-action d-flex align-items-center gap-3 user-list-item"
+                                        onClick={() => onUserClick(user)}
+                                    >
+                                        <div>
+                                            {/* <img src={user.avatarUrl} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> */}
+                                        </div>
+                                        <div className="flex-grow-1">
+                                            <h5 className="mb-1 text-truncate" style={{ fontSize: '16px', fontWeight: '500', color: '#333' }}>{user.name}</h5>
+                                            <small className="text-muted">{user.actionTime}</small>
+                                        </div>
                                     </div>
-                                    <div className="flex-grow-1">
-                                        <h5 className="mb-1 text-truncate" style={{ fontSize: '16px', fontWeight: '500', color: '#333' }}>{user.name}</h5>
-                                        <small className="text-muted">{user.actionTime}</small>
-                                    </div>
-                                </div>
-                            ))}
-                        </ListGroup>
-                    </InfiniteScroll>
-                </UserListContainer>
+                                ))}
+                            </ListGroup>
+                        </InfiniteScroll>
+                    </UserListContainer>
+                </div>
+
+
                 {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} />}
             </div>
         </div>
