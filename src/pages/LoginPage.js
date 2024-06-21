@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { loginUser, registerUser } from "./chatSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {loginUser, registerUser, setLoggedInUser, setLoggedInUSer} from "./chatSlice";
 import WebSocketService from "../webSocketService";
 
 const LoginPage = () => {
@@ -9,10 +9,11 @@ const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [feedbackMessage, setFeedbackMessage] = useState('');
-
+    const user = useSelector(state => state.chat)
     const handleLogin = () => {
         localStorage.clear()
         console.log('Attempting to login with username:', JSON.stringify({ username }));
+        dispatch(setLoggedInUser(username));
         localStorage.setItem('user', JSON.stringify({ username }));
         WebSocketService.sendMessage({
             action: 'onchat',
@@ -46,6 +47,7 @@ const LoginPage = () => {
             if (data.status === 'success' ) {
                 const reLoginCode = data.data.RE_LOGIN_CODE;
                 if (reLoginCode) {
+
                     dispatch(loginUser({ user: username, reLoginCode }));
                     localStorage.setItem('code', JSON.stringify({reLoginCode }));
                     console.log(localStorage.getItem('user'));

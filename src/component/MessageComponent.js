@@ -5,7 +5,7 @@ import { IoClose } from 'react-icons/io5';
 import { IoMdSend } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import './Chat.css';
-const MessageComponent = ({ messages, onSendMessage, fetchLatestMessages }) => {
+const MessageComponent = ({ messages, onSendMessage, fetchUserMessages }) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
@@ -69,7 +69,7 @@ const MessageComponent = ({ messages, onSendMessage, fetchLatestMessages }) => {
                 setVideoUrl('');
 
                 // Fetch latest messages after sending a message
-                fetchLatestMessages();
+                fetchUserMessages();
             } catch (error) {
                 console.error('Failed to send message', error);
             }
@@ -103,11 +103,11 @@ const MessageComponent = ({ messages, onSendMessage, fetchLatestMessages }) => {
                 style={{ height: 'calc(100vh - 128px)' }}
             >
                 <div className="d-flex flex-column gap-2 py-2 mx-2">
-                    {messages.map((msg, index) => (
+                    {messages.slice(0).reverse().map((msg, index) => (
                         <div
                             key={index}
                             className={`p-2 rounded max-w-75 ${
-                                msg.sentByCurrentUser ? 'sent-message' : 'received-message'
+                                msg.sentByCurrentUser ? 'received-message' : 'sent-message'
                             }`}
                         >
                             <p className="mb-1">{msg.mes}</p>

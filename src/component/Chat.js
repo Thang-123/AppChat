@@ -9,8 +9,7 @@ import Message from '../img/message.png';
 const Chat = () => {
     const dispatch = useDispatch();
     const [selectedUser, setSelectedUser] = React.useState(null);
-    const { messages, loggedIn, reLoginCode, users } = useSelector((state) => state.chat);
-    const {loggedInUser} = useSelector((state) => state.chat);
+    const { messages, loggedIn,loggedInUser, reLoginCode, users } = useSelector((state) => state.chat);
     useEffect(() => {
         WebSocketService.registerCallback('GET_PEOPLE_CHAT_MES', handleGetUserMessagesResponse);
         WebSocketService.registerCallback('GET_USER_LIST', handleGetUserListResponse);
@@ -51,6 +50,7 @@ const Chat = () => {
         }
         const newMessage = data.data || {};
         dispatch(setMessages([...messages, newMessage]));
+        fetchLatestMessages()
     };
 
     const handleGetUserMessagesResponse = (data) => {
@@ -58,14 +58,20 @@ const Chat = () => {
             console.log('Failed to fetch user messages');
             return;
         }
-        const fetchedMessages = data.data || [];
-        dispatch(setMessages(fetchedMessages));
+        // const fetchedMessages = data.data || [];
+        const MessageResponse = data.data || [];
+        const MessageSend = MessageResponse.map(msg =>({
+            ...msg,
+            sentByCurrentUser: msg.name !== loggedInUser
+        }))
+        dispatch(setMessages(MessageSend));
     };
 
     const handleUserClick = (user) => {
         setSelectedUser(user);
         // console.log(selectedUser.name)
         fetchUserMessages(user);
+
     };
 
     const handleSendMessage = (newMessage) => {
@@ -104,6 +110,7 @@ const Chat = () => {
     };
 
     const fetchUserMessages = (user) => {
+
         WebSocketService.sendMessage({
             "action": "onchat",
             "data": {
@@ -151,7 +158,7 @@ const Chat = () => {
                         selectedUser={selectedUser}
                         messages={messages}
                         onSendMessage={handleSendMessage}
-                        fetchLatestMessages={fetchLatestMessages}
+                        fetchLatestMessages={fetchLatestMessages()}
                     />
                 )}
             </div>
