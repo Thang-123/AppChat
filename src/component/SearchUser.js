@@ -18,18 +18,11 @@ const SearchUser = ({ onClose }) => {
     );
 
     return (
-        <div className="modal show d-block" tabIndex="-1" role="dialog">
-            <div className="modal-dialog modal-dialog-centered" role="document">
+        <div className="modal-container">
+            <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title">Search User</h5>
-                        <button type="button" className="close" onClick={onClose}>
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div className="modal-body">
-                        {/* Input search user */}
-                        <div className="input-group mb-3">
+                        <div className="input-group">
                             <input
                                 type="text"
                                 className="form-control"
@@ -37,24 +30,23 @@ const SearchUser = ({ onClose }) => {
                                 onChange={handleInputChange}
                                 value={search}
                             />
-                            <div className="input-group-append">
-                                <span className="input-group-text">
-                                    <IoSearchOutline size={25} />
-                                </span>
-                            </div>
+                            <button className="input-icon">
+                                <IoSearchOutline size={25}/>
+                            </button>
                         </div>
-
-                        {/* Display search user */}
-                        <div>
+                        <button type="button" className="close-button" onClick={onClose}>
+                            &times;
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        <div className="user-list">
                             {filteredUsers.length === 0 && !loading && (
-                                <p className="text-center text-muted">No user found!</p>
+                                <p className="no-user-found">No user found!</p>
                             )}
-
-                            {loading && <Loading />}
-
+                            {loading && <Loading/>}
                             {filteredUsers.length !== 0 && !loading && (
                                 filteredUsers.map((user, index) => (
-                                    <UserSearchCard key={index} user={user} onClose={onClose} />
+                                    <UserSearchCard key={index} user={user} onClose={onClose}/>
                                 ))
                             )}
                         </div>
