@@ -11,7 +11,10 @@ const MessageComponent = ({ messages, onSendMessage, fetchLatestMessages }) => {
     const [videoUrl, setVideoUrl] = useState('');
     const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
     const messageContainerRef = useRef(null);
+    useEffect(() => {
+        fetchLatestMessages();
 
+    }, [fetchLatestMessages]);
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
