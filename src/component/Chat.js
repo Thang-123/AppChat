@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import Sidebar from './SideBar';
 import MessageComponent from './MessageComponent';
 import './Chat.css';
@@ -12,7 +12,6 @@ const Chat = () => {
     const [selectedUser, setSelectedUser] = React.useState(null);
     const [lastFetchedUser, setLastFetchedUser] = React.useState(null);
     const { messages, loggedIn, loggedInUser, reLoginCode, users } = useSelector((state) => state.chat);
-
     useEffect(() => {
         WebSocketService.registerCallback('GET_PEOPLE_CHAT_MES', handleGetUserMessagesResponse);
         WebSocketService.registerCallback('GET_USER_LIST', handleGetUserListResponse);
@@ -151,9 +150,12 @@ const Chat = () => {
         });
     };
 
+    const handleCloseMessageComponent = () => {
+        setSelectedUser(null);
+    };
     return (
         <div className="chat-page d-flex">
-            <div className="sidebar bg-white border-right d-flex flex-column" style={{ flexBasis: '20%' }}>
+            <div className="sidebar bg-white border-right d-flex flex-column" style={{ flexBasis: '25%' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
                     onLogout={handleLogOut}
@@ -168,6 +170,7 @@ const Chat = () => {
                          className="center-image" />
                 ) : (
                     <MessageComponent
+                        onClose={handleCloseMessageComponent}
                         selectedUser={selectedUser}
                         messages={messages}
                         onSendMessage={handleSendMessage}

@@ -78,7 +78,7 @@ const SearchInputContainer = styled.div`
     font-size: 1rem;
     cursor: pointer;
 `;
-const Sidebar = ({ onUserClick, onLogout, users }) => {
+const Sidebar = ({onUserClick, onLogout, users }) => {
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [displayedUsers, setDisplayedUsers] = useState(users.slice(0, 10));
     const [hasMore, setHasMore] = useState(users.length > 10);
@@ -160,7 +160,7 @@ const Sidebar = ({ onUserClick, onLogout, users }) => {
                             value={searchTerm}
                             onChange={handleSearchChange}
                             style={{ border: 'none', width: '100%' }}
-                            readOnly // Ensure input is not editable directly
+                            readOnly
                         />
                     </SearchInputContainer>
                 </div>
