@@ -2,8 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const UserSearchCard = ({ user, onUserClick }) => {
-    console.log('onUserClick in UserSearchCard:', typeof onUserClick);
-    console.log('Props in UserSearchCard:', { user, onUserClick });
+
     const handleClick = () => {
         onUserClick(user);
     };

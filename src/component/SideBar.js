@@ -112,7 +112,6 @@ const Sidebar = ({onUserClick, onLogout, users }) => {
         setDisplayedUsers(filteredUsers.slice(0, 10));
         setHasMore(filteredUsers.length > 10);
     };
-    console.log('Props in SideBar:', { users, onUserClick });
     return (
         <div className="d-flex">
             <SidebarContainer>
@@ -179,9 +178,9 @@ const Sidebar = ({onUserClick, onLogout, users }) => {
                             // loader={<h4>Loading...</h4>}
                         >
                             <div>
-                                {users.map((user) => (
+                                {users.map((user,index) => (
                                     <UserSearchCard
-                                        key={user.id}
+                                        key={index}
                                         user={user}
                                         onUserClick={() => onUserClick(user)}
                                     />

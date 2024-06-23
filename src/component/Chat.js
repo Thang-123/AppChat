@@ -14,6 +14,7 @@ const Chat = () => {
     const { messages, loggedIn, loggedInUser, reLoginCode, users } = useSelector((state) => state.chat);
     useEffect(() => {
         WebSocketService.registerCallback('GET_PEOPLE_CHAT_MES', handleGetUserMessagesResponse);
+        WebSocketService.registerCallback('GET_ROOM_CHAT_MES', handleGetRoomChatResponse );
         WebSocketService.registerCallback('GET_USER_LIST', handleGetUserListResponse);
         WebSocketService.registerCallback('LOGOUT', handleLogoutResponse);
         WebSocketService.registerCallback('SEND_CHAT', handleSendChatResponse);
@@ -66,24 +67,61 @@ const Chat = () => {
             console.log('Failed to fetch user messages');
             return;
         }
-
+        console.log('fetching user messages ');
         const MessageResponse = data.data || [];
         const newMessages = MessageResponse.map(msg => ({
             ...msg,
             sentByCurrentUser: msg.name !== loggedInUser
         }));
+        dispatch(setMessages(newMessages));
 
-        // Update messages state with all fetched messages
+    };
+    const handleGetRoomChatResponse = (data) => {
+        if (!data || data.status !== 'success') {
+            console.log('Failed to fetch room messages');
+            return;
+        }
+        console.log('fetching room messages ');
+        const MessageResponse = data.data.chatData || [];
+        const newMessages = MessageResponse.map(msg => ({
+            ...msg,
+            sentByCurrentUser: msg.name !== loggedInUser
+        }));
+
         dispatch(setMessages(newMessages));
     };
 
-    const handleUserClick = (user) => {
-        if (selectedUser && selectedUser.name === user.name) return;
+    function getRoomChatMes() {
+        WebSocketService.sendMessage({
+            action: 'onchat',
+            data: {
+                event: 'GET_ROOM_CHAT_MES',
+                data: {
+                    name: selectedUser.name,
+                    page: 1
+                }
+            }
+        });
+    }
 
+    const handleUserClick = (user) => {
+        if (!user || typeof user.name === 'undefined' || typeof user.type === 'undefined') {
+            console.error('Invalid user object:', user);
+            return;
+        }
+
+        if (selectedUser && selectedUser.name === user.name) return;
+        console.log('Clicked User:', user);
         setSelectedUser(user);
-        setLastFetchedUser(user.name);
-        fetchUserMessages(user);
+        if (user.type === 0) {
+            fetchUserMessages(user);
+        } else if (user.type === 1) {
+            getRoomChatMes(user);
+        } else {
+            console.warn('Unknown user type:', user.type);
+        }
     };
+
 
     const handleSendMessage = (newMessage) => {
         WebSocketService.sendMessage({
@@ -122,7 +160,7 @@ const Chat = () => {
 
     const fetchLatestMessages = () => {
         if (selectedUser) {
-            console.log("fetch Message real time");
+            // console.log("fetch Message real time");
             WebSocketService.sendMessage({
                 action: 'onchat',
                 data: {
@@ -175,6 +213,7 @@ const Chat = () => {
                         messages={messages}
                         onSendMessage={handleSendMessage}
                         fetchLatestMessages={fetchLatestMessages}
+                        getRoomChatMes = {getRoomChatMes}
                     />
                 )}
             </div>

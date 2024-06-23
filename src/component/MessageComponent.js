@@ -4,7 +4,7 @@ import { HiDotsVertical } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { IoMdSend } from 'react-icons/io';
 import './Chat.css';
-const MessageComponent = ({selectedUser, onClose , messages, onSendMessage, fetchLatestMessages}) => {
+const MessageComponent = ({selectedUser, onClose , messages, onSendMessage, fetchLatestMessages,getRoomChatMes}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
@@ -23,9 +23,15 @@ const MessageComponent = ({selectedUser, onClose , messages, onSendMessage, fetc
     }, []);
 
     useEffect(() => {
-        fetchLatestMessages();
+        if (selectedUser) {
+            if (selectedUser.type === 0) {
+                fetchLatestMessages();
+            } else if (selectedUser.type === 1) {
+                getRoomChatMes();
+            }
+        }
+    }, [selectedUser, fetchLatestMessages,  getRoomChatMes]);
 
-    }, [fetchLatestMessages]);
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
