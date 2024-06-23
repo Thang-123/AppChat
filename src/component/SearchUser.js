@@ -4,7 +4,7 @@ import Loading from './Loading';
 import UserSearchCard from './UserSearchCard';
 import { useSelector } from "react-redux";
 
-const SearchUser = ({ onClose }) => {
+const SearchUser = ({ onClose,onUserClick }) => {
     const [search, setSearch] = useState('');
     const users = useSelector((state) => state.chat.users);
     const [loading, setLoading] = useState(false);
@@ -46,7 +46,7 @@ const SearchUser = ({ onClose }) => {
                             {loading && <Loading/>}
                             {filteredUsers.length !== 0 && !loading && (
                                 filteredUsers.map((user, index) => (
-                                    <UserSearchCard key={index} user={user} onClose={onClose}/>
+                                    <UserSearchCard key={index} user={user} onClose={onClose} onUserClick={onUserClick}/>
                                 ))
                             )}
                         </div>
