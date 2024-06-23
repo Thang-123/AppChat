@@ -16,14 +16,15 @@ const chatSlice = createSlice({
         setUsers: (state, action) => {
             state.users = action.payload;
         },
+        // setMessages(state, action) {
+        //     state.messages = action.payload.map(msg => ({
+        //         ...msg,
+        //         sentByCurrentUser: msg.to !== state.loggedInUser.name
+        //     }));
+        // },
         setMessages(state, action) {
-            state.messages = action.payload.map(msg => ({
-                ...msg,
-                sentByCurrentUser: msg.to !== state.loggedInUser.name
-            }));
+            state.messages = action.payload
         },
-        // nếu tin nhắn có thong tin tên ng nhận != tên ng dùng đã đăng nhập nghĩa la
-        // do la tin nhan gui di con lai la tin nhan do ng dung gui di
         registerUser: (state, action) => {
             state.users.push(action.payload.user);
         },
@@ -31,7 +32,10 @@ const chatSlice = createSlice({
             state.currentUser = action.payload.user;
             state.reLoginCode = action.payload.reLoginCode;
             state.loggedIn = true;
-            state.loggedInUser= action.payload.user;
+            // state.loggedInUser= action.payload.user;
+        },
+        setLoggedInUser: (state, action) => {
+            state.loggedInUser = action.payload;
         },
         logoutUser: (state) => {
             state.currentUser = null;
@@ -50,6 +54,7 @@ const chatSlice = createSlice({
 });
 
 export const {
+    setLoggedInUser,
     setMessage,
     setLoading,
     setUsers,
