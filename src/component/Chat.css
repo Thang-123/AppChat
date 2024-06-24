@@ -334,6 +334,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-left: 12px;
+    flex-direction: column;
 }
 
 .dot {
@@ -364,8 +366,12 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 1rem;
     margin-bottom: 1rem;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s, background-color 0.3s ease-in-out;
     cursor: pointer;
+
+}
+.has-message {
+    background-color: lightblue; /* Màu nền khi có tin nhắn mới */
 }
 
 .user-card:hover {
@@ -392,9 +398,12 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-right: 30px;
+    margin: 0 0 6px 0;
 }
-
+.user-message {
+    margin: 0;
+    font-weight: bold;
+}
 .user-email {
     margin: 0;
     color: #777;

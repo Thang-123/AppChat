@@ -32,15 +32,15 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
         }
     }, [selectedUser, fetchLatestMessages,  getRoomChatMes]);
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
-
-    const scrollToBottom = () => {
-        if (messageContainerRef.current) {
-            messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
-        }
-    };
+    // useEffect(() => {
+    //     scrollToBottom();
+    // }, [messages]);
+    //
+    // const scrollToBottom = () => {
+    //     if (messageContainerRef.current) {
+    //         messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    //     }
+    // };
 
     const handleUploadImageVideoOpen = () => {
         setOpenImageVideoUpload(prev => !prev);
@@ -88,7 +88,6 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 setImageUrl('');
                 setVideoUrl('');
 
-                // Fetch latest messages after sending a message
                 if (typeof fetchLatestMessages === 'function') {
                     fetchLatestMessages();
                 }

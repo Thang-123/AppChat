@@ -14,7 +14,7 @@ const Chat = () => {
     const [lastFetchedUser, setLastFetchedUser] = React.useState(null);
     const { messages, loggedIn, loggedInUser, reLoginCode, users } = useSelector((state) => state.chat);
     const [isActive, setActiveUsers] = useState({});
-
+    const [newMessages, setNewMessages] = useState({});
 
     useEffect(() => {
         WebSocketService.registerCallback('GET_PEOPLE_CHAT_MES', handleGetUserMessagesResponse);
@@ -95,17 +95,32 @@ const Chat = () => {
             console.log('Failed to send chat message');
             return;
         }
-        // fetchLatestMessages()
+        // if(newMessages !== null){
+        //     setNewMessages(null);
+        // }
 
+        const { name, mes } = data.data;
+
+        // Cập nhật tin nhắn của user tương ứng
+        setNewMessages(prevMessages => ({
+            ...prevMessages,
+            [name]: [
+                ...(prevMessages[name] || []),
+                mes
+            ]
+        }));
         const newMessage = {
             ...data.data,
             sentByCurrentUser: data.data.name === loggedInUser
         };
 
-        // Update messages state with the new message
         dispatch(addMessage([...messages, newMessage]));
         fetchLatestMessages();
     };
+    // useEffect(() => {
+    //     console.log(newMessages);
+    //     console.log(Object.keys(newMessages));
+    // }, [newMessages]);
 
     const handleGetUserMessagesResponse = (data) => {
         if (!data || data.status !== 'success') {
@@ -153,6 +168,9 @@ const Chat = () => {
         if (!user || typeof user.name === 'undefined' || typeof user.type === 'undefined') {
             console.error('Invalid user object:', user);
             return;
+        }
+        if(newMessages !== null){
+            setNewMessages(null);
         }
 
         if (selectedUser && selectedUser.name === user.name) return;
@@ -247,6 +265,7 @@ const Chat = () => {
                     onJoinRoom={handleJoinRoom}
                     onGetUserList={handleGetUserList}
                     users={users}
+                    newMessage={newMessages || {}}
 
                 />
             </div>
