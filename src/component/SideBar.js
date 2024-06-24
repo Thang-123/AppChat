@@ -112,7 +112,6 @@ const Sidebar = ({onUserClick, onLogout, users }) => {
         setDisplayedUsers(filteredUsers.slice(0, 10));
         setHasMore(filteredUsers.length > 10);
     };
-
     return (
         <div className="d-flex">
             <SidebarContainer>
@@ -179,7 +178,7 @@ const Sidebar = ({onUserClick, onLogout, users }) => {
                             // loader={<h4>Loading...</h4>}
                         >
                             <div>
-                                {users.map((user, index) => (
+                                {users.map((user,index) => (
                                     <UserSearchCard
                                         key={index}
                                         user={user}
@@ -192,7 +191,7 @@ const Sidebar = ({onUserClick, onLogout, users }) => {
                 </div>
 
 
-                {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser}/>}
+                {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
             </div>
         </div>
     );

@@ -2,8 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const UserSearchCard = ({ user, onUserClick }) => {
+
     const handleClick = () => {
-        onUserClick(user._id);
+        onUserClick(user);
     };
     return (
         <div onClick={handleClick} className={`user-search-card`}>
