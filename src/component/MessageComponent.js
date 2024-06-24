@@ -4,7 +4,7 @@ import { HiDotsVertical } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { IoMdSend } from 'react-icons/io';
 import './Chat.css';
-const MessageComponent = ({selectedUser, onClose , messages, onSendMessage, fetchLatestMessages,getRoomChatMes}) => {
+const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage, fetchLatestMessages,getRoomChatMes}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
@@ -109,8 +109,14 @@ const MessageComponent = ({selectedUser, onClose , messages, onSendMessage, fetc
                         {/* User details */}
                         <div>
                             <span className="d-block font-weight-bold">{selectedUser.name}</span>
-                            <span className="text-success">Online</span>
+                            <div className="status-container">
+                                <div className={`dot ${isActive ? 'dot-active' : 'dot-inactive'}`}/>
+                                <span className="status-text mx-2">
+                                    {isActive ? 'Online' : 'Offline'}
+                                 </span>
+                            </div>
                         </div>
+
                     </div>
                 </div>
                 <div className="d-flex align-items-center gap-3">

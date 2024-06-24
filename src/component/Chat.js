@@ -6,19 +6,26 @@ import {addMessage, logoutUser, setMessages, setUsers} from "../pages/chatSlice"
 import { useDispatch, useSelector } from "react-redux";
 import WebSocketService from "../webSocketService";
 import Message from '../img/message.png';
+import webSocketService from "../webSocketService";
 
 const Chat = () => {
     const dispatch = useDispatch();
     const [selectedUser, setSelectedUser] = React.useState(null);
     const [lastFetchedUser, setLastFetchedUser] = React.useState(null);
     const { messages, loggedIn, loggedInUser, reLoginCode, users } = useSelector((state) => state.chat);
+    const [isActive, setActiveUsers] = useState({});
+
+
     useEffect(() => {
         WebSocketService.registerCallback('GET_PEOPLE_CHAT_MES', handleGetUserMessagesResponse);
         WebSocketService.registerCallback('GET_ROOM_CHAT_MES', handleGetRoomChatResponse );
         WebSocketService.registerCallback('GET_USER_LIST', handleGetUserListResponse);
         WebSocketService.registerCallback('LOGOUT', handleLogoutResponse);
         WebSocketService.registerCallback('SEND_CHAT', handleSendChatResponse);
+        WebSocketService.registerCallback('CHECK_USER', handleCheckUserActiveResponse);
 
+    }, [dispatch]);
+    useEffect(() => {
         handleGetUserList();
     }, [dispatch]);
 
@@ -35,14 +42,52 @@ const Chat = () => {
             console.log(errorMessage);
         }
     };
+        const handleGetUserListResponse = (data) => {
+            if (!data || data.status !== 'success') {
+                console.log('Failed to fetch user list');
+                return;
+            }
 
-    const handleGetUserListResponse = (data) => {
-        if (!data || data.status !== 'success') {
-            console.log('Failed to fetch user list');
+            const users = data.data || [];
+            // const updatedUsers = users.map((user) => {
+            //
+            //     const isActive = user.isActive || false;
+            //
+            //     checkUserActive(user.name);
+            //
+            //     return {
+            //         ...user,
+            //         isActive: isActive
+            //     };
+            // });
+
+
+            dispatch(setUsers(users));
+        };
+
+        const checkUserActive = (user) =>{
+            if (!user || !user.name) {
+                console.error('Invalid user object passed to checkUserActive:', user);
+                return;
+            }
+            console.log("Check active for user:" + user.name);
+        webSocketService.sendMessage({
+            "action": "onchat",
+            "data": {
+                "event": "CHECK_USER",
+                "data": {
+                    "user": user.name
+                }
+            }
+        })
+        }
+    const handleCheckUserActiveResponse = (data) => {
+        if (data.status !== 'success') {
+            console.log('Failed to check user active');
             return;
         }
-        const users = data.data || [];
-        dispatch(setUsers(users));
+        const isActive = data.data.status;
+        setActiveUsers(isActive);
     };
 
     const handleSendChatResponse = (data) => {
@@ -113,6 +158,8 @@ const Chat = () => {
         if (selectedUser && selectedUser.name === user.name) return;
         console.log('Clicked User:', user);
         setSelectedUser(user);
+        checkUserActive(user)
+        console.log('Check Active :', user);
         if (user.type === 0) {
             fetchUserMessages(user);
         } else if (user.type === 1) {
@@ -200,6 +247,7 @@ const Chat = () => {
                     onJoinRoom={handleJoinRoom}
                     onGetUserList={handleGetUserList}
                     users={users}
+
                 />
             </div>
             <div className="chat-content flex-grow-1 d-flex flex-column">
@@ -214,6 +262,7 @@ const Chat = () => {
                         onSendMessage={handleSendMessage}
                         fetchLatestMessages={fetchLatestMessages}
                         getRoomChatMes = {getRoomChatMes}
+                        isActive={isActive}
                     />
                 )}
             </div>
