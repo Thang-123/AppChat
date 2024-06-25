@@ -237,74 +237,7 @@
     font-size: 1rem;
     margin: 1rem 0;
 }
-/* UserCard.css */
 
-.card-link {
-    text-decoration: none; /* Loại bỏ underline của link */
-    color: inherit; /* Giữ nguyên màu chữ khi là link */
-}
-
-.user-card {
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    cursor: pointer;
-}
-
-.user-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-
-.user-avatar {
-    margin-right: 1rem;
-}
-
-.user-avatar img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.user-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.user-name {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #333;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.user-email {
-    margin: 0;
-    color: #777;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-@media (max-width: 576px) {
-    .user-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .user-avatar {
-        margin-bottom: 1rem;
-    }
-}
 .chat-footer {
     display: flex;
     align-items: center;
@@ -391,5 +324,100 @@
     }
     100% {
         opacity: 1;
+    }
+}
+
+
+
+/*UserCard*/
+.user-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 12px;
+    flex-direction: column;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-active {
+    background-color: yellow;
+}
+
+.dot-inactive {
+    background-color: grey;
+}
+
+.card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s, background-color 0.3s ease-in-out;
+    cursor: pointer;
+
+}
+.has-message {
+    background-color: lightblue; /* Màu nền khi có tin nhắn mới */
+}
+
+.user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.user-avatar {
+    margin-right: 1rem;
+}
+
+.user-avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
+.user-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 0 6px 0;
+}
+.user-message {
+    margin: 0;
+    font-weight: bold;
+}
+.user-email {
+    margin: 0;
+    color: #777;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 576px) {
+    .user-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .user-avatar {
+        margin-bottom: 1rem;
     }
 }

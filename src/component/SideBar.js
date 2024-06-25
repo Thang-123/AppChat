@@ -78,7 +78,7 @@ const SearchInputContainer = styled.div`
     font-size: 1rem;
     cursor: pointer;
 `;
-const Sidebar = ({onUserClick, onLogout, users }) => {
+const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [displayedUsers, setDisplayedUsers] = useState(users.slice(0, 10));
     const [hasMore, setHasMore] = useState(users.length > 10);
@@ -183,6 +183,7 @@ const Sidebar = ({onUserClick, onLogout, users }) => {
                                         key={index}
                                         user={user}
                                         onUserClick={() => onUserClick(user)}
+                                        newMessage={newMessage[user.name] || ""}
                                     />
                                 ))}
                             </div>
