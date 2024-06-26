@@ -9,7 +9,8 @@ import SearchUser from "./SearchUser";
 import { ListGroup } from "react-bootstrap";
 import UserSearchCard from "./UserSearchCard";
 import {useSelector} from "react-redux";
-
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'; // Import Firebase Storage from modular SDK
+import { firestore } from '../firebaseconfig'; // Import Firestore from your config
 const StyledIconContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -95,13 +96,48 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
 
     const handleAvatarChange = (event) => {
         const file = event.target.files[0];
-        setAvatar(file);
-        setPreview(URL.createObjectURL(file));
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatar(file);
+                setPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+      ;
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        console.log('Profile submitted:', { avatar, name });
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (avatar) {
+            const storage = getStorage(); // Initialize Firebase Storage
+            const storageRef = ref(storage, `avatars/${avatar.name}`); // Create a reference to the file
+            uploadBytesResumable(storageRef, avatar).then((snapshot) => {
+                console.log('File uploaded successfully');
+                getDownloadURL(snapshot.ref).then((downloadURL) => {
+                    // Update Firestore with downloadURL
+                    firestore.collection('users').doc(loggedInUser).set(
+                        {
+                            name: name,
+                            avatarUrl: downloadURL,
+                        },
+                        { merge: true }
+                    ).then(() => {
+                        console.log('Profile updated successfully');
+                        setName(''); // Optionally reset form values
+                        setAvatar(null);
+                        setPreview(null);
+                    }).catch((error) => {
+                        console.error('Error updating profile: ', error);
+                    });
+                }).catch((error) => {
+                    console.error('Error getting download URL: ', error);
+                });
+            }).catch((error) => {
+                console.error('Error uploading file: ', error);
+            });
+        }
     };
     const handleToggleShowSearchUser = () => {
         setOpenSearchUser(prev => !prev);
@@ -232,7 +268,6 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                                             src={preview}
                                             alt="Avatar Preview"
                                             className="avatar-container "
-                                            style={{ borderRadius: '50%' }}
                                         />
                                     ) : (
                                         <FaUserCircle
