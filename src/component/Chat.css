@@ -327,9 +327,6 @@
     }
 }
 
-
-
-/*UserCard*/
 .user-info {
     display: flex;
     align-items: center;
@@ -371,7 +368,10 @@
 
 }
 .has-message {
-    background-color: lightblue; /* Màu nền khi có tin nhắn mới */
+    background-color: lightblue;
+}
+.user-card.clicked  {
+    font-style: normal;
 }
 
 .user-card:hover {
