@@ -70,44 +70,42 @@ const LoginPage = () => {
                     <p className="text-text">Sign in to your account</p>
                 </div>
 
-                <form onSubmit={(e) => e.preventDefault()} className="mt-4">
-                    <div className="mb-3">
-                        <label htmlFor="username" className="form-label">Username</label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            className="form-control"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                        />
-                    </div>
+                <div className="form-input">
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Username"
+                        className="form-control"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                    />
+                </div>
 
-                    <div className="mb-3">
-                        <label htmlFor="password" className="form-label">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            className="form-control"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
+                <div className="form-input">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Password"
+                        className="form-control"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
 
-                    <button type="button" onClick={handleLogin} className="btn btn-primary w-100">Login
-                    </button>
-                </form>
+                <button type="button" onClick={handleLogin} className="btn btn-primary w-100">Login</button>
 
                 {feedbackMessage && (
-                    <div className="alert alert-danger mt-3" role="alert">
+                    <div className="alert alert-danger" role="alert">
                         {feedbackMessage}
                     </div>
                 )}
 
-                <p className="mt-3 text-center">Don't have an account? <Link to="/register" className="text-primary">Sign Up</Link></p>
+                <p className="text-center">Don't have an account? <Link to="/register" className="text-primary">Sign Up</Link></p>
+
             </div>
         </div>
     );
