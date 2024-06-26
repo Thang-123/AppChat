@@ -25,14 +25,14 @@ const Router = () => {
             children: [
                 {
                     path: "register",
-                    element: <AuthLayouts><RegisterPage /></AuthLayouts>
+                    element: <RegisterPage />
                 },{
                     path: "login",
-                    element: <AuthLayouts><LoginPage /></AuthLayouts>
+                    element: loggedIn ? <Chat /> : <LoginPage />
                 },{
                     path: "chat",
-                    // element: loggedIn ? <AuthLayouts><ChatPage /></AuthLayouts> : <AuthLayouts><LoginPage /></AuthLayouts>
-                    element: loggedIn ? <AuthLayouts><Chat /></AuthLayouts> : <AuthLayouts><LoginPage /></AuthLayouts>
+                    // element: loggedIn ? <ChatPage /> : <LoginPage />
+                    element: loggedIn ? <Chat /> : <LoginPage />
                 },
                 {
                     path: "",

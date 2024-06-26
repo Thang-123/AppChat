@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { IoChatbubbleEllipses } from 'react-icons/io5';
-import { FaUserPlus } from 'react-icons/fa';
+import {FaUserCircle, FaUserPlus} from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
 import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
 import SearchUser from "./SearchUser";
 import { ListGroup } from "react-bootstrap";
 import UserSearchCard from "./UserSearchCard";
+import {useSelector} from "react-redux";
 
 const StyledIconContainer = styled.div`
     display: flex;
@@ -79,18 +80,43 @@ const SearchInputContainer = styled.div`
     cursor: pointer;
 `;
 const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
+    const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
+    const [openChat, setOpenChat] = useState(false);
+    const [openSetting, setOpenSetting] = useState(false);
     const [displayedUsers, setDisplayedUsers] = useState(users.slice(0, 10));
     const [hasMore, setHasMore] = useState(users.length > 10);
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeIcon, setActiveIcon] = useState(null); // State to keep track of active icon
+    const [activeIcon, setActiveIcon] = useState(null);
+    const [avatar, setAvatar] = useState(null);
+    const [preview, setPreview] = useState(null);
+    const [name, setName] = useState(loggedInUser);
 
+
+    const handleAvatarChange = (event) => {
+        const file = event.target.files[0];
+        setAvatar(file);
+        setPreview(URL.createObjectURL(file));
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        console.log('Profile submitted:', { avatar, name });
+    };
     const handleToggleShowSearchUser = () => {
         setOpenSearchUser(prev => !prev);
     };
 
     const handleIconClick = (icon) => {
-        setActiveIcon(prev => (prev === icon ? null : icon)); // Toggle icon active state
+        setActiveIcon(prev => (prev === icon ? null : icon));
+        if (icon === 'chat') {
+            setOpenChat(prev => !prev);
+            setOpenSetting(false);
+        }
+        if (icon === 'settings') {
+            setOpenSetting(prev => !prev);
+            setOpenChat(false);
+        }
     };
 
     const fetchMoreData = () => {
@@ -126,7 +152,6 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                     <StyledIcon
                         onClick={() => {
                             handleIconClick('addFriend');
-                            // handleToggleShowSearchUser();
                         }}
                         active={activeIcon === 'addFriend' ? "true" : "false"}
                         title="Add Friend"
@@ -148,7 +173,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                     </StyledIcon>
                 </StyledIconContainer>
             </SidebarContainer>
-            <div className="flex-grow-1">
+            {openChat && <div className="flex-grow-1">
                 <div className="bg-slate-100 p-4">
                     <h2 className="text-xl font-bold">CHATS</h2>
                     <hr />
@@ -194,6 +219,56 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
 
                 {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
             </div>
+            }
+            {openSetting &&
+                <div className="flex-1">
+                    <div className="bg-slate-100 p-4 mx-auto w-80">
+                        <h2 className="text-xl font-bold">Profile</h2>
+                        <form onSubmit={handleSubmit} className="mx-auto">
+                            <div className="text-center my-auto">
+                                <label htmlFor="avatarInput" className="cursor-pointer">
+                                    {preview ? (
+                                        <img
+                                            src={preview}
+                                            alt="Avatar Preview"
+                                            className="avatar-container "
+                                            style={{ borderRadius: '50%' }}
+                                        />
+                                    ) : (
+                                        <FaUserCircle
+                                            size={96}
+                                            className="mx-auto h-75 w-75 rounded-full object-cover"
+                                        />
+                                    )}
+                                </label>
+                                <input
+                                    id="avatarInput"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                    className="d-none"
+                                />
+                            </div>
+                            <div className="my-4">
+                                <input
+                                    id="name"
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="block w-full p-2 border border-gray-300 rounded-md"
+                                    placeholder="Enter your name"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="mt-4 px-4 py-2 bg-blue-500 text-secondary rounded hover:bg-blue-700 w-full"
+                            >
+                                Save
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
         </div>
     );
 };

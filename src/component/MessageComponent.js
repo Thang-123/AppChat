@@ -1,16 +1,27 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {FaAngleLeft, FaImage, FaPaperclip, FaPhone, FaPlus, FaSearch, FaSmile, FaVideo} from 'react-icons/fa';
+import {
+    FaAngleLeft,
+    FaImage,
+    FaPaperclip,
+    FaPhone,
+    FaPlus,
+    FaSearch,
+    FaSmile,
+    FaUserCircle,
+    FaVideo
+} from 'react-icons/fa';
 import { HiDotsVertical } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { IoMdSend } from 'react-icons/io';
 import './Chat.css';
+import { Picker } from 'emoji-mart';
 const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage, fetchLatestMessages,getRoomChatMes}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
     const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
     const messageContainerRef = useRef(null);
-
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     useEffect(() => {
         const messageComponentElement = document.getElementById('messageComponent');
         if (messageComponentElement) {
@@ -67,30 +78,25 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
     const handleOnChange = (e) => {
         setCurrentMessage(e.target.value);
     };
+    const handleEmojiClick = (event, emojiObject) => {
+        // Chèn emoji vào trong tin nhắn
+        setCurrentMessage(currentMessage + emojiObject.emoji);
+    };
 
+    const toggleEmojiPicker = () => {
+        setShowEmojiPicker(prev => !prev);
+    };
     const handleSendMessage = async (e) => {
         e.preventDefault();
 
         if (currentMessage.trim() !== '') {
             try {
                 const newMessage = {
-                    id: Date.now(),
-                    sentByCurrentUser: true,
-                    mes: currentMessage,
-                    imageUrl: imageUrl,
-                    videoUrl: videoUrl,
-                    createAt: new Date().toISOString()
+                    mes: currentMessage
                 };
-
-                await onSendMessage(newMessage);
-
+                onSendMessage(newMessage);
                 setCurrentMessage('');
-                setImageUrl('');
-                setVideoUrl('');
 
-                if (typeof fetchLatestMessages === 'function') {
-                    fetchLatestMessages();
-                }
             } catch (error) {
                 console.error('Failed to send message', error);
             }
@@ -104,8 +110,8 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 <div className="d-flex align-items-center gap-4">
                     <div className="d-flex align-items-center gap-2">
                         {/* Profile picture */}
-                        <img src="" alt="Profile" className="rounded-circle" style={{width: '40px', height: '40px'}}/>
-
+                        {/*<img src="" alt="Profile" className="rounded-circle" style={{width: '40px', height: '40px'}}/>*/}
+                        <FaUserCircle size={40} className="rounded-circle" />
                         {/* User details */}
                         <div>
                             <span className="d-block font-weight-bold">{selectedUser.name}</span>
@@ -158,8 +164,8 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                             }`}
                         >
                             <p className="mb-1">{msg.mes}</p>
-                            {msg.imageUrl && <img src={msg.imageUrl} alt="Sent" className="img-fluid"/>}
-                            {msg.videoUrl && <video src={msg.videoUrl} className="img-fluid" controls/>}
+                            {/*{msg.imageUrl && <img src={msg.imageUrl} alt="Sent" className="img-fluid"/>}*/}
+                            {/*{msg.videoUrl && <video src={msg.videoUrl} className="img-fluid" controls/>}*/}
                             <p className="text-right small text-muted">
                                 {new Date(msg.createAt).toLocaleString()}
                             </p>
@@ -215,12 +221,16 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                         onChange={handleUploadImage}
                     />
                 </div>
+
                 {/* Emojis */}
-                <div className="d-flex align-items-center ps-2">
-                    <button className="btn-emoji">
+                <div className="d-flex align-items-center ps-2 " >
+                    <button className="btn-emoji" onClick={toggleEmojiPicker}>
                         <FaSmile size={20}/>
                     </button>
                 </div>
+                {/*{showEmojiPicker && (*/}
+                {/*    <Picker onEmojiClick={handleEmojiClick} />*/}
+                {/*)}*/}
                 {/* Message Input */}
                 <form onSubmit={handleSendMessage} className="flex-grow-1 ms-2 me-2">
                     <div className="input-group w-100">
