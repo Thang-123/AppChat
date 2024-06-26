@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {loginUser, registerUser, setLoggedInUser, setLoggedInUSer} from "./chatSlice";
 import WebSocketService from "../webSocketService";
+import '../component/Chat.css';
 
 const LoginPage = () => {
     const dispatch = useDispatch();
@@ -62,54 +63,51 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="container mt-5">
-            <div className="row justify-content-center">
-                <div className="col-md-6">
-                    <div className="card">
-                        <div className="card-body">
-                            <h2 className="card-title text-center">Chat Application</h2>
-                            <p className="card-text text-center">Sign in to your account</p>
-
-                            <form onSubmit={(e) => e.preventDefault()} className="mt-4">
-                                <div className="mb-3">
-                                    <label htmlFor="username" className="form-label">Username</label>
-                                    <input
-                                        type="text"
-                                        id="username"
-                                        name="username"
-                                        className="form-control"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <div className="mb-3">
-                                    <label htmlFor="password" className="form-label">Password</label>
-                                    <input
-                                        type="password"
-                                        id="password"
-                                        name="password"
-                                        className="form-control"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <button type="button" onClick={handleLogin} className="btn btn-primary w-100">Login</button>
-                            </form>
-
-                            {feedbackMessage && (
-                                <div className="alert alert-danger mt-3" role="alert">
-                                    {feedbackMessage}
-                                </div>
-                            )}
-
-                        </div>
-                    </div>
-                    <p className="mt-3 text-center">Don't have an account? <Link to="/register" className="text-primary">Sign Up</Link></p>
+        <div className="container">
+            <div className="card-body">
+                <div className="sign-in">
+                    <h2 className="title-text">Sign In</h2>
+                    <p className="text-text">Sign in to your account</p>
                 </div>
+
+                <form onSubmit={(e) => e.preventDefault()} className="mt-4">
+                    <div className="mb-3">
+                        <label htmlFor="username" className="form-label">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            className="form-control"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            className="form-control"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <button type="button" onClick={handleLogin} className="btn btn-primary w-100">Login
+                    </button>
+                </form>
+
+                {feedbackMessage && (
+                    <div className="alert alert-danger mt-3" role="alert">
+                        {feedbackMessage}
+                    </div>
+                )}
+
+                <p className="mt-3 text-center">Don't have an account? <Link to="/register" className="text-primary">Sign Up</Link></p>
             </div>
         </div>
     );
