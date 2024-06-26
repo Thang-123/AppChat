@@ -96,7 +96,7 @@ const Chat = () => {
             return;
         }
         // if(newMessages !== null){
-        //     setNewMessages(null);
+            setNewMessages("");
         // }
 
         const { name, mes } = data.data;
@@ -169,9 +169,9 @@ const Chat = () => {
             console.error('Invalid user object:', user);
             return;
         }
-        if(newMessages !== null){
-            setNewMessages(null);
-        }
+        // if(newMessages !== null){
+        //     setNewMessages(null);
+        // }
 
         if (selectedUser && selectedUser.name === user.name) return;
         console.log('Clicked User:', user);

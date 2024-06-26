@@ -22,15 +22,15 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
         };
     }, []);
 
-    useEffect(() => {
-        if (selectedUser) {
-            if (selectedUser.type === 0) {
-                fetchLatestMessages();
-            } else if (selectedUser.type === 1) {
-                getRoomChatMes();
-            }
-        }
-    }, [selectedUser, fetchLatestMessages,  getRoomChatMes]);
+    // useEffect(() => {
+    //     if (selectedUser) {
+    //         if (selectedUser.type === 0) {
+    //             fetchLatestMessages();
+    //         } else if (selectedUser.type === 1) {
+    //             getRoomChatMes();
+    //         }
+    //     }
+    // }, [selectedUser, fetchLatestMessages,  getRoomChatMes]);
 
     // useEffect(() => {
     //     scrollToBottom();
