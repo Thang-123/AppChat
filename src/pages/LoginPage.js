@@ -67,7 +67,7 @@ const LoginPage = () => {
             <div className="card-body">
                 <div className="sign-in">
                     <h2 className="title-text">Sign In</h2>
-                    <p className="text-text">Sign in to your account</p>
+                    {/*<p className="text-text">Sign in to your account</p>*/}
                 </div>
 
                 <form onSubmit={(e) => e.preventDefault()} className="mt-4">
