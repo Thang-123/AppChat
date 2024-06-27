@@ -23,9 +23,6 @@ const Chat = () => {
         WebSocketService.registerCallback('LOGOUT', handleLogoutResponse);
         WebSocketService.registerCallback('SEND_CHAT', handleSendChatResponse);
         WebSocketService.registerCallback('CHECK_USER', handleCheckUserActiveResponse);
-
-    }, [dispatch]);
-    useEffect(() => {
         handleGetUserList();
     }, [dispatch]);
 
@@ -95,9 +92,7 @@ const Chat = () => {
             console.log('Failed to send chat message');
             return;
         }
-        // if(newMessages !== null){
             setNewMessages("");
-        // }
 
         const { name, mes } = data.data;
 
@@ -115,12 +110,10 @@ const Chat = () => {
         };
 
         dispatch(addMessage([...messages, newMessage]));
-        fetchLatestMessages();
+        // fetchLatestMessages();
+        fetchUserMessages(name)
     };
-    // useEffect(() => {
-    //     console.log(newMessages);
-    //     console.log(Object.keys(newMessages));
-    // }, [newMessages]);
+
 
     const handleGetUserMessagesResponse = (data) => {
         if (!data || data.status !== 'success') {
@@ -179,7 +172,7 @@ const Chat = () => {
         checkUserActive(user)
         console.log('Check Active :', user);
         if (user.type === 0) {
-            fetchUserMessages(user);
+            fetchUserMessages(user.name);
         } else if (user.type === 1) {
             getRoomChatMes(user);
         } else {
@@ -246,7 +239,7 @@ const Chat = () => {
             data: {
                 event: 'GET_PEOPLE_CHAT_MES',
                 data: {
-                    name: user.name,
+                    name: user,
                     page: 1
                 }
             }

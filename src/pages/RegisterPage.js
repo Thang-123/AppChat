@@ -94,10 +94,10 @@ const RegisterPage = () => {
                     </div>
                 )}
 
-
                 <p className="text-center">Already have an account? <Link to="/login" className="text-primary">Sign In</Link></p>
             </div>
         </div>
+
     );
 };
 

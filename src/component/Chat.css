@@ -130,7 +130,7 @@
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 1050;
-    overflow: hidden; /* Ẩn thanh cuộn của modal container */
+    overflow: hidden;
 }
 
 .modal-dialog {
@@ -439,6 +439,14 @@
     gap: 14px;
     width: 439px;
     height: auto;
+    overflow: hidden;
+    height: 100vh;
+}
+
+.card-body{
+    gap: 25px;
+    width: 439px;
+    height: 444px;
     display: flex;
     padding: 25px;
     align-items: center;
@@ -509,7 +517,6 @@
     font-stretch: normal;
     text-decoration: none;
 }
-
 .alert{
     margin: 0px;
 }
@@ -539,5 +546,3 @@
     text-decoration: none;
     margin: 0px;
 }
-
-

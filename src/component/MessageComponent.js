@@ -32,15 +32,15 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
     //     }
     // }, [selectedUser, fetchLatestMessages,  getRoomChatMes]);
 
-    // useEffect(() => {
-    //     scrollToBottom();
-    // }, [messages]);
-    //
-    // const scrollToBottom = () => {
-    //     if (messageContainerRef.current) {
-    //         messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
-    //     }
-    // };
+    useEffect(() => {
+        scrollToBottom();
+    }, [selectedUser]);
+
+    const scrollToBottom = () => {
+        if (messageContainerRef.current) {
+            messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+        }
+    };
 
     const handleUploadImageVideoOpen = () => {
         setOpenImageVideoUpload(prev => !prev);
@@ -95,6 +95,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 console.error('Failed to send message', error);
             }
         }
+        scrollToBottom()
     };
     return (
     <div id ="messageComponent" className="bg-no-repeat bg-cover">
