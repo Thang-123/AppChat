@@ -14,14 +14,17 @@ import { HiDotsVertical } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { IoMdSend } from 'react-icons/io';
 import './Chat.css';
-import { Picker } from 'emoji-mart';
-const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage, fetchLatestMessages,getRoomChatMes}) => {
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { firestore } from '../firebaseconfig';
+import { doc,getDoc } from 'firebase/firestore';
+const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
     const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
     const messageContainerRef = useRef(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [avatarUrl, setAvatarUrl] = useState('');
     useEffect(() => {
         const messageComponentElement = document.getElementById('messageComponent');
         if (messageComponentElement) {
@@ -32,6 +35,24 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
             messageComponentElement.classList.remove('fadeInEffect');
         };
     }, []);
+
+    useEffect(() => {
+        const fetchAvatar = async () => {
+            try {
+                const storage = getStorage();
+                const avatarRef = ref(storage, `avatars/${selectedUser.name}`);
+                const downloadURL = await getDownloadURL(avatarRef);
+                setAvatarUrl(downloadURL);
+                console.log("avatar url:", downloadURL)
+            } catch (error) {
+                console.error('Error fetching avatar:', error);
+                setAvatarUrl('');
+            }
+        };
+
+        fetchAvatar();
+    }, [selectedUser]);
+
 
     // useEffect(() => {
     //     if (selectedUser) {
@@ -110,8 +131,11 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 <div className="d-flex align-items-center gap-4">
                     <div className="d-flex align-items-center gap-2">
                         {/* Profile picture */}
-                        {/*<img src="" alt="Profile" className="rounded-circle" style={{width: '40px', height: '40px'}}/>*/}
-                        <FaUserCircle size={40} className="rounded-circle" />
+                        {avatarUrl ? (
+                            <img src={avatarUrl} alt="Profile" className="rounded-circle" style={{ width: '40px', height: '40px' }} />
+                        ) : (
+                            <FaUserCircle size={40} className="rounded-circle" />
+                        )}
                         {/* User details */}
                         <div>
                             <span className="d-block font-weight-bold">{selectedUser.name}</span>
