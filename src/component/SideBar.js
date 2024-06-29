@@ -93,13 +93,22 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
     const [avatar, setAvatar] = useState(null);
     const [preview, setPreview] = useState(null);
     const [name, setName] = useState(loggedInUser);
-
+    const [avatarUrl, setAvatarUrl] = useState('');
     useEffect(() => {
-        // Kiểm tra nếu có URL avatar được lưu trong localStorage, sử dụng nó
-        const savedAvatarUrl = localStorage.getItem('avatarUrl');
-        if (savedAvatarUrl) {
-            setPreview(savedAvatarUrl);
-        }
+        const fetchAvatar = async () => {
+            try {
+                const storage = getStorage();
+                const avatarRef = ref(storage, `avatars/${loggedInUser}`);
+                const downloadURL = await getDownloadURL(avatarRef);
+                setAvatarUrl(downloadURL);
+                console.log("avatar url:", downloadURL)
+            } catch (error) {
+                console.error('Error fetching avatar:', error);
+                setAvatarUrl('');
+            }
+        };
+
+        fetchAvatar();
     }, []);
     const handleAvatarChange = (event) => {
         const file = event.target.files[0];
@@ -266,17 +275,10 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                         <form onSubmit={handleSubmit} className="mx-auto">
                             <div className="text-center my-auto">
                                 <label htmlFor="avatarInput" className="cursor-pointer">
-                                    {preview ? (
-                                        <img
-                                            src={preview}
-                                            alt="Avatar Preview"
-                                            className="avatar-container "
-                                        />
+                                    {avatarUrl ? (
+                                        <img src={avatarUrl} alt="Profile" className="rounded-circle" style={{ width: '60px', height: '60px' }} />
                                     ) : (
-                                        <FaUserCircle
-                                            size={96}
-                                            className="mx-auto h-75 w-75 rounded-full object-cover"
-                                        />
+                                        <FaUserCircle size={40} className="rounded-circle" />
                                     )}
                                 </label>
                                 <input
