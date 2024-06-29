@@ -424,15 +424,21 @@
 }
 
 .container {
-    gap: 10px;
     max-width: 100%;
     display: flex;
     padding: 295px 497px;
+    overflow: hidden;
     background: linear-gradient(150deg, rgba(184, 206, 249, 1) 3%, rgba(101, 150, 247, 1) 40%, rgba(34, 76, 160, 1) 95%);
     align-items: center;
     flex-shrink: 0;
     flex-direction: column;
     justify-content: center;
+}
+
+.card-body{
+    gap: 14px;
+    width: 439px;
+    height: auto;
     overflow: hidden;
     height: 100vh;
 }
@@ -451,7 +457,7 @@
     background-color: rgba(223, 230, 255, 1);
 }
 
-.sign-in{
+.sign-in .sign-up{
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -461,9 +467,9 @@
 .title-text{
     color: rgba(60, 124, 221, 1);
     height: auto;
-    font-size: 50px;
-    font-style: Regular;
-    text-align: left;
+    margin-bottom: 4px;
+    font-size: 58px;
+    text-align: center;
     font-family: Paytone One;
     font-weight: 400;
     line-height: normal;
@@ -474,14 +480,71 @@
 .text-text{
     color: rgba(102, 132, 240, 1);
     height: auto;
+    margin-bottom: 4px;
     font-size: 26px;
-    font-style: Regular;
+    text-align: center;
+    font-family: Poor Story;
+    font-weight: 400;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+}
+
+.form-control{
+    gap: 10px;
+    width: 360px;
+    height: 45px;
+    display: flex;
+    padding: 6px 14px;
+    box-sizing: content-box;
+    align-items: center;
+    flex-shrink: 0;
+    border-color: rgba(145, 167, 224, 1);
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    background-color: rgba(223, 230, 255, 1);
+}
+
+.form-input {
+    color: rgba(168, 168, 168, 1);
+    height: auto;
+    font-size: 26px;
     text-align: left;
     font-family: Poor Story;
     font-weight: 400;
     line-height: normal;
     font-stretch: normal;
     text-decoration: none;
+}
+.alert{
+    margin: 0px;
+}
+
+.btn {
+    gap: 10px;
+    display: flex;
+    padding: 5px 50px;
+    align-items: center;
+    border-radius: 12px;
+    justify-content: center;
+    background-color: rgba(61, 125, 221, 1);
+    color: rgba(223, 230, 255, 1);
+    font-size: 20px;
+    font-family: Poor Story;
+    line-height: normal;
+}
+
+.text-center{
+    color: rgba(103, 103, 103, 1);
+    height: auto;
+    font-size: 19px;
+    font-family: Poor Story;
+    font-weight: 400;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+    margin: 0px;
 }
 
 .avatar-container {

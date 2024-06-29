@@ -53,49 +53,49 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="container d-flex justify-content-center align-items-center vh-100">
-                    <div className="card-body">
-                        <h2 className="title-text text-center mb-4">Register</h2>
-                        <form onSubmit={(e) => e.preventDefault()}>
-                            <div className="mb-3">
-                                <label htmlFor="username" className="form-label">User Name</label>
-                                <input
-                                    type="text"
-                                    id="username"
-                                    name="username"
-                                    className="form-control"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    required
-                                />
-                            </div>
+        <div className="container">
+            <div className="card-body">
+                <div className="sign-up">
+                    <h2 className="title-text">Sign Up</h2>
+                    <p className="text-text">Create your account</p>
+                </div>
 
-                            <div className="mb-3">
-                                <label htmlFor="password" className="form-label">Password</label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    className="form-control"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
+                <div className="form-input">
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Username"
+                        className="form-control"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                    />
+                </div>
 
-                            <button type="button" onClick={handleRegister} className="btn btn-primary w-100">Register
-                            </button>
-                        </form>
+                <div className="form-input">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Password"
+                        className="form-control"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
 
-                        {feedbackMessage && (
-                            <div className="alert alert-danger mt-3" role="alert">
-                                {feedbackMessage}
-                            </div>
-                        )}
+                <button type="button" onClick={handleRegister} className="btn btn-primary w-100">Register</button>
 
-                        <p className="mt-3 text-center">Already have an account? <a href="/login" className="text-primary">Login</a></p>
+                {feedbackMessage && (
+                    <div className="alert alert-danger" role="alert">
+                        {feedbackMessage}
                     </div>
+                )}
 
+                <p className="text-center">Already have an account? <Link to="/login" className="text-primary">Sign In</Link></p>
+            </div>
         </div>
 
     );

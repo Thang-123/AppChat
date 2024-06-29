@@ -28,11 +28,11 @@ const Router = () => {
                     element: <RegisterPage />
                 },{
                     path: "login",
-                    element: loggedIn ? <Chat /> : <LoginPage />
+                    element:  loggedIn ? <Chat /> : <LoginPage />
                 },{
                     path: "chat",
-                    // element: loggedIn ? <ChatPage /> : <LoginPage />
-                    element: loggedIn ? <Chat /> : <LoginPage />
+                    // element: loggedIn ? <AuthLayouts><ChatPage /></AuthLayouts> : <AuthLayouts><LoginPage /></AuthLayouts>
+                    element:  loggedIn ? <Chat /> : <LoginPage />
                 },
                 {
                     path: "",
