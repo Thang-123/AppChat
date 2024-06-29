@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { IoChatbubbleEllipses } from 'react-icons/io5';
 import {FaUserCircle, FaUserPlus} from 'react-icons/fa';
@@ -9,8 +9,9 @@ import SearchUser from "./SearchUser";
 import { ListGroup } from "react-bootstrap";
 import UserSearchCard from "./UserSearchCard";
 import {useSelector} from "react-redux";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'; // Import Firebase Storage from modular SDK
-import { firestore } from '../firebaseconfig'; // Import Firestore from your config
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { firestore } from '../firebaseconfig';
+import { doc, setDoc } from 'firebase/firestore';
 const StyledIconContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -93,7 +94,13 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
     const [preview, setPreview] = useState(null);
     const [name, setName] = useState(loggedInUser);
 
-
+    useEffect(() => {
+        // Kiểm tra nếu có URL avatar được lưu trong localStorage, sử dụng nó
+        const savedAvatarUrl = localStorage.getItem('avatarUrl');
+        if (savedAvatarUrl) {
+            setPreview(savedAvatarUrl);
+        }
+    }, []);
     const handleAvatarChange = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -107,27 +114,22 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
       ;
     };
 
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
         if (avatar) {
-            const storage = getStorage(); // Initialize Firebase Storage
-            const storageRef = ref(storage, `avatars/${avatar.name}`); // Create a reference to the file
+            const storage = getStorage();
+            const storageRef = ref(storage, `avatars/${loggedInUser}`);
             uploadBytesResumable(storageRef, avatar).then((snapshot) => {
                 console.log('File uploaded successfully');
                 getDownloadURL(snapshot.ref).then((downloadURL) => {
-                    // Update Firestore with downloadURL
-                    firestore.collection('users').doc(loggedInUser).set(
-                        {
-                            name: name,
-                            avatarUrl: downloadURL,
-                        },
-                        { merge: true }
-                    ).then(() => {
+                    const userDocRef = doc(firestore, 'users', loggedInUser);
+                    setDoc(userDocRef, {
+                        avatarUrl: downloadURL,
+                    }, { merge: true }).then(() => {
                         console.log('Profile updated successfully');
-                        setName(''); // Optionally reset form values
                         setAvatar(null);
-                        setPreview(null);
                     }).catch((error) => {
                         console.error('Error updating profile: ', error);
                     });
@@ -139,6 +141,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
             });
         }
     };
+
     const handleToggleShowSearchUser = () => {
         setOpenSearchUser(prev => !prev);
     };

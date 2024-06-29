@@ -193,6 +193,7 @@ const Chat = () => {
                 }
             }
         });
+        fetchLatestMessages()
     };
 
     const handleLogOut = () => {
