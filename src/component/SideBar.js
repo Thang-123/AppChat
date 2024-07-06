@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { IoChatbubbleEllipses } from 'react-icons/io5';
-import {FaUserCircle, FaUserPlus} from 'react-icons/fa';
+import {FaUserCircle, FaUserFriends, FaUserPlus, FaUsers} from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
 import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -12,6 +12,8 @@ import {useSelector} from "react-redux";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { firestore } from '../firebaseconfig';
 import { doc, setDoc } from 'firebase/firestore';
+import {FaPeopleGroup, FaUserGroup} from 'react-icons/fa6';
+import Modal from 'react-bootstrap/Modal'; // Import Modal from react-bootstrap
 const StyledIconContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -72,6 +74,13 @@ const UserListContainer = styled.div`
     padding: 1rem;
     background-color: #f8f9fa;
 `;
+
+const GroupListContainer = styled.div`
+    height: calc(100vh - 65px);
+    padding: 1rem;
+    background-color: #f8f9fa;
+`;
+
 const SearchInputContainer = styled.div`
     width: 100%;
     padding: 0.5rem 1rem;
@@ -84,8 +93,10 @@ const SearchInputContainer = styled.div`
 const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
+    const [openSearchGroup, setOpenSearchGroup] = useState(false);
     const [openChat, setOpenChat] = useState(false);
     const [openSetting, setOpenSetting] = useState(false);
+    const [openGroup, setOpenGroup] = useState(false);
     const [displayedUsers, setDisplayedUsers] = useState(users.slice(0, 10));
     const [hasMore, setHasMore] = useState(users.length > 10);
     const [searchTerm, setSearchTerm] = useState('');
@@ -94,6 +105,9 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
     const [preview, setPreview] = useState(null);
     const [name, setName] = useState(loggedInUser);
     const [avatarUrl, setAvatarUrl] = useState('');
+    const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
+    const [groupName, setGroupName] = useState('');
+    const [groupImage, setGroupImage] = useState(null); // Assume groupImage is a state variable to hold the image file
     useEffect(() => {
         const fetchAvatar = async () => {
             try {
@@ -155,15 +169,48 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
         setOpenSearchUser(prev => !prev);
     };
 
+    const handleToggleShowSearchGroup= () => {
+        setOpenSearchGroup(prev => !prev);
+    };
+
+    const handleOpenCreateGroupModal = () => {
+        setShowCreateGroupModal(true);
+    };
+
+    const handleCloseCreateGroupModal = () => {
+        setShowCreateGroupModal(false);
+    };
+
+    const handleGroupNameChange = (e) => {
+        setGroupName(e.target.value);
+    };
+
+    const handleGroupImageChange = (e) => {
+        setGroupImage(e.target.files[0]);
+    };
+
+    const handleCreateGroup = () => {
+        // Implement logic to create the group using groupName and groupImage
+        // (e.g., call an API or update state in a Redux store)
+        handleCloseCreateGroupModal();
+    };
+
     const handleIconClick = (icon) => {
         setActiveIcon(prev => (prev === icon ? null : icon));
         if (icon === 'chat') {
             setOpenChat(prev => !prev);
             setOpenSetting(false);
+            setOpenGroup(false);
         }
         if (icon === 'settings') {
             setOpenSetting(prev => !prev);
             setOpenChat(false);
+            setOpenGroup(false);
+        }
+        if (icon === 'group') {
+            setOpenGroup(prev => !prev);
+            setOpenChat(false);
+            setOpenSetting(false);
         }
     };
 
@@ -186,6 +233,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
         setDisplayedUsers(filteredUsers.slice(0, 10));
         setHasMore(filteredUsers.length > 10);
     };
+
     return (
         <div className="d-flex">
             <SidebarContainer>
@@ -199,10 +247,10 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                     </StyledIcon>
                     <StyledIcon
                         onClick={() => {
-                            handleIconClick('addFriend');
+                            handleIconClick('group');
                         }}
-                        active={activeIcon === 'addFriend' ? "true" : "false"}
-                        title="Add Friend"
+                        active={activeIcon === 'group' ? "true" : "false"}
+                        title="Group"
                     >
                         <FaUserPlus size={24} />
                     </StyledIcon>
@@ -221,52 +269,53 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                     </StyledIcon>
                 </StyledIconContainer>
             </SidebarContainer>
-            {openChat && <div className="flex-grow-1">
-                <div className="bg-slate-100 p-4">
-                    <h2 className="text-xl font-bold">CHATS</h2>
-                    <hr />
-                    <SearchInputContainer onClick={handleToggleShowSearchUser}>
-                        <input
-                            type="text"
-                            placeholder="Search users..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            style={{ border: 'none', width: '100%' }}
-                            readOnly
-                        />
-                    </SearchInputContainer>
-                </div>
-                <div className='col-12 custom-scrollbar' style={{ height: 'calc(85vh - 55px)'}}>
-                    <UserListContainer>
-                        {users.length === 0 && (
-                            <div className="text-center mt-4">
-                                <FiArrowUpLeft size={24} className="text-gray-500" />
-                                <p className="text-gray-500 mt-2">Explore users to start a conversation with.</p>
-                            </div>
-                        )}
-                        <InfiniteScroll
-                            dataLength={users.length}
-                            // next={fetchMoreData}
-                            // hasMore={hasMore}
-                            // loader={<h4>Loading...</h4>}
-                        >
-                            <div>
-                                {users.map((user,index) => (
-                                    <UserSearchCard
-                                        key={index}
-                                        user={user}
-                                        onUserClick={() => onUserClick(user)}
-                                        newMessage={newMessage[user.name] || ""}
-                                    />
-                                ))}
-                            </div>
-                        </InfiniteScroll>
-                    </UserListContainer>
-                </div>
+            {openChat &&
+                <div className="flex-grow-1">
+                    <div className="bg-slate-100 p-4">
+                        <h2 className="text-xl font-bold">CHATS</h2>
+                        <hr />
+                        <SearchInputContainer onClick={handleToggleShowSearchUser}>
+                            <input
+                                type="text"
+                                placeholder="Search users..."
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                style={{ border: 'none', width: '100%' }}
+                                readOnly
+                            />
+                        </SearchInputContainer>
+                    </div>
+                    <div className='col-12 custom-scrollbar' style={{ height: 'calc(85vh - 55px)'}}>
+                        <UserListContainer>
+                            {users.length === 0 && (
+                                <div className="text-center mt-4">
+                                    <FiArrowUpLeft size={24} className="text-gray-500" />
+                                    <p className="text-gray-500 mt-2">Explore users to start a conversation with.</p>
+                                </div>
+                            )}
+                            <InfiniteScroll
+                                dataLength={users.length}
+                                // next={fetchMoreData}
+                                // hasMore={hasMore}
+                                // loader={<h4>Loading...</h4>}
+                            >
+                                <div>
+                                    {users.map((user,index) => (
+                                        <UserSearchCard
+                                            key={index}
+                                            user={user}
+                                            onUserClick={() => onUserClick(user)}
+                                            newMessage={newMessage[user.name] || ""}
+                                        />
+                                    ))}
+                                </div>
+                            </InfiniteScroll>
+                        </UserListContainer>
+                    </div>
 
 
-                {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
-            </div>
+                    {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
+                </div>
             }
             {openSetting &&
                 <div className="flex-1">
@@ -307,6 +356,103 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                             </button>
                         </form>
                     </div>
+                </div>
+            }
+            {openGroup &&
+                <div className="flex-grow-1">
+                    <div className="bg-slate-100 p-4">
+                        <h2 className="text-xl font-bold">GROUPS</h2>
+                        <hr/>
+                        <SearchInputContainer onClick={handleToggleShowSearchGroup}>
+                            <input
+                                type="text"
+                                placeholder="Search groups..."
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                style={{border: 'none', width: '100%'}}
+                                readOnly
+                            />
+                        </SearchInputContainer>
+                        <div className="d-flex align-items-center gap-3">
+                            <button className="btn btn-link text-dark p-2" onClick={handleOpenCreateGroupModal}>
+                                <FaUsers size={20} className="me-2"/> Create Group
+                            </button>
+
+                            <Modal show={showCreateGroupModal} onHide={handleCloseCreateGroupModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Create Group</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <form>
+                                        <div className="mb-3">
+                                            <label htmlFor="groupName" className="form-label">Group Name:</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="groupName"
+                                                value={groupName}
+                                                onChange={handleGroupNameChange}
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label htmlFor="groupImage" className="form-label">Group image:</label>
+                                            <input
+                                                type="file"
+                                                className="form-control"
+                                                id="groupImage"
+                                                onChange={handleGroupImageChange}
+                                            />
+                                        </div>
+                                    </form>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <button variant="secondary" onClick={handleCloseCreateGroupModal}>
+                                        Cancel
+                                    </button>
+                                    <button variant="primary" onClick={handleCreateGroup}>
+                                        Create
+                                    </button>
+                                </Modal.Footer>
+                            </Modal>
+
+                            <button className="btn btn-link text-dark p-2" data-bs-toggle="modal"
+                                    data-bs-target="#joinGroupModal">
+                                <FaUserFriends size={20} className="me-2"/> Join Group
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <div className='col-12 custom-scrollbar' style={{height: 'calc(85vh - 55px)'}}>
+                        <GroupListContainer>
+                            {users.length === 0 && (
+                                <div className="text-center mt-4">
+                                    <FiArrowUpLeft size={24} className="text-gray-500"/>
+                                    <p className="text-gray-500 mt-2">Explore users to start a conversation with.</p>
+                                </div>
+                            )}
+                            <InfiniteScroll
+                                dataLength={users.length}
+                                // next={fetchMoreData}
+                                // hasMore={hasMore}
+                                // loader={<h4>Loading...</h4>}
+                            >
+                                <div>
+                                    {users.map((user, index) => (
+                                        <UserSearchCard
+                                            key={index}
+                                            user={user}
+                                            onUserClick={() => onUserClick(user)}
+                                            newMessage={newMessage[user.name] || ""}
+                                        />
+                                    ))}
+                                </div>
+                            </InfiniteScroll>
+                        </GroupListContainer>
+                    </div>
+
+
+                    {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} onUserClick={onUserClick}/>}
                 </div>
             }
         </div>
