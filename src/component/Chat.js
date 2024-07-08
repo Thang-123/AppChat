@@ -24,7 +24,7 @@ const Chat = () => {
         WebSocketService.registerCallback('LOGOUT', handleLogoutResponse);
         WebSocketService.registerCallback('SEND_CHAT', handleSendChatResponse);
         WebSocketService.registerCallback('CHECK_USER', handleCheckUserActiveResponse);
-        handleGetUserList();
+        WebSocketService.registerCallback('CREATE_ROOM', handleCreateRoom);
     }, [dispatch]);
 
     const handleLogoutResponse = (data) => {
@@ -40,6 +40,7 @@ const Chat = () => {
             console.log(errorMessage);
         }
     };
+
     const handleGetUserListResponse = (data) => {
         if (!data || data.status !== 'success') {
             console.error('Failed to fetch user list');
@@ -47,14 +48,10 @@ const Chat = () => {
         }
 
         const users = data.data || [];
-        const groups = data.data === 1 || [];
+        const groups = users.filter(user => user.type === 1);
 
-        if (users.length > 0) {
-            dispatch(setUsers(users));
-        }
-        if (groups.length > 0) {
-            dispatch(setGroups(groups)); // Assuming setGroups updates group state
-        }
+
+        dispatch(setUsers(users), setGroups(groups));
     };
 
 
@@ -277,7 +274,6 @@ const Chat = () => {
     };
 
     const fetchGroupMessages = (groupId) => {
-        console.log("fetch Group Message first time");
         WebSocketService.sendMessage({
             action: 'onchat', // Assuming same action for chat communication
             data: {
@@ -293,17 +289,15 @@ const Chat = () => {
     const handleCreateRoom = (roomName) => {
         console.log("Creating room:", roomName);
         WebSocketService.sendMessage({
-            action: 'onchat', // Assuming same action for chat communication
+            action: 'onchat',
             data: {
-                event: 'CREATE_ROOM', // Event for creating a room
+                event: 'CREATE_ROOM',
                 data: {
-                    name: roomName // Use roomName for clarity
+                    name: roomName,
                 }
             }
         });
     };
-
-
 
 
     const handleCloseMessageComponent = () => {

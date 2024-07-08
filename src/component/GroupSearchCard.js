@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {FaUserGroup} from 'react-icons/fa6';
 import { getDownloadURL, getStorage, ref } from "firebase/storage"; // Assuming group avatars are stored in Firebase Storage
 
-const GroupSearchCard = ({ group, onClose, onGroupClick }) => {
+const GroupSearchCard = ({ group, onGroupClick, newMessage }) => {
     const [clicked, setClicked] = useState(false);
     const [groupImageUrl, setGroupImageUrl] = useState('');
 
@@ -29,8 +29,9 @@ const GroupSearchCard = ({ group, onClose, onGroupClick }) => {
     }, [group]); // Dependency array includes `group` to refetch on group change
 
     return (
-        <div onClick={handleClick} className={`group-search-card ${clicked ? 'clicked' : ''}`}>
-            <div className="group-card">
+        <div onClick={handleClick}
+             className={`group-search-card ${newMessage ? 'has-message' : ''} ${clicked ? 'clicked' : ''}`}>
+            <div className={`group-card ${newMessage ? 'has-message' : ''} ${clicked ? 'clicked' : ''}`}>
                 <div className="group-avatar">
                     {groupImageUrl ? (
                         <img src={groupImageUrl} alt={group.name} className="rounded-circle" style={{ width: '40px', height: '40px' }} />
@@ -40,6 +41,7 @@ const GroupSearchCard = ({ group, onClose, onGroupClick }) => {
                 </div>
                 <div className="group-info">
                     <h5 className="group-name">{group.name}</h5>
+                    {newMessage && <p className="user-message">{newMessage}</p>}
                 </div>
             </div>
         </div>

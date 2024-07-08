@@ -6,16 +6,17 @@ import { BiLogOut } from 'react-icons/bi';
 import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
 import SearchUser from "./SearchUser";
-import { ListGroup } from "react-bootstrap";
 import UserSearchCard from "./UserSearchCard";
+import SearchGroup from "./SearchGroup";
+import GroupSearchCard from "./GroupSearchCard";
+import { ListGroup } from "react-bootstrap";
 import {useSelector} from "react-redux";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { firestore } from '../firebaseconfig';
 import { doc, setDoc } from 'firebase/firestore';
 import Modal from 'react-bootstrap/Modal';
-import SearchGroup from "./SearchGroup";
-import GroupSearchCard from "./GroupSearchCard"; // Import Modal from react-bootstrap
 import {GrGroup} from "react-icons/gr";
+import WebSocketService from "../webSocketService";
 const StyledIconContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -110,8 +111,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     const [name, setName] = useState(loggedInUser);
     const [avatarUrl, setAvatarUrl] = useState('');
     const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
-    const [groupName, setGroupName] = useState('');
-    const [groupImage, setGroupImage] = useState(null); // Assume groupImage is a state variable to hold the image file
+    const [roomName, setGroupName] = useState('');
     useEffect(() => {
         const fetchAvatar = async () => {
             try {
@@ -184,19 +184,38 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
         setShowCreateGroupModal(false);
     };
 
-    const handleGroupNameChange = (e) => {
-        setGroupName(e.target.value);
+
+    const handleInputChange = (event) => {
+        setGroupName(event.target.value);
     };
 
-    const handleGroupImageChange = (e) => {
-        setGroupImage(e.target.files[0]);
-    };
+    const handleSubmitCG = async (event) => {
+        event.preventDefault();
 
-    const handleCreateGroup = () => {
-        // Implement logic to create the group using groupName and groupImage
-        // (e.g., call an API or update state in a Redux store)
-        handleCloseCreateGroupModal();
-    };
+        if (!roomName) { // Basic validation to ensure a room name is provided
+            alert('Please enter a room name.');
+            return;
+        }
+
+        try {
+            console.log("Creating room:", roomName);
+            await WebSocketService.sendMessage({
+                action: 'onchat',
+                data: {
+                    event: 'CREATE_ROOM',
+                    data: {
+                        name: roomName,
+                    },
+                },
+            });
+        } catch (error) {
+            console.error('Error creating room:', error);
+            // Handle creation errors (optional):
+            // - Display an error message to the user
+        } finally {
+            // Perform any cleanup actions (optional)
+        }
+        };
 
     const handleIconClick = (icon) => {
         setActiveIcon(prev => (prev === icon ? null : icon));
@@ -346,36 +365,22 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                                     <Modal.Title>Create Group</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <form>
+                                    <form onSubmit={handleSubmitCG}>
                                         <div className="mb-3">
                                             <label htmlFor="groupName" className="form-label">Group Name:</label>
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                id="groupName"
-                                                value={groupName}
-                                                onChange={handleGroupNameChange}
+                                                id="roomName"
+                                                value={roomName}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter room name..."
                                             />
                                         </div>
-                                        <div className="mb-3">
-                                            <label htmlFor="groupImage" className="form-label">Group image:</label>
-                                            <input
-                                                type="file"
-                                                className="form-control"
-                                                id="groupImage"
-                                                onChange={handleGroupImageChange}
-                                            />
-                                        </div>
+
+                                        <button type="submit" className="btn btn-primary">Create Room</button>
                                     </form>
                                 </Modal.Body>
-                                <Modal.Footer>
-                                    <button variant="secondary" onClick={handleCloseCreateGroupModal}>
-                                        Cancel
-                                    </button>
-                                    <button variant="primary" onClick={handleCreateGroup}>
-                                        Create
-                                    </button>
-                                </Modal.Footer>
                             </Modal>
 
                             <button className="btn btn-link text-dark p-2" data-bs-toggle="modal"
