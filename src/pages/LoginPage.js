@@ -77,7 +77,7 @@ const LoginPage = () => {
                         id="username"
                         name="username"
                         placeholder="Username"
-                        className="form-control"
+                        className="form-control-iu"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
@@ -90,7 +90,7 @@ const LoginPage = () => {
                         id="password"
                         name="password"
                         placeholder="Password"
-                        className="form-control"
+                        className="form-control-iu"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required

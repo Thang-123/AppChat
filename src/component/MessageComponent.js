@@ -151,21 +151,21 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 </div>
                 <div className="d-flex align-items-center gap-3">
                     {/* Video call icon */}
-                    <button className="btn btn-link text-dark p-0">
+                    <button className="btn btn-link text-dark p-2">
                         <FaVideo size={20}/>
                     </button>
 
                     {/* Phone call icon */}
-                    <button className="btn btn-link text-dark p-0">
+                    <button className="btn btn-link text-dark p-2">
                         <FaPhone size={20}/>
                     </button>
 
                     {/* Search icon */}
-                    <button className="btn btn-link text-dark p-0">
+                    <button className="btn btn-link text-dark p-2">
                         <FaSearch size={20}/>
                     </button>
 
-                    <button className="btn btn-link text-dark p-0" onClick={onClose}>
+                    <button className="btn btn-link text-dark p-2" onClick={onClose}>
                         <HiDotsVertical size={20}/>
                     </button>
 
@@ -247,7 +247,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 </div>
 
                 {/* Emojis */}
-                <div className="d-flex align-items-center ps-2 " >
+                <div className="d-flex align-items-center pe-2 " >
                     <button className="btn-emoji" onClick={toggleEmojiPicker}>
                         <FaSmile size={20}/>
                     </button>
