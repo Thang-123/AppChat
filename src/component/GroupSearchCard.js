@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaObjectGroup } from 'react-icons/fa';
+import {FaUserGroup} from 'react-icons/fa6';
 import { getDownloadURL, getStorage, ref } from "firebase/storage"; // Assuming group avatars are stored in Firebase Storage
 
 const GroupSearchCard = ({ group, onClose, onGroupClick }) => {
@@ -35,7 +35,7 @@ const GroupSearchCard = ({ group, onClose, onGroupClick }) => {
                     {groupImageUrl ? (
                         <img src={groupImageUrl} alt={group.name} className="rounded-circle" style={{ width: '40px', height: '40px' }} />
                     ) : (
-                        <FaObjectGroup size={40} className="rounded-circle" />
+                        <FaUserGroup size={40} className="rounded-circle" />
                     )}
                 </div>
                 <div className="group-info">

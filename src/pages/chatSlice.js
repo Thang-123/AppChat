@@ -4,6 +4,7 @@ const chatSlice = createSlice({
     name: 'chat',
     initialState: {
         users: [],
+        groups: [],
         messages: [],
         loggedIn: false,
         reLoginCode: null,
@@ -16,12 +17,18 @@ const chatSlice = createSlice({
         setUsers: (state, action) => {
             state.users = action.payload;
         },
+
+        setGroups: (state, action) => {
+            state.groups = action.payload;
+        },
+
         // setMessages(state, action) {
         //     state.messages = action.payload.map(msg => ({
         //         ...msg,
         //         sentByCurrentUser: msg.to !== state.loggedInUser.name
         //     }));
         // },
+
         setMessages(state, action) {
             state.messages = action.payload
         },
@@ -58,6 +65,7 @@ export const {
     setMessage,
     setLoading,
     setUsers,
+    setGroups,
     setMessages,
     registerUser,
     loginUser,

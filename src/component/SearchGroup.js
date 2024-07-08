@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { IoMdPeople } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { IoSearchOutline } from 'react-icons/io5';
 import Loading from './Loading';
-import GroupCard from './GroupSearchCard';
+import GroupSearchCard from './GroupSearchCard';
 import { useSelector } from "react-redux";
 
 const SearchGroup = ({ onClose, onGroupClick }) => {
@@ -31,7 +31,7 @@ const SearchGroup = ({ onClose, onGroupClick }) => {
                                 value={search}
                             />
                             <button className="input-icon">
-                                <IoMdPeople size={25}/>
+                                <IoSearchOutline size={25}/>
                             </button>
                         </div>
                         <button type="button" className="close-button" onClick={onClose}>
@@ -46,7 +46,7 @@ const SearchGroup = ({ onClose, onGroupClick }) => {
                             {loading && <Loading/>}
                             {filteredGroups.length !== 0 && !loading && (
                                 filteredGroups.map((group, index) => (
-                                    <GroupCard key={index} group={group} onClose={onClose} onGroupClick={onGroupClick}/>
+                                    <GroupSearchCard key={index} group={group} onClose={onClose} onGroupClick={onGroupClick}/>
                                 ))
                             )}
                         </div>
