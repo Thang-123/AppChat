@@ -5,10 +5,12 @@ import {getDownloadURL, getStorage, ref} from "firebase/storage";
 const UserSearchCard = ({ user, onUserClick , newMessage}) => {
     const [clicked, setClicked] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState('');
+
     const handleClick = () => {
         onUserClick(user);
         setClicked(true);
     };
+
     useEffect(() => {
         const fetchAvatar = async () => {
             try {

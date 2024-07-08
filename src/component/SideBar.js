@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { IoChatbubbleEllipses } from 'react-icons/io5';
-import {FaUserCircle, FaUserFriends, FaUserPlus, FaUsers} from 'react-icons/fa';
+import {FaUserCircle, FaUserFriends, FaUsers} from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
 import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -12,8 +12,10 @@ import {useSelector} from "react-redux";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { firestore } from '../firebaseconfig';
 import { doc, setDoc } from 'firebase/firestore';
-import {FaPeopleGroup, FaUserGroup} from 'react-icons/fa6';
-import Modal from 'react-bootstrap/Modal'; // Import Modal from react-bootstrap
+import Modal from 'react-bootstrap/Modal';
+import SearchGroup from "./SearchGroup";
+import GroupSearchCard from "./GroupSearchCard"; // Import Modal from react-bootstrap
+import {GrGroup} from "react-icons/gr";
 const StyledIconContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -90,7 +92,9 @@ const SearchInputContainer = styled.div`
     font-size: 1rem;
     cursor: pointer;
 `;
-const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
+
+
+const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [openSearchGroup, setOpenSearchGroup] = useState(false);
@@ -121,9 +125,8 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                 setAvatarUrl('');
             }
         };
-
         fetchAvatar();
-    }, []);
+    },[]);
     const handleAvatarChange = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -252,7 +255,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                         active={activeIcon === 'group' ? "true" : "false"}
                         title="Group"
                     >
-                        <FaUserPlus size={24} />
+                        <GrGroup size={24} />
                     </StyledIcon>
                     <Divider />
                     <StyledIcon
@@ -317,47 +320,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                     {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
                 </div>
             }
-            {openSetting &&
-                <div className="flex-1">
-                    <div className="bg-slate-100 p-4 mx-auto w-80">
-                        <h2 className="text-xl font-bold">Profile</h2>
-                        <form onSubmit={handleSubmit} className="mx-auto">
-                            <div className="text-center my-auto">
-                                <label htmlFor="avatarInput" className="cursor-pointer">
-                                    {avatarUrl ? (
-                                        <img src={avatarUrl} alt="Profile" className="rounded-circle" style={{ width: '60px', height: '60px' }} />
-                                    ) : (
-                                        <FaUserCircle size={40} className="rounded-circle" />
-                                    )}
-                                </label>
-                                <input
-                                    id="avatarInput"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleAvatarChange}
-                                    className="d-none"
-                                />
-                            </div>
-                            <div className="my-4">
-                                <input
-                                    id="name"
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="block w-full p-2 border border-gray-300 rounded-md"
-                                    placeholder="Enter your name"
-                                />
-                            </div>
-                            <button
-                                type="submit"
-                                className="mt-4 px-4 py-2 bg-blue-500 text-secondary rounded hover:bg-blue-700 w-full"
-                            >
-                                Save
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            }
+
             {openGroup &&
                 <div className="flex-grow-1">
                     <div className="bg-slate-100 p-4">
@@ -420,6 +383,8 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                                 <FaUserFriends size={20} className="me-2"/> Join Group
                             </button>
                         </div>
+
+                        {openSearchGroup && <SearchGroup onClose={handleToggleShowSearchGroup} onUserClick={onUserClick} />}
                     </div>
 
 
@@ -438,12 +403,11 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                                 // loader={<h4>Loading...</h4>}
                             >
                                 <div>
-                                    {users.map((user, index) => (
-                                        <UserSearchCard
+                                    {groups.map((group, index) => (
+                                        <GroupSearchCard
                                             key={index}
-                                            user={user}
-                                            onUserClick={() => onUserClick(user)}
-                                            newMessage={newMessage[user.name] || ""}
+                                            group={group} // Pass the group object
+                                            onGroupClick={() => onGroupClick(group)} // Function to handle group click
                                         />
                                     ))}
                                 </div>
@@ -455,6 +419,49 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users}) => {
                     {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} onUserClick={onUserClick}/>}
                 </div>
             }
+
+            {openSetting &&
+                <div className="flex-1">
+                    <div className="bg-slate-100 p-4 mx-auto w-80">
+                        <h2 className="text-xl font-bold">Profile</h2>
+                        <form onSubmit={handleSubmit} className="mx-auto">
+                            <div className="text-center my-auto">
+                                <label htmlFor="avatarInput" className="cursor-pointer">
+                                    {avatarUrl ? (
+                                        <img src={avatarUrl} alt="Profile" className="rounded-circle" style={{ width: '60px', height: '60px' }} />
+                                    ) : (
+                                        <FaUserCircle size={40} className="rounded-circle" />
+                                    )}
+                                </label>
+                                <input
+                                    id="avatarInput"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                    className="d-none"
+                                />
+                            </div>
+                            <div className="my-4">
+                                <input
+                                    id="name"
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="block w-full p-2 border border-gray-300 rounded-md"
+                                    placeholder="Enter your name"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="mt-4 px-4 py-2 bg-blue-500 text-secondary rounded hover:bg-blue-700 w-full"
+                            >
+                                Save
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+
         </div>
     );
 };

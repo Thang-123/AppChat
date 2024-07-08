@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Sidebar from './SideBar';
 import MessageComponent from './MessageComponent';
 import './Chat.css';
-import {addMessage, logoutUser, setMessages, setUsers} from "../pages/chatSlice";
+import {addMessage, logoutUser, setMessages, setUsers, setGroups} from "../pages/chatSlice";
 import { useDispatch, useSelector } from "react-redux";
 import WebSocketService from "../webSocketService";
 import Message from '../img/message.png';
@@ -11,14 +11,15 @@ import webSocketService from "../webSocketService";
 const Chat = () => {
     const dispatch = useDispatch();
     const [selectedUser, setSelectedUser] = React.useState(null);
+    const [selectedGroup, setSelectedGroup] = React.useState(null);
     const [lastFetchedUser, setLastFetchedUser] = React.useState(null);
-    const { messages, loggedIn, loggedInUser, reLoginCode, users } = useSelector((state) => state.chat);
+    const { messages, loggedIn, loggedInUser, reLoginCode, users, groups } = useSelector((state) => state.chat);
     const [isActive, setActiveUsers] = useState({});
     const [newMessages, setNewMessages] = useState({});
 
     useEffect(() => {
         WebSocketService.registerCallback('GET_PEOPLE_CHAT_MES', handleGetUserMessagesResponse);
-        WebSocketService.registerCallback('GET_ROOM_CHAT_MES', handleGetRoomChatResponse );
+        WebSocketService.registerCallback('GET_ROOM_CHAT_MES', handleGetRoomChatResponse);
         WebSocketService.registerCallback('GET_USER_LIST', handleGetUserListResponse);
         WebSocketService.registerCallback('LOGOUT', handleLogoutResponse);
         WebSocketService.registerCallback('SEND_CHAT', handleSendChatResponse);
@@ -39,30 +40,37 @@ const Chat = () => {
             console.log(errorMessage);
         }
     };
-        const handleGetUserListResponse = (data) => {
-            if (!data || data.status !== 'success') {
-                console.log('Failed to fetch user list');
-                return;
-            }
+    const handleGetUserListResponse = (data) => {
+        if (!data || data.status !== 'success') {
+            console.error('Failed to fetch user list');
+            return;
+        }
 
-            const users = data.data || [];
-            // const updatedUsers = users.map((user) => {
-            //
-            //     const isActive = user.isActive || false;
-            //
-            //     checkUserActive(user.name);
-            //
-            //     return {
-            //         ...user,
-            //         isActive: isActive
-            //     };
-            // });
+        const users = data.data || [];
+        const groups = data.data === 1 || [];
 
-
+        if (users.length > 0) {
             dispatch(setUsers(users));
-        };
+        }
+        if (groups.length > 0) {
+            dispatch(setGroups(groups)); // Assuming setGroups updates group state
+        }
+    };
 
-        const checkUserActive = (user) =>{
+
+    // const handleGetGroupListResponse = (data) => {
+    //     if (!data || data.status !== 'success') {
+    //         console.error('Failed to fetch group list');
+    //         return;
+    //     }
+    //
+    //     const groups = data.data.type === 1 || [];
+    //
+    //     dispatch(setGroups(groups)); // Assuming setGroups updates group state
+    // };
+
+
+    const checkUserActive = (user) =>{
             if (!user || !user.name) {
                 console.error('Invalid user object passed to checkUserActive:', user);
                 return;
@@ -77,7 +85,8 @@ const Chat = () => {
                 }
             }
         })
-        }
+    };
+
     const handleCheckUserActiveResponse = (data) => {
         if (data.status !== 'success') {
             console.log('Failed to check user active');
@@ -129,6 +138,7 @@ const Chat = () => {
         dispatch(setMessages(newMessages));
 
     };
+
     const handleGetRoomChatResponse = (data) => {
         if (!data || data.status !== 'success') {
             console.log('Failed to fetch room messages');
@@ -180,6 +190,25 @@ const Chat = () => {
         }
     };
 
+    const handleGroupClick = (group) => {
+        if (!group || typeof group.id === 'undefined' || typeof group.name === 'undefined') {
+            console.error('Invalid group object:', group);
+            return;
+        }
+
+        if (selectedGroup && selectedGroup.id === group.id) return;
+        console.log('Clicked Group:', group);
+        setSelectedGroup(group);
+        console.log('Check Active:', group);
+
+        if (group.type === 0) { // Public Group
+            fetchGroupMessages(group.id); // Assuming fetchGroupMessages exists
+        } else if (group.type === 1) { // Private Group
+            getRoomChatMes(group); // Assuming getRoomChatMes exists (might need modification)
+        } else {
+            console.warn('Unknown group type:', group.type);
+        }
+    };
 
     const handleSendMessage = (newMessage) => {
         WebSocketService.sendMessage({
@@ -247,6 +276,36 @@ const Chat = () => {
         });
     };
 
+    const fetchGroupMessages = (groupId) => {
+        console.log("fetch Group Message first time");
+        WebSocketService.sendMessage({
+            action: 'onchat', // Assuming same action for chat communication
+            data: {
+                event: 'GET_GROUP_CHAT_MES', // Different event for group messages
+                data: {
+                    groupId, // Use groupId instead of name for groups
+                    page: 1
+                }
+            }
+        });
+    };
+
+    const handleCreateRoom = (roomName) => {
+        console.log("Creating room:", roomName);
+        WebSocketService.sendMessage({
+            action: 'onchat', // Assuming same action for chat communication
+            data: {
+                event: 'CREATE_ROOM', // Event for creating a room
+                data: {
+                    name: roomName // Use roomName for clarity
+                }
+            }
+        });
+    };
+
+
+
+
     const handleCloseMessageComponent = () => {
         setSelectedUser(null);
     };
@@ -255,10 +314,12 @@ const Chat = () => {
             <div className="sidebar bg-white border-right d-flex flex-column" style={{ flexBasis: '25%' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
+                    onGroupClick={handleGroupClick}
                     onLogout={handleLogOut}
                     onJoinRoom={handleJoinRoom}
                     onGetUserList={handleGetUserList}
                     users={users}
+                    groups={groups}
                     newMessage={newMessages || {}}
 
                 />
