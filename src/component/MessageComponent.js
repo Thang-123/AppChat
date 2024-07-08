@@ -17,6 +17,7 @@ import './Chat.css';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { firestore } from '../firebaseconfig';
 import { doc,getDoc } from 'firebase/firestore';
+import EmojiPicker from "./EmojiPicker";
 const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
@@ -99,9 +100,9 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
     const handleOnChange = (e) => {
         setCurrentMessage(e.target.value);
     };
-    const handleEmojiClick = (event, emojiObject) => {
+    const handleEmojiClick = (e) => {
         // Chèn emoji vào trong tin nhắn
-        setCurrentMessage(currentMessage + emojiObject.emoji);
+        setCurrentMessage(currentMessage + e.emoji);
     };
 
     const toggleEmojiPicker = () => {
@@ -253,7 +254,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                     </button>
                 </div>
                 {/*{showEmojiPicker && (*/}
-                {/*    <Picker onEmojiClick={handleEmojiClick} />*/}
+                {/*    <EmojiPicker  onEmojiClick={handleEmojiClick} />*/}
                 {/*)}*/}
                 {/* Message Input */}
                 <form onSubmit={handleSendMessage} className="flex-grow-1 ms-2 me-2">

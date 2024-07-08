@@ -13,8 +13,6 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/
 import { firestore } from '../firebaseconfig';
 import { doc, setDoc } from 'firebase/firestore';
 import Modal from 'react-bootstrap/Modal';
-import SearchGroup from "./SearchGroup";
-import GroupSearchCard from "./GroupSearchCard"; // Import Modal from react-bootstrap
 import {GrGroup} from "react-icons/gr";
 const StyledIconContainer = styled.div`
     display: flex;
@@ -317,7 +315,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                     </div>
 
 
-                    {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
+                    {openSearchUser && <SearchUser users={users} onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
                 </div>
             }
 
@@ -384,7 +382,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                             </button>
                         </div>
 
-                        {openSearchGroup && <SearchGroup onClose={handleToggleShowSearchGroup} onUserClick={onUserClick} />}
+                        {openSearchGroup && <SearchUser users = {groups} onClose={handleToggleShowSearchGroup} onUserClick={onUserClick} />}
                     </div>
 
 
@@ -404,10 +402,10 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                             >
                                 <div>
                                     {groups.map((group, index) => (
-                                        <GroupSearchCard
+                                        <UserSearchCard
                                             key={index}
-                                            group={group} // Pass the group object
-                                            onGroupClick={() => onGroupClick(group)} // Function to handle group click
+                                            user={group}
+                                            onGroupClick={() => onGroupClick(group)}
                                         />
                                     ))}
                                 </div>

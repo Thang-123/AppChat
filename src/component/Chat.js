@@ -47,8 +47,8 @@ const Chat = () => {
         }
 
         const users = data.data || [];
-        const groups = data.data === 1 || [];
-
+        // Filter users with type = 1
+        const groups = users.filter(user => user.type === 1);
         if (users.length > 0) {
             dispatch(setUsers(users));
         }
