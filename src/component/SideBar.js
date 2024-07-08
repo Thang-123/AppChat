@@ -191,8 +191,6 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     };
 
     const handleCreateGroup = () => {
-        // Implement logic to create the group using groupName and groupImage
-        // (e.g., call an API or update state in a Redux store)
         handleCloseCreateGroupModal();
     };
 
@@ -405,7 +403,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                                         <UserSearchCard
                                             key={index}
                                             user={group}
-                                            onGroupClick={() => onGroupClick(group)}
+                                            onUserClick={() => onUserClick(group)}
                                         />
                                     ))}
                                 </div>

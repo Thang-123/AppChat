@@ -7,7 +7,7 @@ const UserSearchCard = ({ user, onUserClick , newMessage}) => {
     const [avatarUrl, setAvatarUrl] = useState('');
 
     const handleClick = () => {
-        onUserClick(user);
+        onUserClick();
         setClicked(true);
     };
 

@@ -49,8 +49,9 @@ const Chat = () => {
         const users = data.data || [];
         // Filter users with type = 1
         const groups = users.filter(user => user.type === 1);
+        const peoples = users.filter(user => user.type === 0);
         if (users.length > 0) {
-            dispatch(setUsers(users));
+            dispatch(setUsers(peoples));
         }
         if (groups.length > 0) {
             dispatch(setGroups(groups)); // Assuming setGroups updates group state
@@ -144,6 +145,7 @@ const Chat = () => {
             console.log('Failed to fetch room messages');
             return;
         }
+
         console.log('fetching room messages ');
         const MessageResponse = data.data.chatData || [];
         const newMessages = MessageResponse.map(msg => ({
@@ -184,31 +186,32 @@ const Chat = () => {
         if (user.type === 0) {
             fetchUserMessages(user.name);
         } else if (user.type === 1) {
-            getRoomChatMes(user);
+            getRoomChatMes(
+            );
         } else {
             console.warn('Unknown user type:', user.type);
         }
     };
 
-    const handleGroupClick = (group) => {
-        if (!group || typeof group.id === 'undefined' || typeof group.name === 'undefined') {
-            console.error('Invalid group object:', group);
-            return;
-        }
-
-        if (selectedGroup && selectedGroup.id === group.id) return;
-        console.log('Clicked Group:', group);
-        setSelectedGroup(group);
-        console.log('Check Active:', group);
-
-        if (group.type === 0) { // Public Group
-            fetchGroupMessages(group.id); // Assuming fetchGroupMessages exists
-        } else if (group.type === 1) { // Private Group
-            getRoomChatMes(group); // Assuming getRoomChatMes exists (might need modification)
-        } else {
-            console.warn('Unknown group type:', group.type);
-        }
-    };
+    // const handleGroupClick = (group) => {
+    //     if (!group || typeof group.id === 'undefined' || typeof group.name === 'undefined') {
+    //         console.error('Invalid group object:', group);
+    //         return;
+    //     }
+    //
+    //     if (selectedGroup && selectedGroup.id === group.id) return;
+    //     console.log('Clicked Group:', group);
+    //     setSelectedGroup(group);
+    //     console.log('Check Active:', group);
+    //
+    //     if (group.type === 0) { // Public Group
+    //         fetchGroupMessages(group.id); // Assuming fetchGroupMessages exists
+    //     } else if (group.type === 1) { // Private Group
+    //         getRoomChatMes();
+    //     } else {
+    //         console.warn('Unknown group type:', group.type);
+    //     }
+    // };
 
     const handleSendMessage = (newMessage) => {
         WebSocketService.sendMessage({
@@ -293,11 +296,11 @@ const Chat = () => {
     const handleCreateRoom = (roomName) => {
         console.log("Creating room:", roomName);
         WebSocketService.sendMessage({
-            action: 'onchat', // Assuming same action for chat communication
+            action: 'onchat',
             data: {
-                event: 'CREATE_ROOM', // Event for creating a room
+                event: 'CREATE_ROOM',
                 data: {
-                    name: roomName // Use roomName for clarity
+                    name: roomName
                 }
             }
         });
@@ -307,16 +310,16 @@ const Chat = () => {
 
 
     const handleCloseMessageComponent = () => {
-        setSelectedUser(null);
+        setSelectedUser("");
     };
     return (
         <div className="chat-page d-flex">
             <div className="sidebar bg-white border-right d-flex flex-column" style={{ flexBasis: '25%' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
-                    onGroupClick={handleGroupClick}
                     onLogout={handleLogOut}
                     onJoinRoom={handleJoinRoom}
+                    onCreateRoom={handleCreateRoom}
                     onGetUserList={handleGetUserList}
                     users={users}
                     groups={groups}
