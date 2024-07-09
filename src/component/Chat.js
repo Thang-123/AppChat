@@ -120,8 +120,9 @@ const Chat = () => {
         };
 
         dispatch(addMessage([...messages, newMessage]));
-        // fetchLatestMessages();
         fetchUserMessages(name)
+        fetchGroupMessages(name)
+        fetchLatestMessages()
     };
 
 
@@ -219,12 +220,13 @@ const Chat = () => {
     // };
 
     const handleSendMessage = (newMessage) => {
+        console.log("send mes to: ",selectedUser.name ,newMessage.mes)
         WebSocketService.sendMessage({
             action: 'onchat',
             data: {
                 event: 'SEND_CHAT',
                 data: {
-                    type: 'people',
+                    type: selectedUser.type ? 'room' : 'people',
                     to: selectedUser.name,
                     mes: newMessage.mes
                 }
@@ -256,11 +258,10 @@ const Chat = () => {
 
     const fetchLatestMessages = () => {
         if (selectedUser) {
-            // console.log("fetch Message real time");
             WebSocketService.sendMessage({
                 action: 'onchat',
                 data: {
-                    event: 'GET_PEOPLE_CHAT_MES',
+                    event: selectedUser.type ? 'GET_ROOM_CHAT_MES' : 'GET_PEOPLE_CHAT_MES',
                     data: {
                         name: selectedUser.name,
                         page: 1
@@ -284,14 +285,14 @@ const Chat = () => {
         });
     };
 
-    const fetchGroupMessages = (groupId) => {
-        console.log("fetch Group Message first time");
+    const fetchGroupMessages = (groupName) => {
+
         WebSocketService.sendMessage({
-            action: 'onchat', // Assuming same action for chat communication
+            action: 'onchat',
             data: {
-                event: 'GET_GROUP_CHAT_MES', // Different event for group messages
+                event: 'GET_GROUP_CHAT_MES',
                 data: {
-                    groupId, // Use groupId instead of name for groups
+                    name: groupName,
                     page: 1
                 }
             }
