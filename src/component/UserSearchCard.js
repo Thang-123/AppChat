@@ -7,7 +7,7 @@ const UserSearchCard = ({ user, onUserClick , newMessage}) => {
     const [avatarUrl, setAvatarUrl] = useState('');
 
     const handleClick = () => {
-        onUserClick();
+        onUserClick(user);
         setClicked(true);
     };
 
@@ -26,7 +26,7 @@ const UserSearchCard = ({ user, onUserClick , newMessage}) => {
         };
 
         fetchAvatar();
-    }, []);
+    }, [user]);
     return (
         <div onClick={handleClick}
              className={`user-search-card ${newMessage ? 'has-message' : ''} ${clicked ? 'clicked' : ''}`}>
