@@ -17,6 +17,7 @@ const Chat = () => {
     const [isActive, setActiveUsers] = useState({});
     const [newMessages, setNewMessages] = useState({});
 
+
     useEffect(() => {
         WebSocketService.registerCallback('GET_PEOPLE_CHAT_MES', handleGetUserMessagesResponse);
         WebSocketService.registerCallback('GET_ROOM_CHAT_MES', handleGetRoomChatResponse);
@@ -24,9 +25,26 @@ const Chat = () => {
         WebSocketService.registerCallback('LOGOUT', handleLogoutResponse);
         WebSocketService.registerCallback('SEND_CHAT', handleSendChatResponse);
         WebSocketService.registerCallback('CHECK_USER', handleCheckUserActiveResponse);
+        WebSocketService.registerCallback('CREATE_ROOM', handleCreateRoomResponse);
+        WebSocketService.registerCallback('JOIN_ROOM', handleJoinRoomResponse);
         handleGetUserList();
     }, [dispatch]);
+    const handleCreateRoomResponse = (data) => {
+        if (!data || data.status !== 'success') {
+            console.error('Failed to create Room');
+            return;
+        }
+        handleGetUserList()
 
+    };
+    const handleJoinRoomResponse = (data) => {
+        if (!data || data.status !== 'success') {
+            console.error('Failed to join Room');
+            return;
+        }
+        handleGetUserList()
+
+    };
     const handleLogoutResponse = (data) => {
         if (!data) {
             console.log('Invalid response data received');
@@ -244,7 +262,16 @@ const Chat = () => {
         });
     };
 
-    const handleJoinRoom = () => {
+    const handleJoinRoom = (roomName) => {
+        WebSocketService.sendMessage({
+            "action": "onchat",
+            "data": {
+                "event": "JOIN_ROOM",
+                "data": {
+                    "name": roomName
+                }
+            }
+        })
     };
 
     const handleGetUserList = () => {

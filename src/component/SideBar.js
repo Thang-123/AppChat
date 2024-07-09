@@ -12,6 +12,7 @@ import {useSelector} from "react-redux";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { firestore } from '../firebaseconfig';
 import { doc, setDoc } from 'firebase/firestore';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from 'react-bootstrap/Modal';
 import {GrGroup} from "react-icons/gr";
 const StyledIconContainer = styled.div`
@@ -92,7 +93,7 @@ const SearchInputContainer = styled.div`
 `;
 
 
-const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups,onCreateRoom}) => {
+const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups,onCreateRoom, onJoinRoom}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [openSearchGroup, setOpenSearchGroup] = useState(false);
@@ -108,6 +109,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     const [name, setName] = useState(loggedInUser);
     const [avatarUrl, setAvatarUrl] = useState('');
     const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
+    const [showJoinGroupModal, setShowJoinGroupModal] = useState(false);
     const [groupName, setGroupName] = useState('');
     const [groupImage, setGroupImage] = useState(null); // Assume groupImage is a state variable to hold the image file
     useEffect(() => {
@@ -181,7 +183,13 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     const handleCloseCreateGroupModal = () => {
         setShowCreateGroupModal(false);
     };
+    const handleOpenJoinGroupModal = () => {
+        setShowJoinGroupModal(true);
+    };
 
+    const handleCloseJoinGroupModal = () => {
+        setShowJoinGroupModal(false);
+    };
     const handleGroupNameChange = (e) => {
         setGroupName(e.target.value);
     };
@@ -194,7 +202,10 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
         onCreateRoom(groupName)
         handleCloseCreateGroupModal();
     };
-
+    const handleJoinGroup = () => {
+        onJoinRoom(groupName)
+        handleCloseJoinGroupModal();
+    };
     const handleIconClick = (icon) => {
         setActiveIcon(prev => (prev === icon ? null : icon));
         if (icon === 'chat') {
@@ -376,9 +387,36 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                             </Modal>
 
                             <button className="btn btn-link text-dark p-2" data-bs-toggle="modal"
-                                    data-bs-target="#joinGroupModal">
+                                    data-bs-target="#joinGroupModal" onClick={handleOpenJoinGroupModal}>
                                  Join Group
                             </button>
+                            <Modal show={showJoinGroupModal} onHide={handleCloseJoinGroupModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Create Group</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <form>
+                                        <div className="mb-3">
+                                            <label htmlFor="groupName" className="form-label">Group Name:</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="groupName"
+                                                value={groupName}
+                                                onChange={handleGroupNameChange}
+                                            />
+                                        </div>
+                                    </form>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <button variant="secondary" onClick={handleCloseJoinGroupModal}>
+                                        Cancel
+                                    </button>
+                                    <button variant="primary" onClick={handleJoinGroup}>
+                                        Join
+                                    </button>
+                                </Modal.Footer>
+                            </Modal>
                         </div>
 
                         {openSearchGroup && <SearchUser users = {groups} onClose={handleToggleShowSearchGroup} onUserClick={onUserClick} />}
@@ -387,7 +425,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
 
                     <div className='col-12 custom-scrollbar' style={{height: 'calc(85vh - 55px)'}}>
                         <GroupListContainer>
-                            {users.length === 0 && (
+                            {groups.length ===0 && users.length === 0 && (
                                 <div className="text-center mt-4">
                                     <FiArrowUpLeft size={24} className="text-gray-500"/>
                                     <p className="text-gray-500 mt-2">Explore users to start a conversation with.</p>
