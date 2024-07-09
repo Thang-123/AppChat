@@ -5,6 +5,7 @@ const chatSlice = createSlice({
     initialState: {
         users: [],
         groups: [],
+        members: [],
         messages: [],
         loggedIn: false,
         reLoginCode: null,
@@ -12,6 +13,7 @@ const chatSlice = createSlice({
         currentMessage: { text: '', imageUrl: '', videoUrl: '' },
         loading: false,
         loggedInUser: null,
+
     },
     reducers: {
         setUsers: (state, action) => {
@@ -21,7 +23,9 @@ const chatSlice = createSlice({
         setGroups: (state, action) => {
             state.groups = action.payload;
         },
-
+        setMember: (state, action) => {
+            state.members = action.payload;
+        },
         // setMessages(state, action) {
         //     state.messages = action.payload.map(msg => ({
         //         ...msg,
@@ -61,6 +65,7 @@ const chatSlice = createSlice({
 });
 
 export const {
+    setMember,
     setLoggedInUser,
     setMessage,
     setLoading,

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Sidebar from './SideBar';
 import MessageComponent from './MessageComponent';
 import './Chat.css';
-import {addMessage, logoutUser, setMessages, setUsers, setGroups} from "../pages/chatSlice";
+import {addMessage, logoutUser, setMessages, setUsers, setGroups, setMember} from "../pages/chatSlice";
 import { useDispatch, useSelector } from "react-redux";
 import WebSocketService from "../webSocketService";
 import Message from '../img/message.png';
@@ -17,6 +17,7 @@ const Chat = () => {
     const [isActive, setActiveUsers] = useState({});
     const [newMessages, setNewMessages] = useState({});
 
+
     useEffect(() => {
         WebSocketService.registerCallback('GET_PEOPLE_CHAT_MES', handleGetUserMessagesResponse);
         WebSocketService.registerCallback('GET_ROOM_CHAT_MES', handleGetRoomChatResponse);
@@ -24,9 +25,26 @@ const Chat = () => {
         WebSocketService.registerCallback('LOGOUT', handleLogoutResponse);
         WebSocketService.registerCallback('SEND_CHAT', handleSendChatResponse);
         WebSocketService.registerCallback('CHECK_USER', handleCheckUserActiveResponse);
+        WebSocketService.registerCallback('CREATE_ROOM', handleCreateRoomResponse);
+        WebSocketService.registerCallback('JOIN_ROOM', handleJoinRoomResponse);
         handleGetUserList();
     }, [dispatch]);
+    const handleCreateRoomResponse = (data) => {
+        if (!data || data.status !== 'success') {
+            console.error('Failed to create Room');
+            return;
+        }
+        handleGetUserList()
 
+    };
+    const handleJoinRoomResponse = (data) => {
+        if (!data || data.status !== 'success') {
+            console.error('Failed to join Room');
+            return;
+        }
+        handleGetUserList()
+
+    };
     const handleLogoutResponse = (data) => {
         if (!data) {
             console.log('Invalid response data received');
@@ -47,10 +65,11 @@ const Chat = () => {
         }
 
         const users = data.data || [];
-        const groups = data.data === 1 || [];
-
+        // Filter users with type = 1
+        const groups = users.filter(user => user.type === 1);
+        const peoples = users.filter(user => user.type === 0);
         if (users.length > 0) {
-            dispatch(setUsers(users));
+            dispatch(setUsers(peoples));
         }
         if (groups.length > 0) {
             dispatch(setGroups(groups)); // Assuming setGroups updates group state
@@ -119,8 +138,9 @@ const Chat = () => {
         };
 
         dispatch(addMessage([...messages, newMessage]));
-        // fetchLatestMessages();
         fetchUserMessages(name)
+        fetchGroupMessages(name)
+        fetchLatestMessages()
     };
 
 
@@ -144,8 +164,15 @@ const Chat = () => {
             console.log('Failed to fetch room messages');
             return;
         }
+
         console.log('fetching room messages ');
         const MessageResponse = data.data.chatData || [];
+        // Sử dụng Set để lấy danh sách các thành viên duy nhất
+        const uniqueMembersSet = new Set();
+        MessageResponse.forEach(msg => uniqueMembersSet.add(msg.name));
+        const members = Array.from(uniqueMembersSet);
+
+        dispatch(setMember(members));
         const newMessages = MessageResponse.map(msg => ({
             ...msg,
             sentByCurrentUser: msg.name !== loggedInUser
@@ -154,13 +181,13 @@ const Chat = () => {
         dispatch(setMessages(newMessages));
     };
 
-    function getRoomChatMes() {
+    function getRoomChatMes(roomName) {
         WebSocketService.sendMessage({
             action: 'onchat',
             data: {
                 event: 'GET_ROOM_CHAT_MES',
                 data: {
-                    name: selectedUser.name,
+                    name: roomName,
                     page: 1
                 }
             }
@@ -184,39 +211,40 @@ const Chat = () => {
         if (user.type === 0) {
             fetchUserMessages(user.name);
         } else if (user.type === 1) {
-            getRoomChatMes(user);
+            getRoomChatMes(user.name);
         } else {
             console.warn('Unknown user type:', user.type);
         }
     };
 
-    const handleGroupClick = (group) => {
-        if (!group || typeof group.id === 'undefined' || typeof group.name === 'undefined') {
-            console.error('Invalid group object:', group);
-            return;
-        }
-
-        if (selectedGroup && selectedGroup.id === group.id) return;
-        console.log('Clicked Group:', group);
-        setSelectedGroup(group);
-        console.log('Check Active:', group);
-
-        if (group.type === 0) { // Public Group
-            fetchGroupMessages(group.id); // Assuming fetchGroupMessages exists
-        } else if (group.type === 1) { // Private Group
-            getRoomChatMes(group); // Assuming getRoomChatMes exists (might need modification)
-        } else {
-            console.warn('Unknown group type:', group.type);
-        }
-    };
+    // const handleGroupClick = (group) => {
+    //     if (!group || typeof group.id === 'undefined' || typeof group.name === 'undefined') {
+    //         console.error('Invalid group object:', group);
+    //         return;
+    //     }
+    //
+    //     if (selectedGroup && selectedGroup.id === group.id) return;
+    //     console.log('Clicked Group:', group);
+    //     setSelectedGroup(group);
+    //     console.log('Check Active:', group);
+    //
+    //     if (group.type === 0) { // Public Group
+    //         fetchGroupMessages(group.id); // Assuming fetchGroupMessages exists
+    //     } else if (group.type === 1) { // Private Group
+    //         getRoomChatMes();
+    //     } else {
+    //         console.warn('Unknown group type:', group.type);
+    //     }
+    // };
 
     const handleSendMessage = (newMessage) => {
+        console.log("send mes to: ",selectedUser.name ,newMessage.mes)
         WebSocketService.sendMessage({
             action: 'onchat',
             data: {
                 event: 'SEND_CHAT',
                 data: {
-                    type: 'people',
+                    type: selectedUser.type ? 'room' : 'people',
                     to: selectedUser.name,
                     mes: newMessage.mes
                 }
@@ -234,7 +262,16 @@ const Chat = () => {
         });
     };
 
-    const handleJoinRoom = () => {
+    const handleJoinRoom = (roomName) => {
+        WebSocketService.sendMessage({
+            "action": "onchat",
+            "data": {
+                "event": "JOIN_ROOM",
+                "data": {
+                    "name": roomName
+                }
+            }
+        })
     };
 
     const handleGetUserList = () => {
@@ -248,11 +285,10 @@ const Chat = () => {
 
     const fetchLatestMessages = () => {
         if (selectedUser) {
-            // console.log("fetch Message real time");
             WebSocketService.sendMessage({
                 action: 'onchat',
                 data: {
-                    event: 'GET_PEOPLE_CHAT_MES',
+                    event: selectedUser.type ? 'GET_ROOM_CHAT_MES' : 'GET_PEOPLE_CHAT_MES',
                     data: {
                         name: selectedUser.name,
                         page: 1
@@ -276,14 +312,14 @@ const Chat = () => {
         });
     };
 
-    const fetchGroupMessages = (groupId) => {
-        console.log("fetch Group Message first time");
+    const fetchGroupMessages = (groupName) => {
+
         WebSocketService.sendMessage({
-            action: 'onchat', // Assuming same action for chat communication
+            action: 'onchat',
             data: {
-                event: 'GET_GROUP_CHAT_MES', // Different event for group messages
+                event: 'GET_GROUP_CHAT_MES',
                 data: {
-                    groupId, // Use groupId instead of name for groups
+                    name: groupName,
                     page: 1
                 }
             }
@@ -293,11 +329,11 @@ const Chat = () => {
     const handleCreateRoom = (roomName) => {
         console.log("Creating room:", roomName);
         WebSocketService.sendMessage({
-            action: 'onchat', // Assuming same action for chat communication
+            action: 'onchat',
             data: {
-                event: 'CREATE_ROOM', // Event for creating a room
+                event: 'CREATE_ROOM',
                 data: {
-                    name: roomName // Use roomName for clarity
+                    name: roomName
                 }
             }
         });
@@ -307,16 +343,16 @@ const Chat = () => {
 
 
     const handleCloseMessageComponent = () => {
-        setSelectedUser(null);
+        setSelectedUser("");
     };
     return (
         <div className="chat-page d-flex">
             <div className="sidebar bg-white border-right d-flex flex-column" style={{ flexBasis: '25%' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
-                    onGroupClick={handleGroupClick}
                     onLogout={handleLogOut}
                     onJoinRoom={handleJoinRoom}
+                    onCreateRoom={handleCreateRoom}
                     onGetUserList={handleGetUserList}
                     users={users}
                     groups={groups}

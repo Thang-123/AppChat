@@ -33,33 +33,6 @@
     padding: 20px;
 }
 
-.message {
-    display: flex;
-    align-items: flex-end;
-    margin-bottom: 10px;
-}
-
-.message .message-content {
-    max-width: 60%;
-    padding: 10px;
-    border-radius: 20px;
-    position: relative;
-    font-size: 14px;
-    line-height: 1.4;
-}
-
-.message .message-content.sent {
-    background-color: #2ec4b6;
-    color: white;
-    align-self: flex-end;
-    border-bottom-right-radius: 0;
-}
-
-.message .message-content.received {
-    background-color: #f4f5fb;
-    border-bottom-left-radius: 0;
-}
-
 .message-input-container {
     display: flex;
     align-items: center;
@@ -77,16 +50,34 @@
 }
 
 .sent-message {
-    background-color: #007bff;
+    background-color: #6c757d;
     color: white;
-    align-self: flex-end;
 }
 
 .received-message {
-    background-color: #6c757d;
+    background-color: #007bff;
     color: white;
-    align-self: flex-start;
 }
+
+.received-message p {
+    margin: 0;
+}
+
+.message-content {
+    padding: 8px;
+}
+
+img.rounded-circle,
+.FaUserCircle.rounded-circle {
+    width: 40px;
+    height: 40px;
+}
+
+#message-container {
+    overflow-y: auto;
+    background-color: #f8f9fa;
+}
+
 .custom-scrollbar {
     scrollbar-width: none;
     -ms-overflow-style: none;
