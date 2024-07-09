@@ -18,6 +18,7 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/
 import { firestore } from '../firebaseconfig';
 import { doc,getDoc } from 'firebase/firestore';
 import EmojiPicker from "./EmojiPicker";
+import {useSelector} from "react-redux";
 const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
@@ -26,6 +27,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
     const messageContainerRef = useRef(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState('');
+    const [memberAvatars, setMemberAvatars] = useState({});
     useEffect(() => {
         const messageComponentElement = document.getElementById('messageComponent');
         if (messageComponentElement) {
@@ -53,6 +55,37 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
 
         fetchAvatar();
     }, [selectedUser]);
+
+    const {members} = useSelector((state) => state.chat);
+    useEffect(() => {
+        console.log(members)
+        console.log('Current member avatars:', memberAvatars);
+        fetchAvatarForMembers()
+    }, [members]);
+    const fetchAvatarForMembers = async () => {
+        try {
+            const storage = getStorage();
+            const avatarUrls = {};
+
+            await Promise.all(members.map(async member => {
+                const avatarRef = ref(storage, `avatars/${member}`);
+
+
+                try {
+                    const downloadURL = await getDownloadURL(avatarRef);
+                    avatarUrls[member] = downloadURL;
+                } catch (error) {
+
+                    console.error(`Avatar for ${member} does not exist.`);
+                    avatarUrls[member] = '';
+                }
+            }));
+
+            setMemberAvatars(avatarUrls);
+        } catch (error) {
+            console.error('Error fetching avatars:', error);
+        }
+    };
 
 
     // useEffect(() => {
@@ -126,16 +159,17 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
         scrollToBottom()
     };
     return (
-    <div id ="messageComponent" className="bg-no-repeat bg-cover">
+        <div id="messageComponent" className="bg-no-repeat bg-cover">
             {/* Header */}
             <header className="sticky-top bg-white d-flex justify-content-between align-items-center p-3 border-bottom">
                 <div className="d-flex align-items-center gap-4">
                     <div className="d-flex align-items-center gap-2">
                         {/* Profile picture */}
                         {avatarUrl ? (
-                            <img src={avatarUrl} alt="Profile" className="rounded-circle" style={{ width: '40px', height: '40px' }} />
+                            <img src={avatarUrl} alt="Profile" className="rounded-circle"
+                                 style={{width: '40px', height: '40px'}}/>
                         ) : (
-                            <FaUserCircle size={40} className="rounded-circle" />
+                            <FaUserCircle size={40} className="rounded-circle"/>
                         )}
                         {/* User details */}
                         <div>
@@ -173,10 +207,10 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 </div>
             </header>
 
-        {/* Message display */}
-        <section
-            id="message-container"
-            ref={messageContainerRef}
+            {/* Message display */}
+            <section
+                id="message-container"
+                ref={messageContainerRef}
                 className="overflow-auto bg-light"
                 style={{height: 'calc(100vh - 145px)'}}
             >
@@ -184,20 +218,41 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                     {messages.slice(0).reverse().map((msg, index) => (
                         <div
                             key={index}
-                            className={`p-2 rounded max-w-75 ${
-                                msg.sentByCurrentUser ? 'received-message' : 'sent-message'
-                            }`}
+                            className={`d-flex ${msg.sentByCurrentUser ? 'justify-content-start' : 'justify-content-end'}`}
                         >
-                            <p className="mb-1">{msg.mes}</p>
-                            {/*{msg.imageUrl && <img src={msg.imageUrl} alt="Sent" className="img-fluid"/>}*/}
-                            {/*{msg.videoUrl && <video src={msg.videoUrl} className="img-fluid" controls/>}*/}
-                            <p className="text-right small text-muted">
-                                {new Date(msg.createAt).toLocaleString()}
-                            </p>
+                            {msg.sentByCurrentUser && (
+                                <div className="mr-2" style={{width: '40px', height: '40px'}}>
+                                    {memberAvatars[msg.name] ? (
+                                        <img
+                                            src={memberAvatars[msg.name]}
+                                            alt={`${msg.name} avatar`}
+                                            className="rounded-circle"
+                                            style={{width: '100%', height: '100%'}}
+                                        />
+                                    ) : (
+                                        <FaUserCircle className="rounded-circle"
+                                                      style={{width: '100%', height: '100%'}}/>
+                                    )}
+                                </div>
+                            )}
+                            <div className="message-content">
+                                {msg.sentByCurrentUser && <p className="mb-0">{msg.name}</p>}
+                                <div
+                                    className={`p-2 rounded ${msg.sentByCurrentUser ? 'received-message bg-secondary text-white' : 'sent-message bg-primary text-white'}`}
+                                >
+                                    <p className="mb-1 text-center text-white">{msg.mes}</p>
+                                    {/* {msg.imageUrl && <img src={msg.imageUrl} alt="Sent" className="img-fluid" />} */}
+                                    {/* {msg.videoUrl && <video src={msg.videoUrl} className="img-fluid" controls />} */}
+                                    {/* <p className="text-right small text-muted"> */}
+                                    {/*     {new Date(msg.createAt).toLocaleString()} */}
+                                    {/* </p> */}
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
             </section>
+
 
             {/* Display uploaded image */}
             {imageUrl && (
@@ -248,7 +303,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 </div>
 
                 {/* Emojis */}
-                <div className="d-flex align-items-center pe-2 " >
+                <div className="d-flex align-items-center pe-2 ">
                     <button className="btn-emoji" onClick={toggleEmojiPicker}>
                         <FaSmile size={20}/>
                     </button>
@@ -267,7 +322,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                             onChange={handleOnChange}
                         />
                         <button type="submit" className="btn-send">
-                            <IoMdSend size={20} />
+                            <IoMdSend size={20}/>
                         </button>
                     </div>
                 </form>

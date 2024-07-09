@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Sidebar from './SideBar';
 import MessageComponent from './MessageComponent';
 import './Chat.css';
-import {addMessage, logoutUser, setMessages, setUsers, setGroups} from "../pages/chatSlice";
+import {addMessage, logoutUser, setMessages, setUsers, setGroups, setMember} from "../pages/chatSlice";
 import { useDispatch, useSelector } from "react-redux";
 import WebSocketService from "../webSocketService";
 import Message from '../img/message.png';
@@ -148,6 +148,12 @@ const Chat = () => {
 
         console.log('fetching room messages ');
         const MessageResponse = data.data.chatData || [];
+        // Sử dụng Set để lấy danh sách các thành viên duy nhất
+        const uniqueMembersSet = new Set();
+        MessageResponse.forEach(msg => uniqueMembersSet.add(msg.name));
+        const members = Array.from(uniqueMembersSet);
+
+        dispatch(setMember(members));
         const newMessages = MessageResponse.map(msg => ({
             ...msg,
             sentByCurrentUser: msg.name !== loggedInUser
@@ -156,13 +162,13 @@ const Chat = () => {
         dispatch(setMessages(newMessages));
     };
 
-    function getRoomChatMes() {
+    function getRoomChatMes(roomName) {
         WebSocketService.sendMessage({
             action: 'onchat',
             data: {
                 event: 'GET_ROOM_CHAT_MES',
                 data: {
-                    name: selectedUser.name,
+                    name: roomName,
                     page: 1
                 }
             }
@@ -186,8 +192,7 @@ const Chat = () => {
         if (user.type === 0) {
             fetchUserMessages(user.name);
         } else if (user.type === 1) {
-            getRoomChatMes(
-            );
+            getRoomChatMes(user.name);
         } else {
             console.warn('Unknown user type:', user.type);
         }

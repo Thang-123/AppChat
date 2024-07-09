@@ -92,7 +92,7 @@ const SearchInputContainer = styled.div`
 `;
 
 
-const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups}) => {
+const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups,onCreateRoom}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [openSearchGroup, setOpenSearchGroup] = useState(false);
@@ -191,6 +191,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     };
 
     const handleCreateGroup = () => {
+        onCreateRoom(groupName)
         handleCloseCreateGroupModal();
     };
 
@@ -332,9 +333,9 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                                 readOnly
                             />
                         </SearchInputContainer>
-                        <div className="d-flex align-items-center gap-3">
+                        <div className="d-flex align-items-center gap-1">
                             <button className="btn btn-link text-dark p-2" onClick={handleOpenCreateGroupModal}>
-                                <FaUsers size={20} className="me-2"/> Create Group
+                                 Create Group
                             </button>
 
                             <Modal show={showCreateGroupModal} onHide={handleCloseCreateGroupModal}>
@@ -376,7 +377,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
 
                             <button className="btn btn-link text-dark p-2" data-bs-toggle="modal"
                                     data-bs-target="#joinGroupModal">
-                                <FaUserFriends size={20} className="me-2"/> Join Group
+                                 Join Group
                             </button>
                         </div>
 
