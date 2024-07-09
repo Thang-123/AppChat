@@ -7,8 +7,6 @@ import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
 import SearchUser from "./SearchUser";
 import UserSearchCard from "./UserSearchCard";
-import SearchGroup from "./SearchGroup";
-import GroupSearchCard from "./GroupSearchCard";
 import { ListGroup } from "react-bootstrap";
 import {useSelector} from "react-redux";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
