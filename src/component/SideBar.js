@@ -111,7 +111,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
     const [showJoinGroupModal, setShowJoinGroupModal] = useState(false);
     const [groupName, setGroupName] = useState('');
-    const [groupImage, setGroupImage] = useState(null); // Assume groupImage is a state variable to hold the image file
+    const [groupImage, setGroupImage] = useState(null);
     useEffect(() => {
         const fetchAvatar = async () => {
             try {
@@ -182,6 +182,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
 
     const handleCloseCreateGroupModal = () => {
         setShowCreateGroupModal(false);
+        setGroupImagePreview("")
     };
     const handleOpenJoinGroupModal = () => {
         setShowJoinGroupModal(true);
@@ -193,14 +194,35 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     const handleGroupNameChange = (e) => {
         setGroupName(e.target.value);
     };
-
+    const [groupImagePreview, setGroupImagePreview] = useState(null);
     const handleGroupImageChange = (e) => {
-        setGroupImage(e.target.files[0]);
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setGroupImage(file);
+                setGroupImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
+    const handleSubmitAvatarGroup = () => {
+
+        if (groupImage) {
+            const storage = getStorage();
+            const storageRef = ref(storage, `avatars/${groupName}`);
+            uploadBytesResumable(storageRef, groupImage).then((snapshot) => {
+                console.log('File uploaded successfully');
+            }).catch((error) => {
+                console.error('Error uploading file: ', error);
+            });
+        }
+    };
     const handleCreateGroup = () => {
         onCreateRoom(groupName)
         handleCloseCreateGroupModal();
+        handleSubmitAvatarGroup();
     };
     const handleJoinGroup = () => {
         onJoinRoom(groupName)
@@ -354,27 +376,34 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                                     <Modal.Title>Create Group</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <form>
-                                        <div className="mb-3">
-                                            <label htmlFor="groupName" className="form-label">Group Name:</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                id="groupName"
-                                                value={groupName}
-                                                onChange={handleGroupNameChange}
+                                    <div className="mb-3">
+                                        <label htmlFor="groupName" className="form-label">Group Name</label>
+                                        <input type="text" className="form-control" id="groupName" value={groupName} onChange={handleGroupNameChange} />
+                                    </div>
+                                    <div className="d-flex flex-column align-items-center mb-3">
+                                        <label htmlFor="groupImage" className="form-label">Group Image</label>
+                                        {groupImagePreview ? (
+                                            <img
+                                                src={groupImagePreview}
+                                                alt="Group Preview"
+                                                className={"rounded-circle"}
+                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                                onClick={() => document.getElementById('groupImageInput').click()}
                                             />
-                                        </div>
-                                        <div className="mb-3">
-                                            <label htmlFor="groupImage" className="form-label">Group image:</label>
-                                            <input
-                                                type="file"
-                                                className="form-control"
-                                                id="groupImage"
-                                                onChange={handleGroupImageChange}
+                                        ) : (
+                                            <FaUserCircle
+                                                size={100}
+                                                onClick={() => document.getElementById('groupImageInput').click()}
                                             />
-                                        </div>
-                                    </form>
+                                        )}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            id="groupImageInput"
+                                            style={{ display: 'none' }}
+                                            onChange={handleGroupImageChange}
+                                        />
+                                    </div>
                                 </Modal.Body>
                                 <Modal.Footer>
                                     <button variant="secondary" onClick={handleCloseCreateGroupModal}>
@@ -395,7 +424,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                                     <Modal.Title>Create Group</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <form>
+                                    <form onSubmit={handleCreateGroup} >
                                         <div className="mb-3">
                                             <label htmlFor="groupName" className="form-label">Group Name:</label>
                                             <input
@@ -462,10 +491,15 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                         <form onSubmit={handleSubmit} className="mx-auto">
                             <div className="text-center my-auto">
                                 <label htmlFor="avatarInput" className="cursor-pointer">
-                                    {avatarUrl ? (
-                                        <img src={avatarUrl} alt="Profile" className="rounded-circle" style={{ width: '60px', height: '60px' }} />
-                                    ) : (
-                                        <FaUserCircle size={40} className="rounded-circle" />
+                                    {avatarUrl && (
+                                        <div>
+                                            <img
+                                                src={avatarUrl}
+                                                alt="Avatar Preview"
+                                                className={"rounded-circle"}
+                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                            />
+                                        </div>
                                     )}
                                 </label>
                                 <input
