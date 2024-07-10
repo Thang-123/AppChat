@@ -12,9 +12,9 @@ import {useSelector} from "react-redux";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { firestore } from '../firebaseconfig';
 import { doc, setDoc } from 'firebase/firestore';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from 'react-bootstrap/Modal';
 import {GrGroup} from "react-icons/gr";
-import WebSocketService from "../webSocketService";
 const StyledIconContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -93,7 +93,7 @@ const SearchInputContainer = styled.div`
 `;
 
 
-const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups}) => {
+const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups,onCreateRoom, onJoinRoom}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [openSearchGroup, setOpenSearchGroup] = useState(false);
@@ -109,7 +109,9 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     const [name, setName] = useState(loggedInUser);
     const [avatarUrl, setAvatarUrl] = useState('');
     const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
-    const [roomName, setGroupName] = useState('');
+    const [showJoinGroupModal, setShowJoinGroupModal] = useState(false);
+    const [groupName, setGroupName] = useState('');
+    const [groupImage, setGroupImage] = useState(null);
     useEffect(() => {
         const fetchAvatar = async () => {
             try {
@@ -180,41 +182,52 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
 
     const handleCloseCreateGroupModal = () => {
         setShowCreateGroupModal(false);
+        setGroupImagePreview("")
+    };
+    const handleOpenJoinGroupModal = () => {
+        setShowJoinGroupModal(true);
     };
 
-
-    const handleInputChange = (event) => {
-        setGroupName(event.target.value);
+    const handleCloseJoinGroupModal = () => {
+        setShowJoinGroupModal(false);
     };
-
-    const handleSubmitCG = async (event) => {
-        event.preventDefault();
-
-        if (!roomName) { // Basic validation to ensure a room name is provided
-            alert('Please enter a room name.');
-            return;
+    const handleGroupNameChange = (e) => {
+        setGroupName(e.target.value);
+    };
+    const [groupImagePreview, setGroupImagePreview] = useState(null);
+    const handleGroupImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setGroupImage(file);
+                setGroupImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
         }
+    };
 
-        try {
-            console.log("Creating room:", roomName);
-            await WebSocketService.sendMessage({
-                action: 'onchat',
-                data: {
-                    event: 'CREATE_ROOM',
-                    data: {
-                        name: roomName,
-                    },
-                },
+    const handleSubmitAvatarGroup = () => {
+
+        if (groupImage) {
+            const storage = getStorage();
+            const storageRef = ref(storage, `avatars/${groupName}`);
+            uploadBytesResumable(storageRef, groupImage).then((snapshot) => {
+                console.log('File uploaded successfully');
+            }).catch((error) => {
+                console.error('Error uploading file: ', error);
             });
-        } catch (error) {
-            console.error('Error creating room:', error);
-            // Handle creation errors (optional):
-            // - Display an error message to the user
-        } finally {
-            // Perform any cleanup actions (optional)
         }
-        };
-
+    };
+    const handleCreateGroup = () => {
+        onCreateRoom(groupName)
+        handleCloseCreateGroupModal();
+        handleSubmitAvatarGroup();
+    };
+    const handleJoinGroup = () => {
+        onJoinRoom(groupName)
+        handleCloseJoinGroupModal();
+    };
     const handleIconClick = (icon) => {
         setActiveIcon(prev => (prev === icon ? null : icon));
         if (icon === 'chat') {
@@ -334,7 +347,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                     </div>
 
 
-                    {openSearchUser && <SearchUser onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
+                    {openSearchUser && <SearchUser users={users} onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
                 </div>
             }
 
@@ -353,9 +366,9 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                                 readOnly
                             />
                         </SearchInputContainer>
-                        <div className="d-flex align-items-center gap-3">
+                        <div className="d-flex align-items-center gap-1">
                             <button className="btn btn-link text-dark p-2" onClick={handleOpenCreateGroupModal}>
-                                <FaUsers size={20} className="me-2"/> Create Group
+                                 Create Group
                             </button>
 
                             <Modal show={showCreateGroupModal} onHide={handleCloseCreateGroupModal}>
@@ -363,37 +376,85 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                                     <Modal.Title>Create Group</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <form onSubmit={handleSubmitCG}>
+                                    <div className="mb-3">
+                                        <label htmlFor="groupName" className="form-label">Group Name</label>
+                                        <input type="text" className="form-control" id="groupName" value={groupName} onChange={handleGroupNameChange} />
+                                    </div>
+                                    <div className="d-flex flex-column align-items-center mb-3">
+                                        <label htmlFor="groupImage" className="form-label">Group Image</label>
+                                        {groupImagePreview ? (
+                                            <img
+                                                src={groupImagePreview}
+                                                alt="Group Preview"
+                                                className={"rounded-circle"}
+                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                                onClick={() => document.getElementById('groupImageInput').click()}
+                                            />
+                                        ) : (
+                                            <FaUserCircle
+                                                size={100}
+                                                onClick={() => document.getElementById('groupImageInput').click()}
+                                            />
+                                        )}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            id="groupImageInput"
+                                            style={{ display: 'none' }}
+                                            onChange={handleGroupImageChange}
+                                        />
+                                    </div>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <button variant="secondary" onClick={handleCloseCreateGroupModal}>
+                                        Cancel
+                                    </button>
+                                    <button variant="primary" onClick={handleCreateGroup}>
+                                        Create
+                                    </button>
+                                </Modal.Footer>
+                            </Modal>
+
+                            <button className="btn btn-link text-dark p-2" data-bs-toggle="modal"
+                                    data-bs-target="#joinGroupModal" onClick={handleOpenJoinGroupModal}>
+                                 Join Group
+                            </button>
+                            <Modal show={showJoinGroupModal} onHide={handleCloseJoinGroupModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Create Group</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <form onSubmit={handleCreateGroup} >
                                         <div className="mb-3">
                                             <label htmlFor="groupName" className="form-label">Group Name:</label>
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                id="roomName"
-                                                value={roomName}
-                                                onChange={handleInputChange}
-                                                placeholder="Enter room name..."
+                                                id="groupName"
+                                                value={groupName}
+                                                onChange={handleGroupNameChange}
                                             />
                                         </div>
-
-                                        <button type="submit" className="btn btn-primary">Create Room</button>
                                     </form>
                                 </Modal.Body>
+                                <Modal.Footer>
+                                    <button variant="secondary" onClick={handleCloseJoinGroupModal}>
+                                        Cancel
+                                    </button>
+                                    <button variant="primary" onClick={handleJoinGroup}>
+                                        Join
+                                    </button>
+                                </Modal.Footer>
                             </Modal>
-
-                            <button className="btn btn-link text-dark p-2" data-bs-toggle="modal"
-                                    data-bs-target="#joinGroupModal">
-                                <FaUserFriends size={20} className="me-2"/> Join Group
-                            </button>
                         </div>
 
-                        {openSearchGroup && <SearchGroup onClose={handleToggleShowSearchGroup} onUserClick={onUserClick} />}
+                        {openSearchGroup && <SearchUser users = {groups} onClose={handleToggleShowSearchGroup} onUserClick={onUserClick} />}
                     </div>
 
 
                     <div className='col-12 custom-scrollbar' style={{height: 'calc(85vh - 55px)'}}>
                         <GroupListContainer>
-                            {users.length === 0 && (
+                            {groups.length ===0 && users.length === 0 && (
                                 <div className="text-center mt-4">
                                     <FiArrowUpLeft size={24} className="text-gray-500"/>
                                     <p className="text-gray-500 mt-2">Explore users to start a conversation with.</p>
@@ -407,10 +468,10 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                             >
                                 <div>
                                     {groups.map((group, index) => (
-                                        <GroupSearchCard
+                                        <UserSearchCard
                                             key={index}
-                                            group={group} // Pass the group object
-                                            onGroupClick={() => onGroupClick(group)} // Function to handle group click
+                                            user={group}
+                                            onUserClick={() => onUserClick(group)}
                                         />
                                     ))}
                                 </div>
@@ -430,10 +491,15 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                         <form onSubmit={handleSubmit} className="mx-auto">
                             <div className="text-center my-auto">
                                 <label htmlFor="avatarInput" className="cursor-pointer">
-                                    {avatarUrl ? (
-                                        <img src={avatarUrl} alt="Profile" className="rounded-circle" style={{ width: '60px', height: '60px' }} />
-                                    ) : (
-                                        <FaUserCircle size={40} className="rounded-circle" />
+                                    {avatarUrl && (
+                                        <div>
+                                            <img
+                                                src={avatarUrl}
+                                                alt="Avatar Preview"
+                                                className={"rounded-circle"}
+                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                            />
+                                        </div>
                                     )}
                                 </label>
                                 <input

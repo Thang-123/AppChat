@@ -4,9 +4,9 @@ import Loading from './Loading';
 import UserSearchCard from './UserSearchCard';
 import { useSelector } from "react-redux";
 
-const SearchUser = ({ onClose,onUserClick }) => {
+const SearchUser = ({ users, onClose,onUserClick }) => {
     const [search, setSearch] = useState('');
-    const users = useSelector((state) => state.chat.users);
+    // const users = useSelector((state) => state.chat.users);
     const [loading, setLoading] = useState(false);
 
     const handleInputChange = (e) => {

@@ -26,7 +26,7 @@ const UserSearchCard = ({ user, onUserClick , newMessage}) => {
         };
 
         fetchAvatar();
-    }, []);
+    }, [user]);
     return (
         <div onClick={handleClick}
              className={`user-search-card ${newMessage ? 'has-message' : ''} ${clicked ? 'clicked' : ''}`}>
