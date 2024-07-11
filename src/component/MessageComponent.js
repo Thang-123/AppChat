@@ -222,18 +222,6 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
 
             {/*{openInfo &&*/}
             {/*    <div className="container">*/}
-            {/*        <h1>User Information</h1>*/}
-            {/*        <div className="user-info">*/}
-            {/*            <label htmlFor="userId">User ID:</label>*/}
-            {/*            <input type="text" id="userId" name="userId" readOnly/>*/}
-
-            {/*            <label htmlFor="userName">Username:</label>*/}
-            {/*            <input type="text" id="userName" name="userName" readOnly/>*/}
-
-            {/*            <label htmlFor="userEmail">Email:</label>*/}
-            {/*            <input type="email" id="userEmail" name="userEmail" readOnly/>*/}
-            {/*        </div>*/}
-
             {/*        <h1>Group Information</h1>*/}
             {/*        <div className="group-info">*/}
             {/*            <label htmlFor="groupId">Group ID:</label>*/}

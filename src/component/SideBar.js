@@ -93,7 +93,7 @@ const SearchInputContainer = styled.div`
 `;
 
 
-const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups, onCreateRoom, onJoinRoom, returnError, returnSuccess}) => {
+const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups, onCreateRoom, onJoinRoom}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [openSearchGroup, setOpenSearchGroup] = useState(false);
@@ -185,7 +185,6 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     const handleCloseCreateGroupModal = () => {
         setShowCreateGroupModal(false);
         setGroupImagePreview("");
-        returnError(true);
     };
 
     const handleOpenJoinGroupModal = () => {
