@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import WebSocketService from "../webSocketService";
 import Message from '../img/message.png';
 import webSocketService from "../webSocketService";
+import Toast from "./Toast";
 
 const Chat = () => {
     const dispatch = useDispatch();
@@ -16,6 +17,8 @@ const Chat = () => {
     const { messages, loggedIn, loggedInUser, reLoginCode, users, groups } = useSelector((state) => state.chat);
     const [isActive, setActiveUsers] = useState({});
     const [newMessages, setNewMessages] = useState({});
+    const [showToast, setShowToast] = useState(false);
+    const [toastProps, setToastProps] = useState({});
 
 
     useEffect(() => {
@@ -32,17 +35,20 @@ const Chat = () => {
     const handleCreateRoomResponse = (data) => {
         if (!data || data.status !== 'success') {
             console.error('Failed to create Room');
+            handleError("Failed to create Room: "+data.mes)
             return;
         }
         handleGetUserList()
-
+        handleSuccess("Create Room Success")
     };
     const handleJoinRoomResponse = (data) => {
         if (!data || data.status !== 'success') {
             console.error('Failed to join Room');
+            handleError(data.mes)
             return;
         }
-        handleGetUserList()
+        handleSuccess("Failed to join Room: "+data.mes)
+        handleGetUserList("Join Room Success")
     };
 
     const handleLogoutResponse = (data) => {
@@ -73,21 +79,10 @@ const Chat = () => {
             dispatch(setUsers(peoples));
         }
         if (groups.length > 0) {
-            dispatch(setGroups(groups)); // Assuming setGroups updates group state
+            dispatch(setGroups(groups));
         }
     };
 
-
-    // const handleGetGroupListResponse = (data) => {
-    //     if (!data || data.status !== 'success') {
-    //         console.error('Failed to fetch group list');
-    //         return;
-    //     }
-    //
-    //     const groups = data.data.type === 1 || [];
-    //
-    //     dispatch(setGroups(groups)); // Assuming setGroups updates group state
-    // };
 
 
     const checkUserActive = (user) =>{
@@ -176,7 +171,7 @@ const Chat = () => {
         // Sử dụng Set để lấy danh sách các thành viên duy nhất
         const uniqueMembersSet = new Set();
         MessageResponse.forEach(msg => uniqueMembersSet.add(msg.name));
-        const members = Array.from(uniqueMembersSet);
+        const members = Array.from(uniqueMembersSet).map(name => ({ name }));
 
         dispatch(setMember(members));
         const newMessages = MessageResponse.map(msg => ({
@@ -222,26 +217,6 @@ const Chat = () => {
             console.warn('Unknown user type:', user.type);
         }
     };
-
-    // const handleGroupClick = (group) => {
-    //     if (!group || typeof group.id === 'undefined' || typeof group.name === 'undefined') {
-    //         console.error('Invalid group object:', group);
-    //         return;
-    //     }
-    //
-    //     if (selectedGroup && selectedGroup.id === group.id) return;
-    //     console.log('Clicked Group:', group);
-    //     setSelectedGroup(group);
-    //     console.log('Check Active:', group);
-    //
-    //     if (group.type === 0) { // Public Group
-    //         fetchGroupMessages(group.id); // Assuming fetchGroupMessages exists
-    //     } else if (group.type === 1) { // Private Group
-    //         getRoomChatMes();
-    //     } else {
-    //         console.warn('Unknown group type:', group.type);
-    //     }
-    // };
 
     const handleSendMessage = (newMessage) => {
         WebSocketService.sendMessage({
@@ -343,110 +318,37 @@ const Chat = () => {
             }
         });
     };
-
-//     // Create a custom event (without using a constructor)
-//     const createRoomLogEvent = new Event('createRoomLog');
-//
-// // Wrap handleCreateRoom with event emission
-//     const handleCreateRoom = (roomName) => {
-//         console.log("Creating room:", roomName);
-//         WebSocketService.sendMessage({
-//             action: 'onchat',
-//             data: {
-//                 event: 'CREATE_ROOM',
-//                 data: {
-//                     name: roomName
-//                 }
-//             }
-//         });
-//
-//         // Emit the event with the console.log message
-//         dispatchEvent(createRoomLogEvent({ message: console.log.toString() })); // Assuming console.log returns a string
-//     };
-//
-// // Function to display captured messages
-//     function displayCapturedLog(message) {
-//         const logContainer = document.getElementById('log-container'); // Assuming an element with ID 'log-container'
-//         if (logContainer) { // Check if the element exists
-//             logContainer.innerHTML += `<p>${message}</p>`;
-//         } else {
-//             console.error('Log container element (ID: log-container) not found!');
-//         }
-//     }
-//
-// // Event listener for displaying messages
-//     window.addEventListener('createRoomLog', (event) => {
-//         displayCapturedLog(event.detail.message);
-//     });
-
-    function showSuccessToast() {
-        toast({
-            title: "Thành công!",
-            message: "Đã cập nhật các thay đổi",
-            type: "success",
-            duration: 5000
+    const handleSuccess = (mes) => {
+        setToastProps({
+            title: 'SUCCEED!',
+            message: mes,
+            type: 'success'
         });
-    }
+        setShowToast(true);
+    };
 
-    function showErrorToast() {
-        toast({
-            title: "Thất bại!",
-            message: "Có lỗi xảy ra, vui lòng kiểm tra lại",
-            type: "error",
-            duration: 5000
+    const handleError = (mes) => {
+        setToastProps({
+            title: 'FAILED!',
+            message: mes,
+            type: 'error'
         });
-    }
+        setShowToast(true);
+    };
 
-    function toast({ title = "", message = "", type = "info", duration = 3000 }) {
-        const main = document.getElementById("toast");
-        if (main) {
-            const toast = document.createElement("div");
 
-            // Auto remove toast
-            const autoRemoveId = setTimeout(function () {
-                main.removeChild(toast);
-            }, duration + 1000);
-
-            // Remove toast when clicked
-            toast.onclick = function (e) {
-                if (e.target.closest(".toast__close")) {
-                    main.removeChild(toast);
-                    clearTimeout(autoRemoveId);
-                }
-            };
-
-            const icons = {
-                success: "fas fa-check-circle",
-                error: "fas fa-exclamation-circle"
-            };
-            const icon = icons[type];
-            const delay = (duration / 1000).toFixed(2);
-
-            toast.classList.add("toast", `toast--${type}`);
-            toast.style.animation = `slideInLeft ease .3s, fadeOut linear 1s ${delay}s forwards`;
-
-            toast.innerHTML = `
-                    <div class="toast__icon">
-                        <i class="${icon}"></i>
-                    </div>
-                    <div class="toast__body">
-                        <h3 class="toast__title">${title}</h3>
-                        <p class="toast__msg">${message}</p>
-                    </div>
-                    <div class="toast__close">
-                        <i class="fas fa-times"></i>
-                    </div>
-                `;
-            main.appendChild(toast);
-        }
-    }
 
     const handleCloseMessageComponent = () => {
         setSelectedUser(null);
     };
+    const handleCloseToast = () => {
+        setShowToast(false);
+    };
     return (
+
         <div className="chat-page d-flex">
-            <div className="sidebar bg-white border-right d-flex flex-column" style={{ flexBasis: '25%' }}>
+            {showToast && <Toast {...toastProps} duration={3000} onClose={handleCloseToast} />}
+            <div className="sidebar bg-white border-right d-flex flex-column" style={{flexBasis: '25%'}}>
                 <Sidebar
                     onUserClick={handleUserClick}
                     onGroupClick={handleUserClick}
@@ -454,8 +356,6 @@ const Chat = () => {
                     onJoinRoom={handleJoinRoom}
                     onCreateRoom={handleCreateRoom}
                     onGetUserList={handleGetUserList}
-                    returnSuccess={showSuccessToast}
-                    returnError={showErrorToast}
                     users={users}
                     groups={groups}
                     newMessage={newMessages || {}}
@@ -465,7 +365,7 @@ const Chat = () => {
             <div className="chat-content flex-grow-1 d-flex flex-column">
                 {!selectedUser ? (
                     <img src={Message} alt="Start chatting"
-                         className="center-image" />
+                         className="center-image"/>
                 ) : (
                     <MessageComponent
                         onClose={handleCloseMessageComponent}
@@ -473,7 +373,7 @@ const Chat = () => {
                         messages={messages}
                         onSendMessage={handleSendMessage}
                         fetchLatestMessages={fetchLatestMessages}
-                        getRoomChatMes = {getRoomChatMes}
+                        getRoomChatMes={getRoomChatMes}
                         isActive={isActive}
                     />
                 )}
