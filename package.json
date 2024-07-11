@@ -16,6 +16,7 @@
     "body-parser": "^1.20.2",
     "bootstrap": "^5.3.3",
     "browserify-zlib": "^0.2.0",
+    "console-log-capture": "^1.0.3",
     "cors": "^2.8.5",
     "emoji-mart": "^5.6.0",
     "express": "^4.19.2",
