@@ -33,7 +33,7 @@ const RegisterPage = () => {
             dispatch(registerUser({ user: username }));
             navigate('/login');
         } else {
-            const errorMessage = data.message || 'Registration failed';
+            const errorMessage = data.mes || 'Registration failed';
             setFeedbackMessage(errorMessage);
         }
     };

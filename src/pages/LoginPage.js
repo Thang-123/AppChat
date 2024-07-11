@@ -57,7 +57,7 @@ const LoginPage = () => {
                     console.error('RE_LOGIN_CODE is missing in the response data.');
                 }
             } else {
-                const errorMessage = data.message || ' Login failed';
+                const errorMessage = data.mes || ' Login failed';
                 setFeedbackMessage(errorMessage);
             }
     };
