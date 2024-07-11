@@ -43,8 +43,8 @@ const Chat = () => {
             return;
         }
         handleGetUserList()
-
     };
+
     const handleLogoutResponse = (data) => {
         if (!data) {
             console.log('Invalid response data received');
@@ -58,6 +58,7 @@ const Chat = () => {
             console.log(errorMessage);
         }
     };
+
     const handleGetUserListResponse = (data) => {
         if (!data || data.status !== 'success') {
             console.error('Failed to fetch user list');
@@ -238,7 +239,6 @@ const Chat = () => {
     // };
 
     const handleSendMessage = (newMessage) => {
-        console.log("send mes to: ",selectedUser.name ,newMessage.mes)
         WebSocketService.sendMessage({
             action: 'onchat',
             data: {
@@ -339,21 +339,118 @@ const Chat = () => {
         });
     };
 
+//     // Create a custom event (without using a constructor)
+//     const createRoomLogEvent = new Event('createRoomLog');
+//
+// // Wrap handleCreateRoom with event emission
+//     const handleCreateRoom = (roomName) => {
+//         console.log("Creating room:", roomName);
+//         WebSocketService.sendMessage({
+//             action: 'onchat',
+//             data: {
+//                 event: 'CREATE_ROOM',
+//                 data: {
+//                     name: roomName
+//                 }
+//             }
+//         });
+//
+//         // Emit the event with the console.log message
+//         dispatchEvent(createRoomLogEvent({ message: console.log.toString() })); // Assuming console.log returns a string
+//     };
+//
+// // Function to display captured messages
+//     function displayCapturedLog(message) {
+//         const logContainer = document.getElementById('log-container'); // Assuming an element with ID 'log-container'
+//         if (logContainer) { // Check if the element exists
+//             logContainer.innerHTML += `<p>${message}</p>`;
+//         } else {
+//             console.error('Log container element (ID: log-container) not found!');
+//         }
+//     }
+//
+// // Event listener for displaying messages
+//     window.addEventListener('createRoomLog', (event) => {
+//         displayCapturedLog(event.detail.message);
+//     });
 
+    function showSuccessToast() {
+        toast({
+            title: "Thành công!",
+            message: "Đã cập nhật các thay đổi",
+            type: "success",
+            duration: 5000
+        });
+    }
 
+    function showErrorToast() {
+        toast({
+            title: "Thất bại!",
+            message: "Có lỗi xảy ra, vui lòng kiểm tra lại",
+            type: "error",
+            duration: 5000
+        });
+    }
+
+    function toast({ title = "", message = "", type = "info", duration = 3000 }) {
+        const main = document.getElementById("toast");
+        if (main) {
+            const toast = document.createElement("div");
+
+            // Auto remove toast
+            const autoRemoveId = setTimeout(function () {
+                main.removeChild(toast);
+            }, duration + 1000);
+
+            // Remove toast when clicked
+            toast.onclick = function (e) {
+                if (e.target.closest(".toast__close")) {
+                    main.removeChild(toast);
+                    clearTimeout(autoRemoveId);
+                }
+            };
+
+            const icons = {
+                success: "fas fa-check-circle",
+                error: "fas fa-exclamation-circle"
+            };
+            const icon = icons[type];
+            const delay = (duration / 1000).toFixed(2);
+
+            toast.classList.add("toast", `toast--${type}`);
+            toast.style.animation = `slideInLeft ease .3s, fadeOut linear 1s ${delay}s forwards`;
+
+            toast.innerHTML = `
+                    <div class="toast__icon">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div class="toast__body">
+                        <h3 class="toast__title">${title}</h3>
+                        <p class="toast__msg">${message}</p>
+                    </div>
+                    <div class="toast__close">
+                        <i class="fas fa-times"></i>
+                    </div>
+                `;
+            main.appendChild(toast);
+        }
+    }
 
     const handleCloseMessageComponent = () => {
-        setSelectedUser("");
+        setSelectedUser(null);
     };
     return (
         <div className="chat-page d-flex">
             <div className="sidebar bg-white border-right d-flex flex-column" style={{ flexBasis: '25%' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
+                    onGroupClick={handleUserClick}
                     onLogout={handleLogOut}
                     onJoinRoom={handleJoinRoom}
                     onCreateRoom={handleCreateRoom}
                     onGetUserList={handleGetUserList}
+                    returnSuccess={showSuccessToast}
+                    returnError={showErrorToast}
                     users={users}
                     groups={groups}
                     newMessage={newMessages || {}}

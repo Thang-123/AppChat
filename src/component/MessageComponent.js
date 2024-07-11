@@ -28,6 +28,8 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState('');
     const [memberAvatars, setMemberAvatars] = useState({});
+    const [activeIcon, setActiveIcon] = useState(null);
+    const [openInfo, setOpenInfo] = useState(false);
     useEffect(() => {
         const messageComponentElement = document.getElementById('messageComponent');
         if (messageComponentElement) {
@@ -158,6 +160,14 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
         }
         scrollToBottom()
     };
+
+    const handleMoreInfo = (icon) => {
+        setActiveIcon(prev => (prev === icon ? null : icon));
+        if (icon === 'info'){
+            setOpenInfo(prev => !prev);
+        }
+    };
+
     return (
         <div id="messageComponent" className="bg-no-repeat bg-cover">
             {/* Header */}
@@ -200,12 +210,43 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                         <FaSearch size={20}/>
                     </button>
 
-                    <button className="btn btn-link text-dark p-2" onClick={onClose}>
+                    <button className="btn btn-link text-dark p-2"
+                            onClick={() => handleMoreInfo('info')}
+                            active={activeIcon === 'info' ? "true" : "false"}
+                            title="Informations">
                         <HiDotsVertical size={20}/>
                     </button>
 
                 </div>
             </header>
+
+            {/*{openInfo &&*/}
+            {/*    <div className="container">*/}
+            {/*        <h1>User Information</h1>*/}
+            {/*        <div className="user-info">*/}
+            {/*            <label htmlFor="userId">User ID:</label>*/}
+            {/*            <input type="text" id="userId" name="userId" readOnly/>*/}
+
+            {/*            <label htmlFor="userName">Username:</label>*/}
+            {/*            <input type="text" id="userName" name="userName" readOnly/>*/}
+
+            {/*            <label htmlFor="userEmail">Email:</label>*/}
+            {/*            <input type="email" id="userEmail" name="userEmail" readOnly/>*/}
+            {/*        </div>*/}
+
+            {/*        <h1>Group Information</h1>*/}
+            {/*        <div className="group-info">*/}
+            {/*            <label htmlFor="groupId">Group ID:</label>*/}
+            {/*            <input type="text" id="groupId" name="groupId" readOnly/>*/}
+
+            {/*            <label htmlFor="groupName">Group Name:</label>*/}
+            {/*            <input type="text" id="groupName" name="groupName" readOnly/>*/}
+
+            {/*            <label htmlFor="groupDescription">Group Description:</label>*/}
+            {/*            <textarea id="groupDescription" name="groupDescription" readOnly></textarea>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*}*/}
 
             {/* Message display */}
             <section

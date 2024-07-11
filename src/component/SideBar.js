@@ -6,8 +6,8 @@ import { BiLogOut } from 'react-icons/bi';
 import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
 import SearchUser from "./SearchUser";
-import { ListGroup } from "react-bootstrap";
 import UserSearchCard from "./UserSearchCard";
+import { ListGroup } from "react-bootstrap";
 import {useSelector} from "react-redux";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { firestore } from '../firebaseconfig';
@@ -93,7 +93,7 @@ const SearchInputContainer = styled.div`
 `;
 
 
-const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups,onCreateRoom, onJoinRoom}) => {
+const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups, onCreateRoom, onJoinRoom, returnError, returnSuccess}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [openSearchGroup, setOpenSearchGroup] = useState(false);
@@ -112,6 +112,8 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     const [showJoinGroupModal, setShowJoinGroupModal] = useState(false);
     const [groupName, setGroupName] = useState('');
     const [groupImage, setGroupImage] = useState(null);
+    const [groupImagePreview, setGroupImagePreview] = useState(null);
+
     useEffect(() => {
         const fetchAvatar = async () => {
             try {
@@ -127,6 +129,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
         };
         fetchAvatar();
     },[]);
+
     const handleAvatarChange = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -139,7 +142,6 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
         }
       ;
     };
-
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -182,8 +184,10 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
 
     const handleCloseCreateGroupModal = () => {
         setShowCreateGroupModal(false);
-        setGroupImagePreview("")
+        setGroupImagePreview("");
+        returnError(true);
     };
+
     const handleOpenJoinGroupModal = () => {
         setShowJoinGroupModal(true);
     };
@@ -191,10 +195,11 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     const handleCloseJoinGroupModal = () => {
         setShowJoinGroupModal(false);
     };
+
     const handleGroupNameChange = (e) => {
         setGroupName(e.target.value);
     };
-    const [groupImagePreview, setGroupImagePreview] = useState(null);
+
     const handleGroupImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -208,7 +213,6 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
     };
 
     const handleSubmitAvatarGroup = () => {
-
         if (groupImage) {
             const storage = getStorage();
             const storageRef = ref(storage, `avatars/${groupName}`);
@@ -219,15 +223,18 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
             });
         }
     };
+
     const handleCreateGroup = () => {
         onCreateRoom(groupName)
         handleCloseCreateGroupModal();
         handleSubmitAvatarGroup();
     };
+
     const handleJoinGroup = () => {
         onJoinRoom(groupName)
         handleCloseJoinGroupModal();
     };
+
     const handleIconClick = (icon) => {
         setActiveIcon(prev => (prev === icon ? null : icon));
         if (icon === 'chat') {
@@ -266,6 +273,68 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
         setDisplayedUsers(filteredUsers.slice(0, 10));
         setHasMore(filteredUsers.length > 10);
     };
+
+    // function showSuccessToast() {
+    //     toast({
+    //         title: "Success!",
+    //         message: "Thành công",
+    //         type: "success",
+    //         duration: 5000
+    //     });
+    // }
+    //
+    // function showErrorToast() {
+    //     toast({
+    //         title: "Thất bại!",
+    //         message: "Có lỗi xảy ra, vui lòng kiểm tra lại",
+    //         type: "error",
+    //         duration: 5000
+    //     });
+    // }
+    //
+    // function toast({ title = "", message = "", type = "info", duration = 3000 }) {
+    //     const main = document.getElementById("toast");
+    //     if (main) {
+    //         const toast = document.createElement("div");
+    //
+    //         // Auto remove toast
+    //         const autoRemoveId = setTimeout(function () {
+    //             main.removeChild(toast);
+    //         }, duration + 1000);
+    //
+    //         // Remove toast when clicked
+    //         toast.onclick = function (e) {
+    //             if (e.target.closest(".toast__close")) {
+    //                 main.removeChild(toast);
+    //                 clearTimeout(autoRemoveId);
+    //             }
+    //         };
+    //
+    //         const icons = {
+    //             success: "fas fa-check-circle",
+    //             error: "fas fa-exclamation-circle"
+    //         };
+    //         const icon = icons[type];
+    //         const delay = (duration / 1000).toFixed(2);
+    //
+    //         toast.classList.add("toast", `toast--${type}`);
+    //         toast.style.animation = `slideInLeft ease .3s, fadeOut linear 1s ${delay}s forwards`;
+    //
+    //         toast.innerHTML = `
+    //                 <div class="toast__icon">
+    //                     <i class="${icon}"></i>
+    //                 </div>
+    //                 <div class="toast__body">
+    //                     <h3 class="toast__title">${title}</h3>
+    //                     <p class="toast__msg">${message}</p>
+    //                 </div>
+    //                 <div class="toast__close">
+    //                     <i class="fas fa-times"></i>
+    //                 </div>
+    //             `;
+    //         main.appendChild(toast);
+    //     }
+    // }
 
     return (
         <div className="d-flex">
