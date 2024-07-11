@@ -321,9 +321,9 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                     <div className='col-12 custom-scrollbar' style={{ height: 'calc(85vh - 55px)'}}>
                         <UserListContainer>
                             {users.length === 0 && (
-                                <div className="text-center mt-4">
+                                <div className="text-center">
                                     <FiArrowUpLeft size={24} className="text-gray-500" />
-                                    <p className="text-gray-500 mt-2">Explore users to start a conversation with.</p>
+                                    <p className="text-gray mt-2">Explore users to start</p>
                                 </div>
                             )}
                             <InfiniteScroll
@@ -457,7 +457,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                             {groups.length ===0 && users.length === 0 && (
                                 <div className="text-center mt-4">
                                     <FiArrowUpLeft size={24} className="text-gray-500"/>
-                                    <p className="text-gray-500 mt-2">Explore users to start a conversation with.</p>
+                                    <p className="text-gray-500 mt-2">Explore room to start</p>
                                 </div>
                             )}
                             <InfiniteScroll
@@ -491,16 +491,14 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                         <form onSubmit={handleSubmit} className="mx-auto">
                             <div className="text-center my-auto">
                                 <label htmlFor="avatarInput" className="cursor-pointer">
-                                    {avatarUrl && (
-                                        <div>
-                                            <img
-                                                src={avatarUrl}
-                                                alt="Avatar Preview"
-                                                className={"rounded-circle"}
-                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-                                            />
-                                        </div>
-                                    )}
+                                    <div className="user-avatar">
+                                        {avatarUrl ? (
+                                            <img src={avatarUrl} alt="Profile" className="rounded-circle"
+                                                 style={{width: '80px', height: '80px'}}/>
+                                        ) : (
+                                            <FaUserCircle size={80} className="rounded-circle"/>
+                                        )}
+                                    </div>
                                 </label>
                                 <input
                                     id="avatarInput"

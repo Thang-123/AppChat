@@ -157,6 +157,11 @@ const Chat = () => {
         }));
         dispatch(setMessages(newMessages));
 
+        const uniqueMembersSet = new Set();
+        MessageResponse.forEach(msg => uniqueMembersSet.add(msg.name));
+        const members = Array.from(uniqueMembersSet);
+
+        dispatch(setMember(members));
     };
 
     const handleGetRoomChatResponse = (data) => {

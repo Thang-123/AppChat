@@ -235,12 +235,12 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                                     )}
                                 </div>
                             )}
-                            <div className="message-content">
+                            <div className="message-content" >
                                 {msg.sentByCurrentUser && <p className="mb-0">{msg.name}</p>}
                                 <div
                                     className={`p-2 rounded ${msg.sentByCurrentUser ? 'received-message bg-secondary text-white' : 'sent-message bg-primary text-white'}`}
                                 >
-                                    <p className="mb-1 text-center text-white">{msg.mes}</p>
+                                    <p className="mb-1 text-center text-white"style={{wordBreak: 'break-word', overflowWrap: 'anywhere'}} >{msg.mes}</p>
                                     {/* {msg.imageUrl && <img src={msg.imageUrl} alt="Sent" className="img-fluid" />} */}
                                     {/* {msg.videoUrl && <video src={msg.videoUrl} className="img-fluid" controls />} */}
                                     {/* <p className="text-right small text-muted"> */}
