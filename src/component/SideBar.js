@@ -93,17 +93,17 @@ const SearchInputContainer = styled.div`
 `;
 
 
-const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, groups, onCreateRoom, onJoinRoom}) => {
+const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoom, onJoinRoom, onSave}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [openSearchGroup, setOpenSearchGroup] = useState(false);
-    const [openChat, setOpenChat] = useState(false);
+    const [openChat, setOpenChat] = useState(true);
     const [openSetting, setOpenSetting] = useState(false);
     const [openGroup, setOpenGroup] = useState(false);
     const [displayedUsers, setDisplayedUsers] = useState(users.slice(0, 10));
     const [hasMore, setHasMore] = useState(users.length > 10);
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeIcon, setActiveIcon] = useState(null);
+    const [activeIcon, setActiveIcon] = useState('chat');
     const [avatar, setAvatar] = useState(null);
     const [preview, setPreview] = useState(null);
     const [name, setName] = useState(loggedInUser);
@@ -151,6 +151,7 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
             const storageRef = ref(storage, `avatars/${loggedInUser}`);
             uploadBytesResumable(storageRef, avatar).then((snapshot) => {
                 console.log('File uploaded successfully');
+                onSave('Success!', 'Profile saved successfully.', 'success', 3000)
                 getDownloadURL(snapshot.ref).then((downloadURL) => {
                     const userDocRef = doc(firestore, 'users', loggedInUser);
                     setDoc(userDocRef, {
@@ -272,68 +273,6 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
         setDisplayedUsers(filteredUsers.slice(0, 10));
         setHasMore(filteredUsers.length > 10);
     };
-
-    // function showSuccessToast() {
-    //     toast({
-    //         title: "Success!",
-    //         message: "Thành công",
-    //         type: "success",
-    //         duration: 5000
-    //     });
-    // }
-    //
-    // function showErrorToast() {
-    //     toast({
-    //         title: "Thất bại!",
-    //         message: "Có lỗi xảy ra, vui lòng kiểm tra lại",
-    //         type: "error",
-    //         duration: 5000
-    //     });
-    // }
-    //
-    // function toast({ title = "", message = "", type = "info", duration = 3000 }) {
-    //     const main = document.getElementById("toast");
-    //     if (main) {
-    //         const toast = document.createElement("div");
-    //
-    //         // Auto remove toast
-    //         const autoRemoveId = setTimeout(function () {
-    //             main.removeChild(toast);
-    //         }, duration + 1000);
-    //
-    //         // Remove toast when clicked
-    //         toast.onclick = function (e) {
-    //             if (e.target.closest(".toast__close")) {
-    //                 main.removeChild(toast);
-    //                 clearTimeout(autoRemoveId);
-    //             }
-    //         };
-    //
-    //         const icons = {
-    //             success: "fas fa-check-circle",
-    //             error: "fas fa-exclamation-circle"
-    //         };
-    //         const icon = icons[type];
-    //         const delay = (duration / 1000).toFixed(2);
-    //
-    //         toast.classList.add("toast", `toast--${type}`);
-    //         toast.style.animation = `slideInLeft ease .3s, fadeOut linear 1s ${delay}s forwards`;
-    //
-    //         toast.innerHTML = `
-    //                 <div class="toast__icon">
-    //                     <i class="${icon}"></i>
-    //                 </div>
-    //                 <div class="toast__body">
-    //                     <h3 class="toast__title">${title}</h3>
-    //                     <p class="toast__msg">${message}</p>
-    //                 </div>
-    //                 <div class="toast__close">
-    //                     <i class="fas fa-times"></i>
-    //                 </div>
-    //             `;
-    //         main.appendChild(toast);
-    //     }
-    // }
 
     return (
         <div className="d-flex">
@@ -560,9 +499,20 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                             <div className="text-center my-auto">
                                 <label htmlFor="avatarInput" className="cursor-pointer">
                                     <div className="user-avatar">
-                                        {avatarUrl ? (
-                                            <img src={avatarUrl} alt="Profile" className="rounded-circle"
-                                                 style={{width: '80px', height: '80px'}}/>
+                                        {preview ? (
+                                            <img
+                                                src={preview}
+                                                alt="Avatar Preview"
+                                                className="rounded-circle"
+                                                style={{width: '80px', height: '80px'}}
+                                            />
+                                        ) : avatarUrl ? (
+                                            <img
+                                                src={avatarUrl}
+                                                alt="Profile"
+                                                className="rounded-circle"
+                                                style={{width: '80px', height: '80px'}}
+                                            />
                                         ) : (
                                             <FaUserCircle size={80} className="rounded-circle"/>
                                         )}
@@ -582,16 +532,19 @@ const Sidebar = ({ newMessage, onUserClick, onGroupClick, onLogout, users, group
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="block w-full p-2 border border-gray-300 rounded-md"
+                                    className="block w-full p-2 border border-gray-300 rounded-md text-center"
                                     placeholder="Enter your name"
                                 />
                             </div>
-                            <button
-                                type="submit"
-                                className="mt-4 px-4 py-2 bg-blue-500 text-secondary rounded hover:bg-blue-700 w-full"
-                            >
-                                Save
-                            </button>
+                            <div style={{ textAlign: 'right' }}>
+                                <button
+                                    type="submit"
+                                    className="mt-4 px-4 py-2 bg-blue-500 text-secondary rounded hover:bg-blue-700"
+                                >
+                                    Save
+                                </button>
+                            </div>
+
                         </form>
                     </div>
                 </div>

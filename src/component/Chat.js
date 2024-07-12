@@ -342,6 +342,11 @@ const Chat = () => {
     const handleCloseToast = () => {
         setShowToast(false);
     };
+    const showToastMessage = (title, message, type = 'success', duration = 3000) => {
+        setToastProps({ title, message, type, duration });
+        setShowToast(true);
+    };
+
     return (
 
         <div className="chat-page d-flex">
@@ -357,6 +362,7 @@ const Chat = () => {
                     users={users}
                     groups={groups}
                     newMessage={newMessages || {}}
+                    onSave={showToastMessage}
 
                 />
             </div>
