@@ -200,9 +200,6 @@ const Chat = () => {
             console.error('Invalid user object:', user);
             return;
         }
-        // if(newMessages !== null){
-        //     setNewMessages(null);
-        // }
 
         if (selectedUser && selectedUser.name === user.name) return;
         console.log('Clicked User:', user);
@@ -335,23 +332,25 @@ const Chat = () => {
         });
         setShowToast(true);
     };
-
-
-
+    
     const handleCloseMessageComponent = () => {
         setSelectedUser(null);
     };
     const handleCloseToast = () => {
         setShowToast(false);
     };
+    const showToastMessage = (title, message, type = 'success', duration = 3000) => {
+        setToastProps({ title, message, type, duration });
+        setShowToast(true);
+    };
+
     return (
 
         <div className="chat-page d-flex">
             {showToast && <Toast {...toastProps} duration={3000} onClose={handleCloseToast} />}
-            <div className="sidebar bg-white border-right d-flex flex-column" style={{flexBasis: '25%'}}>
+            <div className="sidebar bg-white border-right d-flex flex-column" style={{ width: '400px', minWidth: '400px' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
-                    onGroupClick={handleUserClick}
                     onLogout={handleLogOut}
                     onJoinRoom={handleJoinRoom}
                     onCreateRoom={handleCreateRoom}
@@ -359,6 +358,7 @@ const Chat = () => {
                     users={users}
                     groups={groups}
                     newMessage={newMessages || {}}
+                    onSave={showToastMessage}
 
                 />
             </div>
@@ -375,6 +375,8 @@ const Chat = () => {
                         fetchLatestMessages={fetchLatestMessages}
                         getRoomChatMes={getRoomChatMes}
                         isActive={isActive}
+                        onUserClick={handleUserClick}
+                        onSave={showToastMessage}
                     />
                 )}
             </div>
