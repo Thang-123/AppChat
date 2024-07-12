@@ -199,13 +199,12 @@ img.rounded-circle,
 }
 
 .modal-body {
-    /*padding: 1rem;*/
-    padding-top: 3rem;
-    margin: 1rem;
+    padding: 1rem;
     flex: 1;
     overflow: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    background: #C3D4F9;
 }
 
 .modal-body::-webkit-scrollbar {
@@ -213,7 +212,7 @@ img.rounded-circle,
 }
 
 .user-list {
-    max-height: calc(100% - 4rem);
+    max-height: 100%;
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;

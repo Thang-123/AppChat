@@ -10,7 +10,7 @@ import {
     FaUserCircle,
     FaVideo
 } from 'react-icons/fa';
-import { HiDotsVertical } from 'react-icons/hi';
+import {HiChevronDown, HiDotsVertical} from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { IoMdSend } from 'react-icons/io';
 import './Chat.css';
@@ -19,7 +19,12 @@ import { firestore } from '../firebaseconfig';
 import { doc,getDoc } from 'firebase/firestore';
 import EmojiPicker from "./EmojiPicker";
 import {useSelector} from "react-redux";
-const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage}) => {
+import Modal from "react-bootstrap/Modal";
+import {FiArrowUpLeft} from "react-icons/fi";
+import InfiniteScroll from "react-infinite-scroll-component";
+import UserSearchCard from "./UserSearchCard";
+import styled from "styled-components";
+const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage, users, groups}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
@@ -30,6 +35,8 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
     const [memberAvatars, setMemberAvatars] = useState({});
     const [activeIcon, setActiveIcon] = useState(null);
     const [openInfo, setOpenInfo] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
+
     useEffect(() => {
         const messageComponentElement = document.getElementById('messageComponent');
         if (messageComponentElement) {
@@ -54,16 +61,17 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 setAvatarUrl('');
             }
         };
-
         fetchAvatar();
     }, [selectedUser]);
 
     const {members} = useSelector((state) => state.chat);
+
     useEffect(() => {
         console.log(members)
         console.log('Current member avatars:', memberAvatars);
         fetchAvatarForMembers()
     }, [members]);
+
     const fetchAvatarForMembers = async () => {
         try {
             const storage = getStorage();
@@ -88,7 +96,6 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
             console.error('Error fetching avatars:', error);
         }
     };
-
 
     // useEffect(() => {
     //     if (selectedUser) {
@@ -161,12 +168,26 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
         scrollToBottom()
     };
 
-    const handleMoreInfo = (icon) => {
-        setActiveIcon(prev => (prev === icon ? null : icon));
-        if (icon === 'info'){
-            setOpenInfo(prev => !prev);
-        }
-    };
+    // const handleMoreInfo = (icon) => {
+    //     setActiveIcon(prev => (prev === icon ? null : icon));
+    //     if (icon === 'info'){
+    //         setOpenInfo(prev => !prev);
+    //     }
+    // };
+
+    const handleOpenInfo = () => setShowInfo(true);
+    const handleCloseInfo = () => setShowInfo(false);
+
+    // const UserListContainer = styled.div`
+    // height: calc(100vh - 65px);
+    // padding: 1rem;
+    // background-color: #f8f9fa;
+    // `;
+
+    // const InfoGroup = ({ users, onClose,onUserClick }) => {
+    //     const [search, setSearch] = useState('');
+    //     // const users = useSelector((state) => state.chat.users);
+    //     const [loading, setLoading] = useState(false);
 
     return (
         <div id="messageComponent" className="bg-no-repeat bg-cover">
@@ -210,45 +231,91 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                         <FaSearch size={20}/>
                     </button>
 
-                    <button className="btn btn-link text-dark p-2"
-                            onClick={() => handleMoreInfo('info')}
-                            active={activeIcon === 'info' ? "true" : "false"}
-                            title="Informations">
+                    <button className="btn btn-link text-dark p-2" onClick={handleOpenInfo}>
                         <HiDotsVertical size={20}/>
                     </button>
 
+                    {/* Popup Information */}
+                    <Modal show={showInfo} onHide={handleCloseInfo}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Information</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="d-flex flex-column align-items-center mb-3">
+                                {/* Profile picture */}
+                                {avatarUrl ? (
+                                    <img src={avatarUrl} alt="Profile" className="rounded-circle"
+                                         style={{width: '100px', height: '100px'}}/>
+                                ) : (
+                                    <FaUserCircle size={80} className="rounded-circle"/>
+                                )}
+                                {/* User details */}
+                                <div>
+                                    <span className="d-block fs-4 fw-medium">{selectedUser.name}</span>
+                                    <div className="status-container">
+                                        <div className={`dot ${isActive ? 'dot-active' : 'dot-inactive'}`}/>
+                                        <span className="status-text mx-2">
+                                    {isActive ? 'Online' : 'Offline'}
+                                 </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="accordion accordion-flush" id="accordionFlushExample">
+                                <div className="accordion-item">
+                                    <h2 className="accordion-header">
+                                        <button className="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#flush-collapseOne"
+                                                aria-expanded="false"
+                                                aria-controls="flush-collapseOne">
+                                            Accordion Item #1
+                                        </button>
+                                    </h2>
+                                    <div id="flush-collapseOne" className="accordion-collapse collapse"
+                                         data-bs-parent="#accordionFlushExample">
+                                        <div className="accordion-body">
+                                            ...
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="accordion-item">
+                                    <h2 className="accordion-header">
+                                        <button className="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo"
+                                                aria-expanded="false" aria-controls="flush-collapseTwo">
+                                            Accordion Item #2
+                                        </button>
+                                    </h2>
+                                    <div id="flush-collapseTwo" className="accordion-collapse collapse"
+                                         data-bs-parent="#accordionFlushExample">
+                                        <div className="accordion-body">
+                                            ...
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="accordion-item">
+                                    <h2 className="accordion-header">
+                                        <button className="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#flush-collapseThree"
+                                                aria-expanded="false" aria-controls="flush-collapseThree">
+                                            Accordion Item #3
+                                        </button>
+                                    </h2>
+                                    <div id="flush-collapseThree" className="accordion-collapse collapse"
+                                         data-bs-parent="#accordionFlushExample">
+                                        <div className="accordion-body">
+                                            ...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </Modal.Body>
+                        {/* Consider adding a footer with additional buttons or actions, if needed */}
+                    </Modal>
                 </div>
             </header>
 
-            {/*{openInfo &&*/}
-            {/*    <div className="container">*/}
-            {/*        <h1>User Information</h1>*/}
-            {/*        <div className="user-info">*/}
-            {/*            <label htmlFor="userId">User ID:</label>*/}
-            {/*            <input type="text" id="userId" name="userId" readOnly/>*/}
-
-            {/*            <label htmlFor="userName">Username:</label>*/}
-            {/*            <input type="text" id="userName" name="userName" readOnly/>*/}
-
-            {/*            <label htmlFor="userEmail">Email:</label>*/}
-            {/*            <input type="email" id="userEmail" name="userEmail" readOnly/>*/}
-            {/*        </div>*/}
-
-            {/*        <h1>Group Information</h1>*/}
-            {/*        <div className="group-info">*/}
-            {/*            <label htmlFor="groupId">Group ID:</label>*/}
-            {/*            <input type="text" id="groupId" name="groupId" readOnly/>*/}
-
-            {/*            <label htmlFor="groupName">Group Name:</label>*/}
-            {/*            <input type="text" id="groupName" name="groupName" readOnly/>*/}
-
-            {/*            <label htmlFor="groupDescription">Group Description:</label>*/}
-            {/*            <textarea id="groupDescription" name="groupDescription" readOnly></textarea>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*}*/}
-
-            {/* Message display */}
             <section
                 id="message-container"
                 ref={messageContainerRef}

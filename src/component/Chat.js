@@ -176,7 +176,7 @@ const Chat = () => {
         // Sử dụng Set để lấy danh sách các thành viên duy nhất
         const uniqueMembersSet = new Set();
         MessageResponse.forEach(msg => uniqueMembersSet.add(msg.name));
-        const members = Array.from(uniqueMembersSet);
+        const members = Array.from(uniqueMembersSet).map(name => ({name}));
 
         dispatch(setMember(members));
         const newMessages = MessageResponse.map(msg => ({
