@@ -248,6 +248,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                         <div
                             key={index}
                             className={`d-flex ${msg.sentByCurrentUser ? 'justify-content-start' : 'justify-content-end'}`}
+                            style={{maxWidth: '100%'}}
                         >
                             {msg.sentByCurrentUser && (
                                 <div className="mr-2" style={{width: '40px', height: '40px'}}>
@@ -264,17 +265,28 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                                     )}
                                 </div>
                             )}
-                            <div className="message-content" >
+                            <div className="message-content" style={{maxWidth: '60%'}}>
                                 {msg.sentByCurrentUser && <p className="mb-0">{msg.name}</p>}
                                 <div
                                     className={`p-2 rounded ${msg.sentByCurrentUser ? 'received-message bg-secondary text-white' : 'sent-message bg-primary text-white'}`}
+                                    style={{
+                                        wordBreak: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word'
+                                    }}
                                 >
-                                    <p className="mb-1 text-center text-white"style={{wordBreak: 'break-word', overflowWrap: 'anywhere'}} >{msg.mes}</p>
-                                    {/* {msg.imageUrl && <img src={msg.imageUrl} alt="Sent" className="img-fluid" />} */}
-                                    {/* {msg.videoUrl && <video src={msg.videoUrl} className="img-fluid" controls />} */}
-                                    {/* <p className="text-right small text-muted"> */}
-                                    {/*     {new Date(msg.createAt).toLocaleString()} */}
-                                    {/* </p> */}
+                                    <p
+                                        className="mb-1 text-center text-white"
+                                        style={{
+                                            wordBreak: 'break-word',
+                                            overflowWrap: 'break-word',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word'
+                                        }}
+                                    >
+                                        {msg.mes}
+                                    </p>
                                 </div>
                             </div>
                         </div>

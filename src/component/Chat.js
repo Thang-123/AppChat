@@ -335,9 +335,7 @@ const Chat = () => {
         });
         setShowToast(true);
     };
-
-
-
+    
     const handleCloseMessageComponent = () => {
         setSelectedUser(null);
     };
@@ -348,7 +346,7 @@ const Chat = () => {
 
         <div className="chat-page d-flex">
             {showToast && <Toast {...toastProps} duration={3000} onClose={handleCloseToast} />}
-            <div className="sidebar bg-white border-right d-flex flex-column" style={{flexBasis: '25%'}}>
+            <div className="sidebar bg-white border-right d-flex flex-column" style={{ width: '400px', minWidth: '400px' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
                     onGroupClick={handleUserClick}
