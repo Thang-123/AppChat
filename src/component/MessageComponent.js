@@ -19,7 +19,8 @@ import { firestore } from '../firebaseconfig';
 import { doc,getDoc } from 'firebase/firestore';
 import EmojiPicker from "./EmojiPicker";
 import {useSelector} from "react-redux";
-const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage}) => {
+import InfoRoom from "./InfoRoom";
+const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage,onUserClick, onSave}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
@@ -70,16 +71,16 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
             const avatarUrls = {};
 
             await Promise.all(members.map(async member => {
-                const avatarRef = ref(storage, `avatars/${member}`);
+                const avatarRef = ref(storage, `avatars/${member.name}`);
 
 
                 try {
                     const downloadURL = await getDownloadURL(avatarRef);
-                    avatarUrls[member] = downloadURL;
+                    avatarUrls[member.name] = downloadURL;
                 } catch (error) {
 
-                    console.error(`Avatar for ${member} does not exist.`);
-                    avatarUrls[member] = '';
+                    console.error(`Avatar for ${member.name} does not exist.`);
+                    avatarUrls[member.name] = '';
                 }
             }));
 
@@ -162,10 +163,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
     };
 
     const handleMoreInfo = (icon) => {
-        setActiveIcon(prev => (prev === icon ? null : icon));
-        if (icon === 'info'){
             setOpenInfo(prev => !prev);
-        }
     };
 
     return (
@@ -220,21 +218,8 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 </div>
             </header>
 
-            {/*{openInfo &&*/}
-            {/*    <div className="container">*/}
-            {/*        <h1>Group Information</h1>*/}
-            {/*        <div className="group-info">*/}
-            {/*            <label htmlFor="groupId">Group ID:</label>*/}
-            {/*            <input type="text" id="groupId" name="groupId" readOnly/>*/}
+            {openInfo && <InfoRoom users = {members} roomName={selectedUser.name} onClose={handleMoreInfo} onUserClick={onUserClick} onSave={onSave} />}
 
-            {/*            <label htmlFor="groupName">Group Name:</label>*/}
-            {/*            <input type="text" id="groupName" name="groupName" readOnly/>*/}
-
-            {/*            <label htmlFor="groupDescription">Group Description:</label>*/}
-            {/*            <textarea id="groupDescription" name="groupDescription" readOnly></textarea>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*}*/}
 
             {/* Message display */}
             <section

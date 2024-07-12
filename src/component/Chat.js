@@ -200,9 +200,6 @@ const Chat = () => {
             console.error('Invalid user object:', user);
             return;
         }
-        // if(newMessages !== null){
-        //     setNewMessages(null);
-        // }
 
         if (selectedUser && selectedUser.name === user.name) return;
         console.log('Clicked User:', user);
@@ -354,7 +351,6 @@ const Chat = () => {
             <div className="sidebar bg-white border-right d-flex flex-column" style={{ width: '400px', minWidth: '400px' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
-                    onGroupClick={handleUserClick}
                     onLogout={handleLogOut}
                     onJoinRoom={handleJoinRoom}
                     onCreateRoom={handleCreateRoom}
@@ -379,6 +375,8 @@ const Chat = () => {
                         fetchLatestMessages={fetchLatestMessages}
                         getRoomChatMes={getRoomChatMes}
                         isActive={isActive}
+                        onUserClick={handleUserClick}
+                        onSave={showToastMessage}
                     />
                 )}
             </div>
