@@ -19,12 +19,8 @@ import { firestore } from '../firebaseconfig';
 import { doc,getDoc } from 'firebase/firestore';
 import EmojiPicker from "./EmojiPicker";
 import {useSelector} from "react-redux";
-import Modal from "react-bootstrap/Modal";
-import {FiArrowUpLeft} from "react-icons/fi";
-import InfiniteScroll from "react-infinite-scroll-component";
-import UserSearchCard from "./UserSearchCard";
-import styled from "styled-components";
-const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage, users, groups}) => {
+import InfoRoom from "./InfoRoom";
+const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage,onUserClick, onSave}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
@@ -78,16 +74,16 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
             const avatarUrls = {};
 
             await Promise.all(members.map(async member => {
-                const avatarRef = ref(storage, `avatars/${member}`);
+                const avatarRef = ref(storage, `avatars/${member.name}`);
 
 
                 try {
                     const downloadURL = await getDownloadURL(avatarRef);
-                    avatarUrls[member] = downloadURL;
+                    avatarUrls[member.name] = downloadURL;
                 } catch (error) {
 
-                    console.error(`Avatar for ${member} does not exist.`);
-                    avatarUrls[member] = '';
+                    console.error(`Avatar for ${member.name} does not exist.`);
+                    avatarUrls[member.name] = '';
                 }
             }));
 
@@ -168,26 +164,9 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
         scrollToBottom()
     };
 
-    // const handleMoreInfo = (icon) => {
-    //     setActiveIcon(prev => (prev === icon ? null : icon));
-    //     if (icon === 'info'){
-    //         setOpenInfo(prev => !prev);
-    //     }
-    // };
-
-    const handleOpenInfo = () => setShowInfo(true);
-    const handleCloseInfo = () => setShowInfo(false);
-
-    // const UserListContainer = styled.div`
-    // height: calc(100vh - 65px);
-    // padding: 1rem;
-    // background-color: #f8f9fa;
-    // `;
-
-    // const InfoGroup = ({ users, onClose,onUserClick }) => {
-    //     const [search, setSearch] = useState('');
-    //     // const users = useSelector((state) => state.chat.users);
-    //     const [loading, setLoading] = useState(false);
+    const handleMoreInfo = (icon) => {
+            setOpenInfo(prev => !prev);
+    };
 
     return (
         <div id="messageComponent" className="bg-no-repeat bg-cover">
@@ -231,91 +210,20 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                         <FaSearch size={20}/>
                     </button>
 
-                    <button className="btn btn-link text-dark p-2" onClick={handleOpenInfo}>
+                    <button className="btn btn-link text-dark p-2"
+                            onClick={() => handleMoreInfo('info')}
+                            active={activeIcon === 'info' ? "true" : "false"}
+                            title="Informations">
                         <HiDotsVertical size={20}/>
                     </button>
 
-                    {/* Popup Information */}
-                    <Modal show={showInfo} onHide={handleCloseInfo}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Information</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <div className="d-flex flex-column align-items-center mb-3">
-                                {/* Profile picture */}
-                                {avatarUrl ? (
-                                    <img src={avatarUrl} alt="Profile" className="rounded-circle"
-                                         style={{width: '100px', height: '100px'}}/>
-                                ) : (
-                                    <FaUserCircle size={80} className="rounded-circle"/>
-                                )}
-                                {/* User details */}
-                                <div>
-                                    <span className="d-block fs-4 fw-medium">{selectedUser.name}</span>
-                                    <div className="status-container">
-                                        <div className={`dot ${isActive ? 'dot-active' : 'dot-inactive'}`}/>
-                                        <span className="status-text mx-2">
-                                    {isActive ? 'Online' : 'Offline'}
-                                 </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="accordion accordion-flush" id="accordionFlushExample">
-                                <div className="accordion-item">
-                                    <h2 className="accordion-header">
-                                        <button className="accordion-button collapsed" type="button"
-                                                data-bs-toggle="collapse"
-                                                data-bs-target="#flush-collapseOne"
-                                                aria-expanded="false"
-                                                aria-controls="flush-collapseOne">
-                                            Accordion Item #1
-                                        </button>
-                                    </h2>
-                                    <div id="flush-collapseOne" className="accordion-collapse collapse"
-                                         data-bs-parent="#accordionFlushExample">
-                                        <div className="accordion-body">
-                                            ...
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="accordion-item">
-                                    <h2 className="accordion-header">
-                                        <button className="accordion-button collapsed" type="button"
-                                                data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo"
-                                                aria-expanded="false" aria-controls="flush-collapseTwo">
-                                            Accordion Item #2
-                                        </button>
-                                    </h2>
-                                    <div id="flush-collapseTwo" className="accordion-collapse collapse"
-                                         data-bs-parent="#accordionFlushExample">
-                                        <div className="accordion-body">
-                                            ...
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="accordion-item">
-                                    <h2 className="accordion-header">
-                                        <button className="accordion-button collapsed" type="button"
-                                                data-bs-toggle="collapse" data-bs-target="#flush-collapseThree"
-                                                aria-expanded="false" aria-controls="flush-collapseThree">
-                                            Accordion Item #3
-                                        </button>
-                                    </h2>
-                                    <div id="flush-collapseThree" className="accordion-collapse collapse"
-                                         data-bs-parent="#accordionFlushExample">
-                                        <div className="accordion-body">
-                                            ...
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </Modal.Body>
-                        {/* Consider adding a footer with additional buttons or actions, if needed */}
-                    </Modal>
                 </div>
             </header>
 
+            {openInfo && <InfoRoom users = {members} roomName={selectedUser.name} onClose={handleMoreInfo} onUserClick={onUserClick} onSave={onSave} />}
+
+
+            {/* Message display */}
             <section
                 id="message-container"
                 ref={messageContainerRef}
@@ -327,6 +235,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                         <div
                             key={index}
                             className={`d-flex ${msg.sentByCurrentUser ? 'justify-content-start' : 'justify-content-end'}`}
+                            style={{maxWidth: '100%'}}
                         >
                             {msg.sentByCurrentUser && (
                                 <div className="mr-2" style={{width: '40px', height: '40px'}}>
@@ -343,17 +252,28 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                                     )}
                                 </div>
                             )}
-                            <div className="message-content" >
+                            <div className="message-content" style={{maxWidth: '60%'}}>
                                 {msg.sentByCurrentUser && <p className="mb-0">{msg.name}</p>}
                                 <div
                                     className={`p-2 rounded ${msg.sentByCurrentUser ? 'received-message bg-secondary text-white' : 'sent-message bg-primary text-white'}`}
+                                    style={{
+                                        wordBreak: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word'
+                                    }}
                                 >
-                                    <p className="mb-1 text-center text-white"style={{wordBreak: 'break-word', overflowWrap: 'anywhere'}} >{msg.mes}</p>
-                                    {/* {msg.imageUrl && <img src={msg.imageUrl} alt="Sent" className="img-fluid" />} */}
-                                    {/* {msg.videoUrl && <video src={msg.videoUrl} className="img-fluid" controls />} */}
-                                    {/* <p className="text-right small text-muted"> */}
-                                    {/*     {new Date(msg.createAt).toLocaleString()} */}
-                                    {/* </p> */}
+                                    <p
+                                        className="mb-1 text-center text-white"
+                                        style={{
+                                            wordBreak: 'break-word',
+                                            overflowWrap: 'break-word',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word'
+                                        }}
+                                    >
+                                        {msg.mes}
+                                    </p>
                                 </div>
                             </div>
                         </div>

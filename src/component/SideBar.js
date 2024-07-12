@@ -93,17 +93,17 @@ const SearchInputContainer = styled.div`
 `;
 
 
-const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoom, onJoinRoom, returnError, returnSuccess}) => {
+const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoom, onJoinRoom, onSave}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [openSearchGroup, setOpenSearchGroup] = useState(false);
-    const [openChat, setOpenChat] = useState(false);
+    const [openChat, setOpenChat] = useState(true);
     const [openSetting, setOpenSetting] = useState(false);
     const [openGroup, setOpenGroup] = useState(false);
     const [displayedUsers, setDisplayedUsers] = useState(users.slice(0, 10));
     const [hasMore, setHasMore] = useState(users.length > 10);
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeIcon, setActiveIcon] = useState(null);
+    const [activeIcon, setActiveIcon] = useState('chat');
     const [avatar, setAvatar] = useState(null);
     const [preview, setPreview] = useState(null);
     const [name, setName] = useState(loggedInUser);
@@ -151,6 +151,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
             const storageRef = ref(storage, `avatars/${loggedInUser}`);
             uploadBytesResumable(storageRef, avatar).then((snapshot) => {
                 console.log('File uploaded successfully');
+                onSave('Success!', 'Profile saved successfully.', 'success', 3000)
                 getDownloadURL(snapshot.ref).then((downloadURL) => {
                     const userDocRef = doc(firestore, 'users', loggedInUser);
                     setDoc(userDocRef, {
@@ -185,7 +186,6 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
     const handleCloseCreateGroupModal = () => {
         setShowCreateGroupModal(false);
         setGroupImagePreview("");
-        returnError(true);
     };
 
     const handleOpenJoinGroupModal = () => {
@@ -498,9 +498,20 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                             <div className="text-center my-auto">
                                 <label htmlFor="avatarInput" className="cursor-pointer">
                                     <div className="user-avatar">
-                                        {avatarUrl ? (
-                                            <img src={avatarUrl} alt="Profile" className="rounded-circle"
-                                                 style={{width: '80px', height: '80px'}}/>
+                                        {preview ? (
+                                            <img
+                                                src={preview}
+                                                alt="Avatar Preview"
+                                                className="rounded-circle"
+                                                style={{width: '80px', height: '80px'}}
+                                            />
+                                        ) : avatarUrl ? (
+                                            <img
+                                                src={avatarUrl}
+                                                alt="Profile"
+                                                className="rounded-circle"
+                                                style={{width: '80px', height: '80px'}}
+                                            />
                                         ) : (
                                             <FaUserCircle size={80} className="rounded-circle"/>
                                         )}
@@ -520,16 +531,19 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="block w-full p-2 border border-gray-300 rounded-md"
+                                    className="block w-full p-2 border border-gray-300 rounded-md text-center"
                                     placeholder="Enter your name"
                                 />
                             </div>
-                            <button
-                                type="submit"
-                                className="mt-4 px-4 py-2 bg-blue-500 text-secondary rounded hover:bg-blue-700 w-full"
-                            >
-                                Save
-                            </button>
+                            <div style={{ textAlign: 'right' }}>
+                                <button
+                                    type="submit"
+                                    className="mt-4 px-4 py-2 bg-blue-500 text-secondary rounded hover:bg-blue-700"
+                                >
+                                    Save
+                                </button>
+                            </div>
+
                         </form>
                     </div>
                 </div>
