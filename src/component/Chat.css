@@ -586,6 +586,7 @@ img.rounded-circle,
 
 .toast-body {
     flex-grow: 1;
+    margin-right: 1rem;
 }
 
 .toast-title {

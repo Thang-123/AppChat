@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import './Chat.css';
 import {FaCheckCircle, FaExclamationCircle} from "react-icons/fa";
 
 

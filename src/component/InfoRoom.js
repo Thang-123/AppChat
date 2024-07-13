@@ -32,7 +32,7 @@ const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave }) => {
             const storageRef = ref(storage, `avatars/${roomName}`);
             uploadBytesResumable(storageRef, avatar).then((snapshot) => {
                 console.log('File uploaded successfully');
-                onSave('Success!', 'Room Avatar updated successfully.', 'success', 3000)
+                onSave('Success!', 'Room Avatar updated successfully', 'success', 3000)
                 getDownloadURL(snapshot.ref).then((downloadURL) => {
                     const userDocRef = doc(firestore, 'users', roomName);
                     setDoc(userDocRef, {
@@ -68,16 +68,17 @@ const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave }) => {
         <div className="modal-dialog info-room">
             <div className="modal-content">
                 <div className="modal-header">
-                    <h5 className="modal-title">{roomName}</h5>
+                    <h5 className="modal-title">Information</h5>
                     <button type="button" className="close-button" onClick={onClose}>
                         &times;
                     </button>
+
                 </div>
                 <div className="modal-body">
                     <form onSubmit={handleSubmit} className="mx-auto">
-                        <div className="text-center my-auto">
+                        <div className="text-center">
                             <label htmlFor="avatarInput" className="cursor-pointer">
-                                <div className="user-avatar">
+                                <div>
                                     {preview ? (
                                         <img
                                             src={preview}
@@ -96,6 +97,7 @@ const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave }) => {
                                         <FaUserCircle size={80} className="rounded-circle"/>
                                     )}
                                 </div>
+                                <div className="text-center fs-4 mt-2">{roomName}</div>
                             </label>
                             <input
                                 id="avatarInput"
@@ -114,15 +116,13 @@ const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave }) => {
                             </button>
                         </div>
                     </form>
-
                     <div className="accordion accordion-flush" id="accordionFlushExample" style={{marginTop: '15px'}}>
                         <div className="accordion-item">
                             <h2 className="accordion-header">
                                 <button className="accordion-button collapsed" type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#flush-collapseOne"
-                                        aria-expanded="false"
-                                        aria-controls="flush-collapseOne">
+                                        data-bs-toggle="collapse" data-bs-target="#flush-collapseOne"
+                                        aria-expanded="false" aria-controls="flush-collapseOne"
+                                        style={{background: '#E1EAFD', border: '2spx solid #e5e5e5'}}>
                                     Danh sách thành viên (Đã chat)
                                 </button>
                             </h2>
@@ -148,7 +148,8 @@ const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave }) => {
                             <h2 className="accordion-header">
                                 <button className="accordion-button collapsed" type="button"
                                         data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo"
-                                        aria-expanded="false" aria-controls="flush-collapseTwo">
+                                        aria-expanded="false" aria-controls="flush-collapseTwo"
+                                        style={{background: '#E1EAFD'}}>
                                     Accordion Item #2
                                 </button>
                             </h2>
@@ -163,7 +164,8 @@ const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave }) => {
                             <h2 className="accordion-header">
                                 <button className="accordion-button collapsed" type="button"
                                         data-bs-toggle="collapse" data-bs-target="#flush-collapseThree"
-                                        aria-expanded="false" aria-controls="flush-collapseThree">
+                                        aria-expanded="false" aria-controls="flush-collapseThree"
+                                        style={{background: '#E1EAFD'}}>
                                     Accordion Item #3
                                 </button>
                             </h2>

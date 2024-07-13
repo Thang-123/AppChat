@@ -13,7 +13,6 @@ import {
 import {HiChevronDown, HiDotsVertical} from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { IoMdSend } from 'react-icons/io';
-import './Chat.css';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { firestore } from '../firebaseconfig';
 import { doc,getDoc } from 'firebase/firestore';

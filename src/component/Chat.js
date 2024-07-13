@@ -347,7 +347,7 @@ const Chat = () => {
     return (
 
         <div className="chat-page d-flex">
-            {showToast && <Toast {...toastProps} onClose={handleCloseToast} />}
+            {showToast && <Toast {...toastProps} onClose={handleCloseToast} duration={3000}/>}
             <div className="sidebar bg-white border-right d-flex flex-column" style={{ width: '400px', minWidth: '400px' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
