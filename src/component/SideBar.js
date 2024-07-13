@@ -15,6 +15,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from 'react-bootstrap/Modal';
 import {GrGroup} from "react-icons/gr";
+import ConfirmationDialog from "./ComfirmDialog";
 const StyledIconContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -113,7 +114,21 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
     const [groupName, setGroupName] = useState('');
     const [groupImage, setGroupImage] = useState(null);
     const [groupImagePreview, setGroupImagePreview] = useState(null);
+    const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
 
+    const handleLogoutClick = () => {
+        setShowConfirmationDialog(true);
+    };
+
+    const handleConfirmLogout = () => {
+        setShowConfirmationDialog(false);
+        onLogout()
+        console.log('User logged out');
+    };
+
+    const handleCancelLogout = () => {
+        setShowConfirmationDialog(false);
+    };
     useEffect(() => {
         const fetchAvatar = async () => {
             try {
@@ -304,9 +319,16 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                     </StyledIcon>
                 </StyledIconContainer>
                 <StyledIconContainer style={{ marginTop: 'auto' }}>
-                    <StyledIcon onClick={onLogout} title="Logout">
+                    <StyledIcon onClick={handleLogoutClick} title="Logout">
                         <BiLogOut size={24} />
                     </StyledIcon>
+                    {showConfirmationDialog && (
+                        <ConfirmationDialog
+                            message="Are you sure you want to logout?"
+                            onConfirm={handleConfirmLogout}
+                            onCancel={handleCancelLogout}
+                        />
+                    )}
                 </StyledIconContainer>
             </SidebarContainer>
             {openChat &&

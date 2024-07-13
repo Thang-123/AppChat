@@ -4,6 +4,7 @@ import {FaCheckCircle, FaExclamationCircle} from "react-icons/fa";
 
 
 const Toast = ({title, message, type, duration, onClose}) => {
+
     useEffect(() => {
         const timer = setTimeout(() => {
             onClose();
