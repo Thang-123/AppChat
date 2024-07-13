@@ -35,19 +35,19 @@ const Chat = () => {
     const handleCreateRoomResponse = (data) => {
         if (!data || data.status !== 'success') {
             console.error('Failed to create Room');
-            handleError("Failed to create Room: "+data.mes)
+            handleError("Failed to create Room: "+data.mes,3000)
             return;
         }
         handleGetUserList()
-        handleSuccess("Create Room Success")
+        handleSuccess("Create Room Success",3000)
     };
     const handleJoinRoomResponse = (data) => {
         if (!data || data.status !== 'success') {
             console.error('Failed to join Room');
-            handleError(data.mes)
+            handleError(data.mes, 3000)
             return;
         }
-        handleSuccess("Failed to join Room: "+data.mes)
+        handleSuccess("Failed to join Room: "+data.mes, 3000)
         handleGetUserList("Join Room Success")
     };
 
@@ -118,25 +118,26 @@ const Chat = () => {
         }
             setNewMessages("");
 
-        const { name, mes } = data.data;
+        const { name,to, mes } = data.data;
 
         // Cập nhật tin nhắn của user tương ứng
-        setNewMessages(prevMessages => ({
-            ...prevMessages,
-            [name]: [
-                ...(prevMessages[name] || []),
-                mes
-            ]
-        }));
-        const newMessage = {
-            ...data.data,
-            sentByCurrentUser: data.data.name === loggedInUser
-        };
+        if(to === loggedInUser){
+            setNewMessages(prevMessages => ({
+                ...prevMessages,
+                [name]: [
+                    ...(prevMessages[name] || []),
+                    mes
+                ]
+            }));
+            const newMessage = {
+                ...data.data,
+                sentByCurrentUser: data.data.name === loggedInUser
+            };
 
-        dispatch(addMessage([...messages, newMessage]));
-        fetchUserMessages(name)
-        fetchGroupMessages(name)
+            dispatch(addMessage([...messages, newMessage]));
+        }
         fetchLatestMessages()
+        showToastMessage('New Message', `From: ${name}, To: ${to}, Message: ${mes}`, 'info', 10000);
     };
 
 
@@ -315,20 +316,22 @@ const Chat = () => {
             }
         });
     };
-    const handleSuccess = (mes) => {
+    const handleSuccess = (mes,dura) => {
         setToastProps({
             title: 'SUCCEED!',
             message: mes,
-            type: 'success'
+            type: 'success',
+            duration: dura
         });
         setShowToast(true);
     };
 
-    const handleError = (mes) => {
+    const handleError = (mes, dura) => {
         setToastProps({
             title: 'FAILED!',
             message: mes,
-            type: 'error'
+            type: 'error',
+            duration: dura
         });
         setShowToast(true);
     };
@@ -347,7 +350,7 @@ const Chat = () => {
     return (
 
         <div className="chat-page d-flex">
-            {showToast && <Toast {...toastProps} duration={3000} onClose={handleCloseToast} />}
+            {showToast && <Toast {...toastProps} onClose={handleCloseToast} />}
             <div className="sidebar bg-white border-right d-flex flex-column" style={{ width: '400px', minWidth: '400px' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
