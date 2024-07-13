@@ -422,16 +422,15 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                 </Modal.Footer>
                             </Modal>
 
-                            <button className="btn btn-link text-dark p-2" data-bs-toggle="modal"
-                                    data-bs-target="#joinGroupModal" onClick={handleOpenJoinGroupModal}>
+                            <button className="btn btn-link text-dark p-2" onClick={handleOpenJoinGroupModal}>
                                  Join Group
                             </button>
                             <Modal show={showJoinGroupModal} onHide={handleCloseJoinGroupModal}>
                                 <Modal.Header closeButton>
-                                    <Modal.Title>Create Group</Modal.Title>
+                                    <Modal.Title>Join Group</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <form onSubmit={handleCreateGroup} >
+                                    <form>
                                         <div className="mb-3">
                                             <label htmlFor="groupName" className="form-label">Group Name:</label>
                                             <input

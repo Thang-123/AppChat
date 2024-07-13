@@ -4,7 +4,6 @@ import {getDownloadURL, getStorage, ref, uploadBytesResumable} from "firebase/st
 import {FaUserCircle} from "react-icons/fa";
 import {doc, setDoc} from "firebase/firestore";
 import {firestore} from "../firebaseconfig";
-
 const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave }) => {
     const [avatarUrl, setAvatarUrl] = useState('');
     const [preview, setPreview] = useState(null);
@@ -66,13 +65,13 @@ const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave }) => {
     };
     return (
     <div className="modal-container">
-        <div className="modal-dialog">
+        <div className="modal-dialog info-room">
             <div className="modal-content">
                 <div className="modal-header">
+                    <h5 className="modal-title">{roomName}</h5>
                     <button type="button" className="close-button" onClick={onClose}>
                         &times;
                     </button>
-                    <h5 className="modal-title">{roomName}</h5>
                 </div>
                 <div className="modal-body">
                     <form onSubmit={handleSubmit} className="mx-auto">
@@ -84,14 +83,14 @@ const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave }) => {
                                             src={preview}
                                             alt="Avatar Preview"
                                             className="rounded-circle"
-                                            style={{width: '80px', height: '80px'}}
+                                            style={{width: '100px', height: '100px'}}
                                         />
                                     ) : avatarUrl ? (
                                         <img
                                             src={avatarUrl}
                                             alt="Profile"
                                             className="rounded-circle"
-                                            style={{width: '80px', height: '80px'}}
+                                            style={{width: '100px', height: '100px'}}
                                         />
                                     ) : (
                                         <FaUserCircle size={80} className="rounded-circle"/>
@@ -114,18 +113,67 @@ const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave }) => {
                                 Save
                             </button>
                         </div>
-
                     </form>
-                    <div className="user-list">
-                        {users.length === 0 && (
-                            <p className="no-user-found">No members found!</p>
-                        )}
 
-                        {users.length !== 0 && (
-                            users.map((member, index) => (
-                                <UserSearchCard key={index} user={member} onClose={onClose} onUserClick={onUserClick}/>
-                            ))
-                        )}
+                    <div className="accordion accordion-flush" id="accordionFlushExample" style={{marginTop: '15px'}}>
+                        <div className="accordion-item">
+                            <h2 className="accordion-header">
+                                <button className="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#flush-collapseOne"
+                                        aria-expanded="false"
+                                        aria-controls="flush-collapseOne">
+                                    Danh sách thành viên (Đã chat)
+                                </button>
+                            </h2>
+                            <div id="flush-collapseOne" className="accordion-collapse collapse scrollbar"
+                                 data-bs-parent="#accordionFlushExample">
+                                <div className="accordion-body ">
+                                    <div className="user-list">
+                                        {users.length === 0 && (
+                                            <p className="no-user-found">No members found!</p>
+                                        )}
+
+                                        {users.length !== 0 && (
+                                            users.map((member, index) => (
+                                                <UserSearchCard key={index} user={member} onClose={onClose}
+                                                                onUserClick={onUserClick}/>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="accordion-item">
+                            <h2 className="accordion-header">
+                                <button className="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo"
+                                        aria-expanded="false" aria-controls="flush-collapseTwo">
+                                    Accordion Item #2
+                                </button>
+                            </h2>
+                            <div id="flush-collapseTwo" className="accordion-collapse collapse"
+                                 data-bs-parent="#accordionFlushExample">
+                                <div className="accordion-body">
+                                    ...
+                                </div>
+                            </div>
+                        </div>
+                        <div className="accordion-item">
+                            <h2 className="accordion-header">
+                                <button className="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#flush-collapseThree"
+                                        aria-expanded="false" aria-controls="flush-collapseThree">
+                                    Accordion Item #3
+                                </button>
+                            </h2>
+                            <div id="flush-collapseThree" className="accordion-collapse collapse"
+                                 data-bs-parent="#accordionFlushExample">
+                                <div className="accordion-body">
+                                    ...
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

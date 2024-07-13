@@ -155,7 +155,7 @@ const Chat = () => {
 
         const uniqueMembersSet = new Set();
         MessageResponse.forEach(msg => uniqueMembersSet.add(msg.name));
-        const members = Array.from(uniqueMembersSet);
+        const members = Array.from(uniqueMembersSet).map(name => ({name}));
 
         dispatch(setMember(members));
     };
@@ -171,7 +171,7 @@ const Chat = () => {
         // Sử dụng Set để lấy danh sách các thành viên duy nhất
         const uniqueMembersSet = new Set();
         MessageResponse.forEach(msg => uniqueMembersSet.add(msg.name));
-        const members = Array.from(uniqueMembersSet).map(name => ({ name }));
+        const members = Array.from(uniqueMembersSet).map(name => ({name}));
 
         dispatch(setMember(members));
         const newMessages = MessageResponse.map(msg => ({
@@ -332,14 +332,14 @@ const Chat = () => {
         });
         setShowToast(true);
     };
-    
+
     const handleCloseMessageComponent = () => {
         setSelectedUser(null);
     };
     const handleCloseToast = () => {
         setShowToast(false);
     };
-    const showToastMessage = (title, message, type = 'success', duration = 3000) => {
+    const showToastMessage = (title, message, type = 'success', duration) => {
         setToastProps({ title, message, type, duration });
         setShowToast(true);
     };
@@ -347,7 +347,7 @@ const Chat = () => {
     return (
 
         <div className="chat-page d-flex">
-            {showToast && <Toast {...toastProps} duration={3000} onClose={handleCloseToast} />}
+            {showToast && <Toast {...toastProps} onClose={handleCloseToast} />}
             <div className="sidebar bg-white border-right d-flex flex-column" style={{ width: '400px', minWidth: '400px' }}>
                 <Sidebar
                     onUserClick={handleUserClick}

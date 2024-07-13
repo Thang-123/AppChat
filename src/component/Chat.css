@@ -199,13 +199,12 @@ img.rounded-circle,
 }
 
 .modal-body {
-    /*padding: 1rem;*/
-    padding-top: 3rem;
-    margin: 1rem;
+    padding: 1rem;
     flex: 1;
     overflow: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    background: #C3D4F9;
 }
 
 .modal-body::-webkit-scrollbar {
@@ -213,7 +212,7 @@ img.rounded-circle,
 }
 
 .user-list {
-    max-height: calc(100% - 4rem);
+    max-height: 100%;
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -547,71 +546,61 @@ img.rounded-circle,
 
 /* ======= Toast message ======== */
 
-#toast {
+.toast-container {
     position: fixed;
-    top: 32px;
-    right: 32px;
-    z-index: 999999;
-}
-
-.toast {
+    top: 20px;
+    right: 20px;
     display: flex;
     align-items: center;
-    background-color: #fff;
     border-radius: 2px;
-    padding: 20px 0;
-    min-width: 400px;
+    padding: 18px 0;
+    min-width: 300px;
     max-width: 450px;
-    border-left: 4px solid;
+    border-left: 8px solid;
     box-shadow: 0 5px 8px rgba(0, 0, 0, 0.08);
     transition: all linear 0.3s;
 }
 
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(calc(100% + 32px));
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes fadeOut {
-    to {
-        opacity: 0;
-    }
-}
-
-.toast-container {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #fff;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-    padding: 16px;
-    border-radius: 8px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    max-width: 300px;
-}
-
-.toast-title {
-    font-weight: bold;
-    margin-bottom: 8px;
-}
-
-.toast-message {
-    font-size: 14px;
-}
-
 .toast-success {
-    color: green;
+    border-color: #47d864;
+    background-color: #E4FDE9;
+}
+
+.toast-success .toast-icon {
+    color: #47d864;
 }
 
 .toast-error {
-    color: red;
+    border-color: #ff623d;
+    background-color: #FCE7E3;
+}
+
+.toast-error .toast-icon {
+    color: #ff623d;
+}
+
+.toast-icon {
+    font-size: 24px;
+    padding: 0 16px;
+}
+
+.toast-body {
+    flex-grow: 1;
+}
+
+.toast-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.toast-message {
+    font-size: 16px;
+    color: #888;
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+.info-room{
+    width: 460px;
 }

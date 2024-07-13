@@ -10,7 +10,7 @@ import {
     FaUserCircle,
     FaVideo
 } from 'react-icons/fa';
-import { HiDotsVertical } from 'react-icons/hi';
+import {HiChevronDown, HiDotsVertical} from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { IoMdSend } from 'react-icons/io';
 import './Chat.css';
@@ -31,6 +31,8 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
     const [memberAvatars, setMemberAvatars] = useState({});
     const [activeIcon, setActiveIcon] = useState(null);
     const [openInfo, setOpenInfo] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
+
     useEffect(() => {
         const messageComponentElement = document.getElementById('messageComponent');
         if (messageComponentElement) {
@@ -55,16 +57,17 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 setAvatarUrl('');
             }
         };
-
         fetchAvatar();
     }, [selectedUser]);
 
     const {members} = useSelector((state) => state.chat);
+
     useEffect(() => {
         console.log(members)
         console.log('Current member avatars:', memberAvatars);
         fetchAvatarForMembers()
     }, [members]);
+
     const fetchAvatarForMembers = async () => {
         try {
             const storage = getStorage();
@@ -89,7 +92,6 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
             console.error('Error fetching avatars:', error);
         }
     };
-
 
     // useEffect(() => {
     //     if (selectedUser) {

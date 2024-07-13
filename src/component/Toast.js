@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import './Chat.css';
+import {FaCheckCircle, FaExclamationCircle} from "react-icons/fa";
 
-const Toast = ({ title, message, type, duration, onClose }) => {
+
+const Toast = ({title, message, type, duration, onClose}) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             onClose();
@@ -10,10 +12,15 @@ const Toast = ({ title, message, type, duration, onClose }) => {
         return () => clearTimeout(timer);
     }, [duration, onClose]);
 
+    const IconComponent = type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />;
+
     return (
-        <div className={`toast-container ${type === 'success' ? 'toast-success' : 'toast-error'}`}>
-            <div className="toast-title text-center">{title}</div>
-            <div className="toast-message text-center">{message}</div>
+        <div className={`toast-container animated-element ${type === 'success' ? 'toast-success' : 'toast-error'}`}>
+            <div className="toast-icon">{IconComponent}</div>
+            <div className="toast-body">
+                <div className="toast-title">{title}</div>
+                <div className="toast-message">{message}</div>
+            </div>
         </div>
     );
 };
