@@ -8,7 +8,7 @@ import {
     FaSearch,
     FaSmile,
     FaUserCircle,
-    FaVideo
+    FaVideo, FaWindowClose
 } from 'react-icons/fa';
 import {HiChevronDown, HiDotsVertical} from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
@@ -20,6 +20,7 @@ import { doc,getDoc } from 'firebase/firestore';
 import EmojiPicker from "./EmojiPicker";
 import {useSelector} from "react-redux";
 import InfoRoom from "./InfoRoom";
+import {CloseButton} from "react-bootstrap";
 const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage,onUserClick, onSave}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
@@ -209,18 +210,21 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                     <button className="btn btn-link text-dark p-2">
                         <FaSearch size={20}/>
                     </button>
-
+                    {/* More Icon */}
                     <button className="btn btn-link text-dark p-2"
                             onClick={() => handleMoreInfo('info')}
                             active={activeIcon === 'info' ? "true" : "false"}
                             title="Informations">
                         <HiDotsVertical size={20}/>
                     </button>
-
+                    {/* Close Icon */}
+                    <button className="btn btn-link text-dark p-2"  onClick={onClose}>
+                        <FaWindowClose size={20}/>
+                    </button>
                 </div>
             </header>
 
-            {openInfo && <InfoRoom users = {members} roomName={selectedUser.name} onClose={handleMoreInfo} onUserClick={onUserClick} onSave={onSave} />}
+            {openInfo && <InfoRoom users={members} roomName={selectedUser.name} onClose={handleMoreInfo} onUserClick={onUserClick} onSave={onSave} userType={selectedUser.type} isActive={isActive}/>}
 
 
             {/* Message display */}
