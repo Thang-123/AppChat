@@ -8,7 +8,7 @@ import {
     FaSearch,
     FaSmile,
     FaUserCircle,
-    FaVideo
+    FaVideo, FaWindowClose
 } from 'react-icons/fa';
 import {HiChevronDown, HiDotsVertical} from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
@@ -195,7 +195,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 </div>
                 <div className="d-flex align-items-center gap-3">
                     {/* Video call icon */}
-                    <button className="btn btn-link text-dark p-2">
+                    <button className="btn btn-link text-dark p-2 c">
                         <FaVideo size={20}/>
                     </button>
 
@@ -208,18 +208,21 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                     <button className="btn btn-link text-dark p-2">
                         <FaSearch size={20}/>
                     </button>
-
+                    {/* More Icon */}
                     <button className="btn btn-link text-dark p-2"
                             onClick={() => handleMoreInfo('info')}
                             active={activeIcon === 'info' ? "true" : "false"}
                             title="Informations">
                         <HiDotsVertical size={20}/>
                     </button>
-
+                    {/* Close Icon */}
+                    <button className="btn btn-link text-dark p-2"  onClick={onClose}>
+                        <IoClose size={20}/>
+                    </button>
                 </div>
             </header>
 
-            {openInfo && <InfoRoom users = {members} roomName={selectedUser.name} onClose={handleMoreInfo} onUserClick={onUserClick} onSave={onSave} />}
+            {openInfo && <InfoRoom users={members} roomName={selectedUser.name} onClose={handleMoreInfo} onUserClick={onUserClick} onSave={onSave} userType={selectedUser.type} isActive={isActive}/>}
 
 
             {/* Message display */}
