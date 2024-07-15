@@ -176,6 +176,10 @@ const Chat = () => {
 
         console.log('fetching room messages ');
         const MessageResponse = data.data.chatData || [];
+        if (MessageResponse.length === 0) {
+            console.log('Message response is empty');
+            return;
+        }
         // Sử dụng Set để lấy danh sách các thành viên duy nhất
         const uniqueMembersSet = new Set();
         MessageResponse.forEach(msg => uniqueMembersSet.add(msg.name));
