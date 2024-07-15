@@ -72,7 +72,7 @@ const LoginPage = () => {
                 </div>
 
                 <div className="form-input">
-                    <input
+                    <input style={{fontSize: '20px'}}
                         type="text"
                         id="username"
                         name="username"
@@ -85,7 +85,7 @@ const LoginPage = () => {
                 </div>
 
                 <div className="form-input">
-                    <input
+                    <input style={{fontSize: '20px'}}
                         type="password"
                         id="password"
                         name="password"

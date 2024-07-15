@@ -544,65 +544,67 @@ img.rounded-circle,
     border-radius: 50%;
 }
 
-    /* ======= Toast message ======== */
+/* ======= Toast message ======== */
 
-    .toast-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        display: flex;
-        align-items: center;
-        border-radius: 2px;
-        padding: 18px 0;
-        min-width: 300px;
-        max-width: 450px;
-        border-left: 8px solid;
-        box-shadow: 0 5px 8px rgba(0, 0, 0, 0.08);
-        transition: all linear 0.3s;
-        z-index: 1;
-    }
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    border-radius: 2px;
+    padding: 18px 0;
+    min-width: 300px;
+    max-width: 450px;
+    border-left: 8px solid;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.08);
+    transition: all linear 0.3s;
+    z-index: 1;
+}
 
-    .toast-success {
-        border-color: #47d864;
-        background-color: #E4FDE9;
-    }
+.toast-success {
+    border-color: #47d864;
+    background-color: #E4FDE9;
+}
 
-    .toast-success .toast-icon {
-        color: #47d864;
-    }
+.toast-success .toast-icon {
+    color: #47d864;
+}
 
-    .toast-error {
-        border-color: #ff623d;
-        background-color: #FCE7E3;
-    }
+.toast-error {
+    border-color: #ff623d;
+    background-color: #FCE7E3;
+}
 
-    .toast-error .toast-icon {
-        color: #ff623d;
-    }
+.toast-error .toast-icon {
+    color: #ff623d;
+}
 
-    .toast-icon {
-        font-size: 24px;
-        padding: 0 16px;
-    }
+.toast-icon {
+    font-size: 24px;
+    padding: 0 16px;
+}
 
-    .toast-body {
-        flex-grow: 1;
-    }
+.toast-body {
+    flex-grow: 1;
+    margin-right: 1rem;
+}
 
-    .toast-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #333;
-    }
+.toast-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
 
-    .toast-message {
-        font-size: 16px;
-        color: #888;
-        margin-top: 6px;
-        line-height: 1.5;
-    }
+.toast-message {
+    font-size: 16px;
+    color: #888;
+    margin-top: 6px;
+    line-height: 1.5;
+}
 
-    .info-room{
-        width: 460px;
-    }
+.info-room{
+    width: 460px;
+}
+
 /*Confirm css*/

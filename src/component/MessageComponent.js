@@ -13,14 +13,12 @@ import {
 import {HiChevronDown, HiDotsVertical} from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { IoMdSend } from 'react-icons/io';
-import './Chat.css';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { firestore } from '../firebaseconfig';
 import { doc,getDoc } from 'firebase/firestore';
 import EmojiPicker from "./EmojiPicker";
 import {useSelector} from "react-redux";
 import InfoRoom from "./InfoRoom";
-import {CloseButton} from "react-bootstrap";
 const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage,onUserClick, onSave}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
@@ -197,7 +195,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                 </div>
                 <div className="d-flex align-items-center gap-3">
                     {/* Video call icon */}
-                    <button className="btn btn-link text-dark p-2">
+                    <button className="btn btn-link text-dark p-2 c">
                         <FaVideo size={20}/>
                     </button>
 
@@ -219,7 +217,7 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                     </button>
                     {/* Close Icon */}
                     <button className="btn btn-link text-dark p-2"  onClick={onClose}>
-                        <FaWindowClose size={20}/>
+                        <IoClose size={20}/>
                     </button>
                 </div>
             </header>
