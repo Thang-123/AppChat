@@ -126,7 +126,7 @@ const SearchInputContainer = styled.div`
 `;
 
 
-const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoom, onJoinRoom, onSave}) => {
+const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoom, onJoinRoom, onSave,sendMes}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [openSearchGroup, setOpenSearchGroup] = useState(false);
@@ -151,6 +151,8 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
     const [phone, setPhone] = useState('');
     const [gender, setGender] = useState('');
     const [birthdate, setBirthdate] = useState('');
+    const [userName, setUserName] = useState('');
+    const [showNewMessageModal, setShowNewMessageModal] = useState(false);
     const handleLogoutClick = () => {
         setShowConfirmationDialog(true);
     };
@@ -238,6 +240,20 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
         setGroupImagePreview("");
     };
 
+    const handleOpenNewMessageModal = () => {
+        setShowNewMessageModal(true);
+    };
+
+    const handleCloseNewMessageModal = () => {
+        setShowNewMessageModal(false);
+    };
+
+    const handleUserNameChange = (e) => {
+        setUserName(e.target.value);
+    };
+    const handleSendHello = () => {
+        sendMes("Hello", userName)
+    }
     const handleOpenJoinGroupModal = () => {
         setShowJoinGroupModal(true);
     };
@@ -391,23 +407,57 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                 <div className="flex-grow-1">
                     <div className="bg-slate-100 p-4">
                         <h2 className="text-xl font-bold">CHATS</h2>
-                        <hr />
+                        <hr/>
                         <SearchInputContainer onClick={handleToggleShowSearchUser}>
                             <input
                                 type="text"
                                 placeholder="Search users..."
                                 value={searchTerm}
                                 onChange={handleSearchChange}
-                                style={{ border: 'none', width: '100%' }}
+                                style={{border: 'none', width: '100%'}}
                                 readOnly
                             />
                         </SearchInputContainer>
+                        <div className="d-flex align-items-center gap-1">
+
+                            <button className="btn btn-link text-dark p-2" onClick={handleOpenNewMessageModal}>
+                                New Message
+                            </button>
+                            <Modal show={showNewMessageModal} onHide={handleCloseNewMessageModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>New Message</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <form>
+                                        <div className="mb-3">
+                                            <label htmlFor="groupName" className="form-label">Send To:</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="uName"
+                                                value={userName}
+                                                onChange={handleUserNameChange}
+                                            />
+                                        </div>
+                                    </form>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <button variant="secondary" onClick={handleCloseNewMessageModal}>
+                                        Cancel
+                                    </button>
+                                    <button variant="primary" onClick={handleSendHello}>
+                                        Send Hello
+                                    </button>
+                                </Modal.Footer>
+                            </Modal>
+                        </div>
+
                     </div>
-                    <div className='col-12 custom-scrollbar' style={{ height: 'calc(85vh - 55px)'}}>
+                    <div className='col-12 custom-scrollbar' style={{height: 'calc(85vh - 55px)'}}>
                         <UserListContainer>
                             {users.length === 0 && (
                                 <div className="text-center">
-                                    <FiArrowUpLeft size={24} className="text-gray-500" />
+                                    <FiArrowUpLeft size={24} className="text-gray-500"/>
                                     <p className="text-gray mt-2">Explore users to start</p>
                                 </div>
                             )}
@@ -418,7 +468,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                 // loader={<h4>Loading...</h4>}
                             >
                                 <div>
-                                    {users.map((user,index) => (
+                                    {users.map((user, index) => (
                                         <UserSearchCard
                                             key={index}
                                             user={user}
@@ -432,7 +482,8 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                     </div>
 
 
-                    {openSearchUser && <SearchUser users={users} onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
+                    {openSearchUser &&
+                        <SearchUser users={users} onClose={handleToggleShowSearchUser} onUserClick={onUserClick}/>}
                 </div>
             }
 
@@ -453,7 +504,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                         </SearchInputContainer>
                         <div className="d-flex align-items-center gap-1">
                             <button className="btn btn-link text-dark p-2" onClick={handleOpenCreateGroupModal}>
-                                 Create Group
+                                Create Group
                             </button>
 
                             <Modal show={showCreateGroupModal} onHide={handleCloseCreateGroupModal}>
@@ -463,7 +514,8 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                 <Modal.Body>
                                     <div className="mb-3">
                                         <label htmlFor="groupName" className="form-label">Group Name</label>
-                                        <input type="text" className="form-control" id="groupName" value={groupName} onChange={handleGroupNameChange} />
+                                        <input type="text" className="form-control" id="groupName" value={groupName}
+                                               onChange={handleGroupNameChange}/>
                                     </div>
                                     <div className="d-flex flex-column align-items-center mb-3">
                                         <label htmlFor="groupImage" className="form-label">Group Image</label>
@@ -472,7 +524,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                                 src={groupImagePreview}
                                                 alt="Group Preview"
                                                 className={"rounded-circle"}
-                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                                style={{width: '100px', height: '100px', objectFit: 'cover'}}
                                                 onClick={() => document.getElementById('groupImageInput').click()}
                                             />
                                         ) : (
@@ -485,7 +537,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                             type="file"
                                             accept="image/*"
                                             id="groupImageInput"
-                                            style={{ display: 'none' }}
+                                            style={{display: 'none'}}
                                             onChange={handleGroupImageChange}
                                         />
                                     </div>

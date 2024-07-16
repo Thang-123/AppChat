@@ -241,7 +241,21 @@ const Chat = () => {
         });
         fetchLatestMessages()
     };
-
+    const handleSendHello = (newMessage,name) => {
+        WebSocketService.sendMessage({
+            action: 'onchat',
+            data: {
+                event: 'SEND_CHAT',
+                data: {
+                    type:  'people',
+                    to: name,
+                    mes: newMessage
+                }
+            }
+        });
+        fetchLatestMessages()
+        handleGetUserList()
+    };
     const handleLogOut = () => {
         WebSocketService.sendMessage({
             "action": "onchat",
@@ -386,7 +400,7 @@ const Chat = () => {
                     groups={groups}
                     newMessage={newMessages || {}}
                     onSave={showToastMessage}
-
+                    sendMes={handleSendHello}
                 />
             </div>
             <div className="chat-content flex-grow-1 d-flex flex-column">
