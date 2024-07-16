@@ -134,7 +134,7 @@ const InfoRoom = ({ users, onClose, roomName,onUserClick, onSave, userType, isAc
                                 type="submit"
                                 className="mt-3 px-4 py-2 text-secondary rounded"
                                 style={{background: '#E1EAFD'}}
-                                disabled={userType !== 1}
+                                hidden={userType !== 1}
                             >
                                 Save
                             </button>

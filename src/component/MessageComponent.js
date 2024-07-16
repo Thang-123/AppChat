@@ -19,7 +19,7 @@ import { doc,getDoc } from 'firebase/firestore';
 import EmojiPicker from "./EmojiPicker";
 import {useSelector} from "react-redux";
 import InfoRoom from "./InfoRoom";
-const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage,onUserClick, onSave}) => {
+const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMessage,onUserClick, onSave, fetchMoreMessages}) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
@@ -31,6 +31,40 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
     const [activeIcon, setActiveIcon] = useState(null);
     const [openInfo, setOpenInfo] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollPos = messageContainerRef.current.scrollTop;
+            const isAtTop = currentScrollPos === 0;
+            const isAtBottom =
+                messageContainerRef.current.scrollHeight -
+                currentScrollPos ===
+                messageContainerRef.current.clientHeight;
+
+            console.log('Current scroll position:', currentScrollPos);
+            console.log('Is at top:', isAtTop);
+            console.log('Is at bottom:', isAtBottom);
+
+            if (isAtTop) {
+                console.log('Scrolling to top...');
+                setCurrentPage((prevPage) => prevPage + 1);
+                fetchMoreMessages(currentPage + 1);
+            } else if (isAtBottom) {
+                console.log('Scrolling to bottom...');
+                setCurrentPage((prevPage) => prevPage - 1);
+                fetchMoreMessages(currentPage - 1);
+            }
+        };
+
+        const messageContainer = messageContainerRef.current;
+        messageContainer.addEventListener('scroll', handleScroll);
+
+        return () => {
+            messageContainer.removeEventListener('scroll', handleScroll);
+        };
+    }, [currentPage, fetchMoreMessages]);
 
     useEffect(() => {
         const messageComponentElement = document.getElementById('messageComponent');

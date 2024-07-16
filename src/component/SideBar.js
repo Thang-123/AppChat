@@ -16,6 +16,38 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from 'react-bootstrap/Modal';
 import {GrGroup} from "react-icons/gr";
 import ConfirmationDialog from "./ComfirmDialog";
+const DropdownMenu = styled.div`
+    position: absolute;
+    top: 4rem;
+    left: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 150px;
+
+    & > div {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+
+        &:hover {
+            background: #f1f1f1;
+        }
+    }
+`;
+const StyledAvatar = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    img {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+    }
+`;
 const StyledIconContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -115,7 +147,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
     const [groupImage, setGroupImage] = useState(null);
     const [groupImagePreview, setGroupImagePreview] = useState(null);
     const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
-
+    const [showDropdown, setShowDropdown] = useState(false);
     const handleLogoutClick = () => {
         setShowConfirmationDialog(true);
     };
@@ -288,10 +320,31 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
         setDisplayedUsers(filteredUsers.slice(0, 10));
         setHasMore(filteredUsers.length > 10);
     };
+    const handleAvatarClick = () => {
+        setShowDropdown(prev => !prev);
+    };
 
+    const handleProfileClick = () => {
+        setShowDropdown(false);
+        //open profile modal
+        setActiveIcon('settings');
+    };
     return (
         <div className="d-flex">
             <SidebarContainer>
+                <StyledAvatar onClick={handleAvatarClick}>
+                    {avatarUrl ? (
+                        <img src={avatarUrl} alt="Avatar"  />
+                    ) : (
+                        <FaUserCircle size={24} />
+                    )}
+                    {showDropdown && (
+                        <DropdownMenu>
+                            <div onClick={handleProfileClick}>Profile</div>
+                            <div onClick={handleLogoutClick}>Logout</div>
+                        </DropdownMenu>
+                    )}
+                </StyledAvatar>
                 <StyledIconContainer>
                     <StyledIcon
                         onClick={() => handleIconClick('chat')}

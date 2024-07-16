@@ -146,8 +146,15 @@ const Chat = () => {
             console.log('Failed to fetch user messages');
             return;
         }
-        console.log('fetching user messages ');
+
+        console.log('Fetching user messages');
+
         const MessageResponse = data.data || [];
+        if (MessageResponse.length === 0) {
+            console.log('Message response is empty');
+            return;
+        }
+
         const newMessages = MessageResponse.map(msg => ({
             ...msg,
             sentByCurrentUser: msg.name !== loggedInUser
@@ -156,19 +163,23 @@ const Chat = () => {
 
         const uniqueMembersSet = new Set();
         MessageResponse.forEach(msg => uniqueMembersSet.add(msg.name));
-        const members = Array.from(uniqueMembersSet).map(name => ({name}));
+        const members = Array.from(uniqueMembersSet).map(name => ({ name }));
 
         dispatch(setMember(members));
     };
 
     const handleGetRoomChatResponse = (data) => {
-        if (!data || data.status !== 'success') {
+        if (!data || data.status !== 'success' ) {
             console.log('Failed to fetch room messages');
             return;
         }
 
         console.log('fetching room messages ');
         const MessageResponse = data.data.chatData || [];
+        if (MessageResponse.length === 0) {
+            console.log('Message response is empty');
+            return;
+        }
         // Sử dụng Set để lấy danh sách các thành viên duy nhất
         const uniqueMembersSet = new Set();
         MessageResponse.forEach(msg => uniqueMembersSet.add(msg.name));
@@ -275,7 +286,20 @@ const Chat = () => {
             });
         }
     };
-
+    const fetchMoreMessages = (page) => {
+        if (selectedUser) {
+            WebSocketService.sendMessage({
+                action: 'onchat',
+                data: {
+                    event: selectedUser.type ? 'GET_ROOM_CHAT_MES' : 'GET_PEOPLE_CHAT_MES',
+                    data: {
+                        name: selectedUser.name,
+                        page: page
+                    }
+                }
+            });
+        }
+    };
     const fetchUserMessages = (user) => {
         console.log("fetch Message first time");
         WebSocketService.sendMessage({
@@ -351,7 +375,7 @@ const Chat = () => {
 
         <div className="chat-page d-flex">
             {showToast && <Toast {...toastProps} onClose={handleCloseToast} duration={3000}/>}
-            <div className="sidebar bg-white border-right d-flex flex-column" style={{ width: '400px', minWidth: '400px' }}>
+            <div className="sidebar bg-white border-right d-flex flex-column" style={{ minWidth: '455px' }}>
                 <Sidebar
                     onUserClick={handleUserClick}
                     onLogout={handleLogOut}
@@ -380,6 +404,7 @@ const Chat = () => {
                         isActive={isActive}
                         onUserClick={handleUserClick}
                         onSave={showToastMessage}
+                        fetchMoreMessages={fetchMoreMessages}
                     />
                 )}
             </div>
