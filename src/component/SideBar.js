@@ -148,6 +148,9 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
     const [groupImagePreview, setGroupImagePreview] = useState(null);
     const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [phone, setPhone] = useState('');
+    const [gender, setGender] = useState('');
+    const [birthdate, setBirthdate] = useState('');
     const handleLogoutClick = () => {
         setShowConfirmationDialog(true);
     };
@@ -610,6 +613,41 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                     placeholder="Enter your name"
                                 />
                             </div>
+                            {/* Các trường mới */}
+                            <div className="my-4">
+                                <input
+                                    id="phone"
+                                    type="text"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    className="block w-full p-2 border border-gray-300 rounded-md text-center"
+                                    placeholder="Enter your phone number"
+                                />
+                            </div>
+                            <div className="my-4">
+                                <select
+                                    id="gender"
+                                    value={gender}
+                                    onChange={(e) => setGender(e.target.value)}
+                                    className="block w-full p-2 border border-gray-300 rounded-md text-center"
+                                >
+                                    <option value="">Select gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div className="my-4">
+                                <input
+                                    id="birthdate"
+                                    type="date"
+                                    value={birthdate}
+                                    onChange={(e) => setBirthdate(e.target.value)}
+                                    className="block w-full p-2 border border-gray-300 rounded-md text-center"
+                                    placeholder="Enter your birthdate"
+                                />
+                            </div>
+                            {/* Kết thúc các trường mới */}
                             <div style={{ textAlign: 'right' }}>
                                 <button
                                     type="submit"
@@ -618,10 +656,10 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                     Save
                                 </button>
                             </div>
-
                         </form>
                     </div>
                 </div>
+
             }
 
         </div>
