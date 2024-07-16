@@ -396,7 +396,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                             />
                         </SearchInputContainer>
                         <div className="d-flex align-items-center gap-1">
-                            <button className="btn btn-link text-dark p-2" onClick={handleOpenCreateGroupModal}>
+                            <button className="btn btn-link p-2 text-decoration-none" onClick={handleOpenCreateGroupModal}>
                                  Create Group
                             </button>
 
@@ -444,7 +444,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                 </Modal.Footer>
                             </Modal>
 
-                            <button className="btn btn-link text-dark p-2" onClick={handleOpenJoinGroupModal}>
+                            <button className="btn btn-link p-2 text-decoration-none" onClick={handleOpenJoinGroupModal}>
                                  Join Group
                             </button>
                             <Modal show={showJoinGroupModal} onHide={handleCloseJoinGroupModal}>
