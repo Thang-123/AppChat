@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { IoChatbubbleEllipses } from 'react-icons/io5';
-import {FaPlus, FaUserCircle, FaUserFriends, FaUsers} from 'react-icons/fa';
+import {FaDoorOpen, FaPlus, FaUserCircle, FaUserFriends, FaUsers} from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
 import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -426,7 +426,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                         </SearchInputContainer>
                         <div className="d-flex justify-content-center gap-1">
 
-                            <button className="btn btn-link text-dark p-2" onClick={handleOpenNewMessageModal}>
+                            <button className="btn btn-link p-2 text-decoration-none" onClick={handleOpenNewMessageModal}>
                                 <FaPlus  className="me-2"/>
                                 New Message
                             </button>
@@ -511,7 +511,8 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                         </SearchInputContainer>
                         <div className="d-flex align-items-center gap-1">
                             <button className="btn btn-link p-2 text-decoration-none" onClick={handleOpenCreateGroupModal}>
-                                 Create Group
+                                <FaPlus  className="me-2"/>
+                                Create Group
                             </button>
 
                             <Modal show={showCreateGroupModal} onHide={handleCloseCreateGroupModal}>
@@ -560,7 +561,8 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                             </Modal>
 
                             <button className="btn btn-link p-2 text-decoration-none" onClick={handleOpenJoinGroupModal}>
-                                 Join Group
+                                <FaDoorOpen className="me-2"/>
+                                Join Group
                             </button>
                             <Modal show={showJoinGroupModal} onHide={handleCloseJoinGroupModal}>
                                 <Modal.Header closeButton>
