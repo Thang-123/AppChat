@@ -47,8 +47,8 @@ const Chat = () => {
             handleError(data.mes, 3000)
             return;
         }
-        handleSuccess("Failed to join Room: "+data.mes, 3000)
-        handleGetUserList("Join Room Success")
+        handleSuccess("Join Room Success: ", 3000)
+        handleGetUserList()
     };
 
     const handleLogoutResponse = (data) => {
@@ -136,7 +136,10 @@ const Chat = () => {
 
             dispatch(addMessage([...messages, newMessage]));
         }
+        //Có tin nhan moi thi goi lai ham de cap nhat tin nhan
+
         fetchLatestMessages()
+        fetchUserMessages()
         showToastMessage('New Message', `From: ${name}, To: ${to}, Message: ${mes}`, 'info', 10000);
     };
 
@@ -212,7 +215,7 @@ const Chat = () => {
             console.error('Invalid user object:', user);
             return;
         }
-
+        setNewMessages("")
         if (selectedUser && selectedUser.name === user.name) return;
         console.log('Clicked User:', user);
         setSelectedUser(user);
@@ -241,7 +244,21 @@ const Chat = () => {
         });
         fetchLatestMessages()
     };
-
+    const handleSendHello = (newMessage,name) => {
+        WebSocketService.sendMessage({
+            action: 'onchat',
+            data: {
+                event: 'SEND_CHAT',
+                data: {
+                    type:  'people',
+                    to: name,
+                    mes: newMessage
+                }
+            }
+        });
+        fetchLatestMessages()
+        handleGetUserList()
+    };
     const handleLogOut = () => {
         WebSocketService.sendMessage({
             "action": "onchat",
@@ -369,6 +386,8 @@ const Chat = () => {
     const showToastMessage = (title, message, type = 'success', duration) => {
         setToastProps({ title, message, type, duration });
         setShowToast(true);
+        handleGetUserList()
+        setSelectedUser("")
     };
 
     return (
@@ -386,7 +405,7 @@ const Chat = () => {
                     groups={groups}
                     newMessage={newMessages || {}}
                     onSave={showToastMessage}
-
+                    sendMes={handleSendHello}
                 />
             </div>
             <div className="chat-content flex-grow-1 d-flex flex-column">

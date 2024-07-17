@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { IoChatbubbleEllipses } from 'react-icons/io5';
-import {FaUserCircle, FaUserFriends, FaUsers} from 'react-icons/fa';
+import {FaPlus, FaUserCircle, FaUserFriends, FaUsers} from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
 import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -126,7 +126,7 @@ const SearchInputContainer = styled.div`
 `;
 
 
-const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoom, onJoinRoom, onSave}) => {
+const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoom, onJoinRoom, onSave,sendMes}) => {
     const {loggedInUser} = useSelector((state) => state.chat);
     const [openSearchUser, setOpenSearchUser] = useState(false);
     const [openSearchGroup, setOpenSearchGroup] = useState(false);
@@ -148,6 +148,11 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
     const [groupImagePreview, setGroupImagePreview] = useState(null);
     const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [phone, setPhone] = useState('');
+    const [gender, setGender] = useState('');
+    const [birthdate, setBirthdate] = useState('');
+    const [userName, setUserName] = useState('');
+    const [showNewMessageModal, setShowNewMessageModal] = useState(false);
     const handleLogoutClick = () => {
         setShowConfirmationDialog(true);
     };
@@ -233,14 +238,32 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
     const handleCloseCreateGroupModal = () => {
         setShowCreateGroupModal(false);
         setGroupImagePreview("");
+        setName("")
     };
 
+    const handleOpenNewMessageModal = () => {
+        setShowNewMessageModal(true);
+    };
+
+    const handleCloseNewMessageModal = () => {
+        setShowNewMessageModal(false);
+        setUserName("")
+    };
+
+    const handleUserNameChange = (e) => {
+        setUserName(e.target.value);
+    };
+    const handleSendHello = () => {
+        sendMes("Hello", userName)
+        setShowNewMessageModal(false)
+    }
     const handleOpenJoinGroupModal = () => {
         setShowJoinGroupModal(true);
     };
 
     const handleCloseJoinGroupModal = () => {
         setShowJoinGroupModal(false);
+        setGroupName("")
     };
 
     const handleGroupNameChange = (e) => {
@@ -326,7 +349,9 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
 
     const handleProfileClick = () => {
         setShowDropdown(false);
-        //open profile modal
+         setOpenSetting(true)
+        setOpenChat(false)
+        setOpenGroup(false)
         setActiveIcon('settings');
     };
     return (
@@ -388,23 +413,58 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                 <div className="flex-grow-1">
                     <div className="bg-slate-100 p-4">
                         <h2 className="text-xl font-bold">CHATS</h2>
-                        <hr />
+                        <hr/>
                         <SearchInputContainer onClick={handleToggleShowSearchUser}>
                             <input
                                 type="text"
                                 placeholder="Search users..."
                                 value={searchTerm}
                                 onChange={handleSearchChange}
-                                style={{ border: 'none', width: '100%' }}
+                                style={{border: 'none', width: '100%'}}
                                 readOnly
                             />
                         </SearchInputContainer>
+                        <div className="d-flex justify-content-center gap-1">
+
+                            <button className="btn btn-link text-dark p-2" onClick={handleOpenNewMessageModal}>
+                                <FaPlus  className="me-2"/>
+                                New Message
+                            </button>
+                            <Modal show={showNewMessageModal} onHide={handleCloseNewMessageModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>New Message</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <form>
+                                        <div className="mb-3">
+                                            <label htmlFor="groupName" className="form-label">Send To:</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="uName"
+                                                value={userName}
+                                                onChange={handleUserNameChange}
+                                            />
+                                        </div>
+                                    </form>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <button variant="secondary" onClick={handleCloseNewMessageModal}>
+                                        Cancel
+                                    </button>
+                                    <button variant="primary" onClick={handleSendHello}>
+                                        Send Hello
+                                    </button>
+                                </Modal.Footer>
+                            </Modal>
+                        </div>
+
                     </div>
-                    <div className='col-12 custom-scrollbar' style={{ height: 'calc(85vh - 55px)'}}>
+                    <div className='col-12 custom-scrollbar' style={{height: 'calc(85vh - 55px)'}}>
                         <UserListContainer>
                             {users.length === 0 && (
                                 <div className="text-center">
-                                    <FiArrowUpLeft size={24} className="text-gray-500" />
+                                    <FiArrowUpLeft size={24} className="text-gray-500"/>
                                     <p className="text-gray mt-2">Explore users to start</p>
                                 </div>
                             )}
@@ -415,7 +475,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                 // loader={<h4>Loading...</h4>}
                             >
                                 <div>
-                                    {users.map((user,index) => (
+                                    {users.map((user, index) => (
                                         <UserSearchCard
                                             key={index}
                                             user={user}
@@ -429,7 +489,8 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                     </div>
 
 
-                    {openSearchUser && <SearchUser users={users} onClose={handleToggleShowSearchUser} onUserClick={onUserClick} />}
+                    {openSearchUser &&
+                        <SearchUser users={users} onClose={handleToggleShowSearchUser} onUserClick={onUserClick}/>}
                 </div>
             }
 
@@ -460,7 +521,8 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                 <Modal.Body>
                                     <div className="mb-3">
                                         <label htmlFor="groupName" className="form-label">Group Name</label>
-                                        <input type="text" className="form-control" id="groupName" value={groupName} onChange={handleGroupNameChange} />
+                                        <input type="text" className="form-control" id="groupName" value={groupName}
+                                               onChange={handleGroupNameChange}/>
                                     </div>
                                     <div className="d-flex flex-column align-items-center mb-3">
                                         <label htmlFor="groupImage" className="form-label">Group Image</label>
@@ -469,7 +531,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                                 src={groupImagePreview}
                                                 alt="Group Preview"
                                                 className={"rounded-circle"}
-                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                                style={{width: '100px', height: '100px', objectFit: 'cover'}}
                                                 onClick={() => document.getElementById('groupImageInput').click()}
                                             />
                                         ) : (
@@ -482,7 +544,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                             type="file"
                                             accept="image/*"
                                             id="groupImageInput"
-                                            style={{ display: 'none' }}
+                                            style={{display: 'none'}}
                                             onChange={handleGroupImageChange}
                                         />
                                     </div>
@@ -610,6 +672,41 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                     placeholder="Enter your name"
                                 />
                             </div>
+
+                            {/*<div className="my-4">*/}
+                            {/*    <input*/}
+                            {/*        id="phone"*/}
+                            {/*        type="text"*/}
+                            {/*        value={phone}*/}
+                            {/*        onChange={(e) => setPhone(e.target.value)}*/}
+                            {/*        className="block w-full p-2 border border-gray-300 rounded-md text-center"*/}
+                            {/*        placeholder="Enter your phone number"*/}
+                            {/*    />*/}
+                            {/*</div>*/}
+                            {/*<div className="my-4">*/}
+                            {/*    <select*/}
+                            {/*        id="gender"*/}
+                            {/*        value={gender}*/}
+                            {/*        onChange={(e) => setGender(e.target.value)}*/}
+                            {/*        className="block w-full p-2 border border-gray-300 rounded-md text-center"*/}
+                            {/*    >*/}
+                            {/*        <option value="">Select gender</option>*/}
+                            {/*        <option value="male">Male</option>*/}
+                            {/*        <option value="female">Female</option>*/}
+                            {/*        <option value="other">Other</option>*/}
+                            {/*    </select>*/}
+                            {/*</div>*/}
+                            {/*<div className="my-4">*/}
+                            {/*    <input*/}
+                            {/*        id="birthdate"*/}
+                            {/*        type="date"*/}
+                            {/*        value={birthdate}*/}
+                            {/*        onChange={(e) => setBirthdate(e.target.value)}*/}
+                            {/*        className="block w-full p-2 border border-gray-300 rounded-md text-center"*/}
+                            {/*        placeholder="Enter your birthdate"*/}
+                            {/*    />*/}
+                            {/*</div>*/}
+
                             <div style={{ textAlign: 'right' }}>
                                 <button
                                     type="submit"
@@ -618,10 +715,10 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                     Save
                                 </button>
                             </div>
-
                         </form>
                     </div>
                 </div>
+
             }
 
         </div>
