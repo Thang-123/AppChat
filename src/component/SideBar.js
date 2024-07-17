@@ -426,7 +426,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                         </SearchInputContainer>
                         <div className="d-flex justify-content-center gap-1">
 
-                            <button className="btn btn-link text-dark p-2" onClick={handleOpenNewMessageModal}>
+                            <button className="btn btn-link p-2 text-decoration-none" onClick={handleOpenNewMessageModal}>
                                 <FaPlus  className="me-2"/>
                                 New Message
                             </button>
