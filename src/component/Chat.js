@@ -47,8 +47,8 @@ const Chat = () => {
             handleError(data.mes, 3000)
             return;
         }
-        handleSuccess("Failed to join Room: "+data.mes, 3000)
-        handleGetUserList("Join Room Success")
+        handleSuccess("Join Room Success: ", 3000)
+        handleGetUserList()
     };
 
     const handleLogoutResponse = (data) => {
@@ -136,7 +136,10 @@ const Chat = () => {
 
             dispatch(addMessage([...messages, newMessage]));
         }
+        //Có tin nhan moi thi goi lai ham de cap nhat tin nhan
+
         fetchLatestMessages()
+        fetchUserMessages()
         showToastMessage('New Message', `From: ${name}, To: ${to}, Message: ${mes}`, 'info', 10000);
     };
 
@@ -212,7 +215,7 @@ const Chat = () => {
             console.error('Invalid user object:', user);
             return;
         }
-
+        setNewMessages("")
         if (selectedUser && selectedUser.name === user.name) return;
         console.log('Clicked User:', user);
         setSelectedUser(user);
@@ -383,6 +386,8 @@ const Chat = () => {
     const showToastMessage = (title, message, type = 'success', duration) => {
         setToastProps({ title, message, type, duration });
         setShowToast(true);
+        handleGetUserList()
+        setSelectedUser("")
     };
 
     return (

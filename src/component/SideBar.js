@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { IoChatbubbleEllipses } from 'react-icons/io5';
-import {FaUserCircle, FaUserFriends, FaUsers} from 'react-icons/fa';
+import {FaPlus, FaUserCircle, FaUserFriends, FaUsers} from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
 import { FiArrowUpLeft, FiSettings } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -238,6 +238,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
     const handleCloseCreateGroupModal = () => {
         setShowCreateGroupModal(false);
         setGroupImagePreview("");
+        setName("")
     };
 
     const handleOpenNewMessageModal = () => {
@@ -246,6 +247,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
 
     const handleCloseNewMessageModal = () => {
         setShowNewMessageModal(false);
+        setUserName("")
     };
 
     const handleUserNameChange = (e) => {
@@ -253,6 +255,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
     };
     const handleSendHello = () => {
         sendMes("Hello", userName)
+        setShowNewMessageModal(false)
     }
     const handleOpenJoinGroupModal = () => {
         setShowJoinGroupModal(true);
@@ -260,6 +263,7 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
 
     const handleCloseJoinGroupModal = () => {
         setShowJoinGroupModal(false);
+        setGroupName("")
     };
 
     const handleGroupNameChange = (e) => {
@@ -345,7 +349,9 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
 
     const handleProfileClick = () => {
         setShowDropdown(false);
-        //open profile modal
+         setOpenSetting(true)
+        setOpenChat(false)
+        setOpenGroup(false)
         setActiveIcon('settings');
     };
     return (
@@ -418,9 +424,10 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                 readOnly
                             />
                         </SearchInputContainer>
-                        <div className="d-flex align-items-center gap-1">
+                        <div className="d-flex justify-content-center gap-1">
 
                             <button className="btn btn-link text-dark p-2" onClick={handleOpenNewMessageModal}>
+                                <FaPlus  className="me-2"/>
                                 New Message
                             </button>
                             <Modal show={showNewMessageModal} onHide={handleCloseNewMessageModal}>
@@ -665,41 +672,41 @@ const Sidebar = ({ newMessage, onUserClick, onLogout, users, groups, onCreateRoo
                                     placeholder="Enter your name"
                                 />
                             </div>
-                            {/* Các trường mới */}
-                            <div className="my-4">
-                                <input
-                                    id="phone"
-                                    type="text"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    className="block w-full p-2 border border-gray-300 rounded-md text-center"
-                                    placeholder="Enter your phone number"
-                                />
-                            </div>
-                            <div className="my-4">
-                                <select
-                                    id="gender"
-                                    value={gender}
-                                    onChange={(e) => setGender(e.target.value)}
-                                    className="block w-full p-2 border border-gray-300 rounded-md text-center"
-                                >
-                                    <option value="">Select gender</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div className="my-4">
-                                <input
-                                    id="birthdate"
-                                    type="date"
-                                    value={birthdate}
-                                    onChange={(e) => setBirthdate(e.target.value)}
-                                    className="block w-full p-2 border border-gray-300 rounded-md text-center"
-                                    placeholder="Enter your birthdate"
-                                />
-                            </div>
-                            {/* Kết thúc các trường mới */}
+
+                            {/*<div className="my-4">*/}
+                            {/*    <input*/}
+                            {/*        id="phone"*/}
+                            {/*        type="text"*/}
+                            {/*        value={phone}*/}
+                            {/*        onChange={(e) => setPhone(e.target.value)}*/}
+                            {/*        className="block w-full p-2 border border-gray-300 rounded-md text-center"*/}
+                            {/*        placeholder="Enter your phone number"*/}
+                            {/*    />*/}
+                            {/*</div>*/}
+                            {/*<div className="my-4">*/}
+                            {/*    <select*/}
+                            {/*        id="gender"*/}
+                            {/*        value={gender}*/}
+                            {/*        onChange={(e) => setGender(e.target.value)}*/}
+                            {/*        className="block w-full p-2 border border-gray-300 rounded-md text-center"*/}
+                            {/*    >*/}
+                            {/*        <option value="">Select gender</option>*/}
+                            {/*        <option value="male">Male</option>*/}
+                            {/*        <option value="female">Female</option>*/}
+                            {/*        <option value="other">Other</option>*/}
+                            {/*    </select>*/}
+                            {/*</div>*/}
+                            {/*<div className="my-4">*/}
+                            {/*    <input*/}
+                            {/*        id="birthdate"*/}
+                            {/*        type="date"*/}
+                            {/*        value={birthdate}*/}
+                            {/*        onChange={(e) => setBirthdate(e.target.value)}*/}
+                            {/*        className="block w-full p-2 border border-gray-300 rounded-md text-center"*/}
+                            {/*        placeholder="Enter your birthdate"*/}
+                            {/*    />*/}
+                            {/*</div>*/}
+
                             <div style={{ textAlign: 'right' }}>
                                 <button
                                     type="submit"
