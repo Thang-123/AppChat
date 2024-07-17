@@ -228,27 +228,29 @@ const MessageComponent = ({ isActive,selectedUser, onClose , messages, onSendMes
                     </div>
                 </div>
                 <div className="d-flex align-items-center gap-3">
+                    {/* Video call icon */}
+                    <button className="btn btn-link p-2 c">
+                        <FaVideo size={20}/>
+                    </button>
 
-                    {/*<button className="btn btn-link text-dark p-2 c">*/}
-                    {/*    <FaVideo size={20}/>*/}
-                    {/*</button>*/}
+                    {/* Phone call icon */}
+                    <button className="btn btn-link p-2">
+                        <FaPhone size={20}/>
+                    </button>
 
-                    {/*<button className="btn btn-link text-dark p-2">*/}
-                    {/*    <FaPhone size={20}/>*/}
-                    {/*</button>*/}
-
-                    {/*<button className="btn btn-link text-dark p-2">*/}
-                    {/*    <FaSearch size={20}/>*/}
-                    {/*</button>*/}
-
-                    <button className="btn btn-link text-dark p-2"
+                    {/* Search icon */}
+                    <button className="btn btn-link p-2">
+                        <FaSearch size={20}/>
+                    </button>
+                    {/* More Icon */}
+                    <button className="btn btn-link p-2"
                             onClick={() => handleMoreInfo('info')}
                             active={activeIcon === 'info' ? "true" : "false"}
                             title="Informations">
                         <HiDotsVertical size={20}/>
                     </button>
-
-                    <button className="btn btn-link text-dark p-2"  onClick={onClose}>
+                    {/* Close Icon */}
+                    <button className="btn btn-link p-2"  onClick={onClose}>
                         <IoClose size={20}/>
                     </button>
                 </div>
